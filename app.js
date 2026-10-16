@@ -104,7 +104,8 @@
     { id: 'components', icon: 'cog', en: 'Components & Items', pt: 'Componentes e Itens' },
     { id: 'ammo', icon: 'target', en: 'Ammunition', pt: 'Munição' },
     { id: 'food-medical', icon: 'apple', en: 'Food & Medical', pt: 'Comida e Medicamentos' },
-    { id: 'armor-clothing', icon: 'shield', en: 'Armor & Clothing', pt: 'Armadura e Roupas' },
+    { id: 'armor-clothing', icon: 'shield', en: 'Armor', pt: 'Armaduras' },
+    { id: 'clothing', icon: 'user', en: 'Clothing', pt: 'Roupas' },
     { id: 'building', icon: 'building', en: 'Base Building', pt: 'Construção de Bases' },
     { id: 'constructions', icon: 'hammer', en: 'Constructions', pt: 'Construções' },
   ];
