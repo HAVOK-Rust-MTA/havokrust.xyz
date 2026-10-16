@@ -41,7 +41,13 @@
       store_get: 'Get on Discord', cmp_xp: 'XP boost', cmp_slot: 'Reserved slot', cmp_beds: 'Sleeping bags', cmp_bedtime: 'Sleeping bag cooldown', cmp_tools: 'Hatchet + pickaxe on respawn', cmp_craft: 'Crafting cost',
       store_base_note: '* Normal players unlock up to 50 pieces as they level up (15 + level). Veteran gets 50 right away, Legendary 65. You always need a Wardrobe.',
       store_cta: 'Get VIP on Discord', store_fine: 'Open a ticket on our Discord to buy. Type /vip in game to see how much time you have left. Being VIP does not exempt anyone from the rules.',
-      discord: 'Discord', featured: 'Tutorial #1 — HUD & interface',
+      discord: 'Discord', featured: 'Tutorial #1 — HUD & interface', nav_home: 'Home',
+      l_h1a: 'SURVIVE.', l_h1b: 'BUILD.', l_h1c: 'RAID.', l_sub: 'Rust survival on the streets of San Andreas. Wake up with nothing, farm, craft, build your base and fight for everything you own.',
+      l_play: 'Play now', l_wiki: 'Open the wiki', l_feat: 'What awaits you', l_new: 'New to the server?', l_new_sub: 'Your first 10 minutes, step by step: from waking up with nothing to your first safe box.',
+      l_new_btn: 'Read the starter guide', l_steps: ['Break barrels and hit trees and rocks', 'Craft a hatchet and a pickaxe', 'Build a small house with a Wardrobe inside'],
+      l_media: 'See the game', l_news: 'News', l_social: 'Follow HAVOK', l_social_sub: 'Clips, updates and events first-hand.', l_all_news: 'Show older news',
+      tags: { new: 'New', fix: 'Fix', balance: 'Balance', event: 'Event' },
+      feats: [['pickaxe', 'Farm', 'Trees, rocks and ore nodes all over the map.', 'resource-gathering'], ['hammer', 'Craft', 'Over 100 recipes, blueprints and a research table.', 'loot-crafting-and-blueprints'], ['building', 'Build', 'Bases piece by piece, upgraded from twig to armored.', 'base-building'], ['crosshair', 'Raid', 'C4, rockets and sentries. Nothing is safe offline.', 'combat-raiding-and-recovery'], ['users', 'Groups', 'Up to 8 friends with a tag, emblem and ranking.', 'teams-and-groups'], ['map', 'Events', 'Airdrops, a patrol helicopter, radiation and a military base.', 'world-and-events']],
       media_title: 'Media checklist', media_desc: 'Every video and screenshot the guides are waiting for. Drop the file in media/ with the exact name.',
     },
     pt: {
@@ -74,7 +80,13 @@
       store_get: 'Pegar no Discord', cmp_xp: 'Bônus de XP', cmp_slot: 'Vaga reservada', cmp_beds: 'Camas (sleeping bags)', cmp_bedtime: 'Espera da cama', cmp_tools: 'Machado + picareta ao nascer', cmp_craft: 'Custo de craft',
       store_base_note: '* Jogador comum libera até 50 peças subindo de level (15 + level). Veteran já começa com 50, Legendary com 65. O Armário é sempre obrigatório.',
       store_cta: 'Pegar VIP no Discord', store_fine: 'Abra um ticket no nosso Discord para comprar. Digite /vip no jogo para ver quanto tempo falta. Ser VIP não livra ninguém das regras.',
-      discord: 'Discord', featured: 'Tutorial #1 — HUD e interface',
+      discord: 'Discord', featured: 'Tutorial #1 — HUD e interface', nav_home: 'Início',
+      l_h1a: 'SOBREVIVA.', l_h1b: 'CONSTRUA.', l_h1c: 'RAIDE.', l_sub: 'Sobrevivência no estilo Rust nas ruas de San Andreas. Acorde sem nada, farme, crafte, construa sua base e lute por tudo que é seu.',
+      l_play: 'Jogar agora', l_wiki: 'Abrir a wiki', l_feat: 'O que te espera', l_new: 'Novo no servidor?', l_new_sub: 'Seus primeiros 10 minutos, passo a passo: de acordar sem nada até a sua primeira caixa segura.',
+      l_new_btn: 'Ler o guia inicial', l_steps: ['Quebre barris e bata em árvores e pedras', 'Crafte um machado e uma picareta', 'Faça uma casinha com um Armário dentro'],
+      l_media: 'Veja o jogo', l_news: 'Novidades', l_social: 'Siga o HAVOK', l_social_sub: 'Clipes, atualizações e eventos em primeira mão.', l_all_news: 'Ver novidades antigas',
+      tags: { new: 'Novo', fix: 'Correção', balance: 'Ajuste', event: 'Evento' },
+      feats: [['pickaxe', 'Farme', 'Árvores, pedras e minérios pelo mapa inteiro.', 'resource-gathering'], ['hammer', 'Crafte', 'Mais de 100 receitas, blueprints e mesa de pesquisa.', 'loot-crafting-and-blueprints'], ['building', 'Construa', 'Bases peça por peça, do palito ao blindado.', 'base-building'], ['crosshair', 'Raide', 'C4, foguetes e sentinelas. Nada fica seguro offline.', 'combat-raiding-and-recovery'], ['users', 'Grupos', 'Até 8 amigos com tag, emblema e ranking.', 'teams-and-groups'], ['map', 'Eventos', 'Airdrops, helicóptero de patrulha, radiação e base militar.', 'world-and-events']],
       media_title: 'Checklist de mídias', media_desc: 'Todos os vídeos e prints que os guias estão esperando. Coloque o arquivo em media/ com o nome exato.',
     },
   };
@@ -100,7 +112,7 @@
     'Primary Weapon': ['Primary Weapon', 'Arma Primária'], 'Secondary Weapon': ['Secondary Weapon', 'Arma Secundária'], Explosive: ['Explosive', 'Explosivo'],
     Tool: ['Tool', 'Ferramenta'], Resource: ['Resource', 'Recurso'], Item: ['Component', 'Componente'], Ammo: ['Ammo', 'Munição'], Food: ['Food', 'Comida'],
     'Raw Food': ['Raw Food', 'Comida Crua'], Drink: ['Drink', 'Bebida'], Medicament: ['Medical', 'Medicamento'], 'Empty Can': ['Empty Can', 'Lata Vazia'],
-    Helmet: ['Helmet', 'Capacete'], Vest: ['Vest', 'Colete'], Hazmat: ['Hazmat', 'Hazmat'], 'Base Object': ['Base Object', 'Estrutura de Base'],
+    Helmet: ['Helmet', 'Capacete'], Vest: ['Vest', 'Colete'], Hazmat: ['Hazmat', 'Hazmat'], Shirt: ['Shirt', 'Camisa'], Pants: ['Pants', 'Calça'], Shoes: ['Shoes', 'Calçado'], Hat: ['Hat', 'Chapéu'], 'Base Object': ['Base Object', 'Estrutura de Base'],
     Construction: ['Construction', 'Construção'], 'Vehicle Part': ['Vehicle Part', 'Peça de Veículo'],
   };
   const typeName = (ty) => (TYPES[ty] ? TYPES[ty][lang === 'pt' ? 1 : 0] : ty);
@@ -152,6 +164,10 @@
     bag: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>',
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    youtube: '<path d="M22 8.6c-.2-1.6-1-2.7-2.7-2.9C16.9 5.4 12 5.4 12 5.4s-4.9 0-7.3.3C3 5.9 2.2 7 2 8.6 1.8 10 1.8 12 1.8 12s0 2 .2 3.4c.2 1.6 1 2.7 2.7 2.9 2.4.3 7.3.3 7.3.3s4.9 0 7.3-.3c1.7-.2 2.5-1.3 2.7-2.9.2-1.4.2-3.4.2-3.4s0-2-.2-3.4Z"/><path d="m10 15 5-3-5-3Z"/>',
+    tiktok: '<path d="M16 3c.4 2.6 2 4.2 4.5 4.4v3.2c-1.6 0-3.1-.5-4.5-1.4V15a6 6 0 1 1-6-6v3.3A2.7 2.7 0 1 0 12.7 15V3Z"/>',
+    instagram: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
+    play: '<path d="M7 4v16l13-8Z"/>',
     discord: '<path d="M8 12h.01M16 12h.01M7.5 7.5c3-1 6-1 9 0M7 16.5c3.3 1.3 6.7 1.3 10 0M15.5 17l1 2c2-.6 3.9-1.6 5.5-3 .4-4.6-.8-8.6-3-12-1.3-.6-2.7-1-4-1.3L14.5 4M8.5 17l-1 2c-2-.6-3.9-1.6-5.5-3-.4-4.6.8-8.6 3-12 1.3-.6 2.7-1 4-1.3L9.5 4"/>',
   };
   const svg = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${P[n] || P.box}</svg>`;
@@ -196,6 +212,8 @@
         ${W.guides.map((g) => a('#/guides/' + g.slug, g.icon, L(g).title)).join('')}
       </div>
       <div class="nav-group"><h5>HAVOK</h5>
+        ${a('#/', 'rocket', t('nav_home'))}
+        ${a('#/wiki', 'book', 'Wiki')}
         ${a('#/badges', 'award', t('nav_badges'))}
         ${a('#/store', 'crown', t('nav_store'))}
         <a href="${esc((window.HAVOK || {}).discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>Discord ↗</span></a>
@@ -213,7 +231,7 @@
   }
   function pageHome() {
     const count = (id) => W.items.filter((i) => i.cat === id).length;
-    return `${crumbs([['Wiki', '#/']])}
+    return `${crumbs([['Wiki', '#/wiki']])}
       <h1 class="page-title">${t('wiki_title')}</h1><p class="page-sub">${t('wiki_sub')}</p>
       ${featuredVideo()}
       <div class="section-title">${t('categories')}</div>
@@ -235,7 +253,7 @@
     const base = W.items.filter((i) => !catId || i.cat === catId);
     const types = [...new Set(base.map((i) => i.type))];
     const title = cat ? cat[lang] : t('items_title');
-    const html = `${crumbs(cat ? [['Wiki', '#/'], [t('items_title'), '#/items'], [title]] : [['Wiki', '#/'], [title]])}
+    const html = `${crumbs(cat ? [['Wiki', '#/wiki'], [t('items_title'), '#/items'], [title]] : [['Wiki', '#/wiki'], [title]])}
       <h1 class="page-title">${esc(title)}</h1><p class="page-sub">${t('items_desc')}</p>
       <div class="filters">
         <input type="search" id="fq" placeholder="${t('search')}" value="${esc(filt.q)}">
@@ -318,7 +336,7 @@
 
     const related = W.items.filter((x) => x.id !== it.id && x.type === it.type && (!it.piece || x.piece === it.piece || x.tier === it.tier)).sort(sortByName).slice(0, 6);
 
-    return `${crumbs([['Wiki', '#/'], [cat ? cat[lang] : t('items_title'), cat ? '#/category/' + cat.id : '#/items'], [name(it)]])}
+    return `${crumbs([['Wiki', '#/wiki'], [cat ? cat[lang] : t('items_title'), cat ? '#/category/' + cat.id : '#/items'], [name(it)]])}
       <div class="item-head">${iconOf(it)}<div><h1>${esc(name(it))}</h1><div class="badges">${badges.join('')}</div><p>${esc(L(it.desc))}</p></div></div>
       <div class="cols"><div>${left.join('') || ''}</div><div style="margin-top:34px">${right.join('')}</div></div>
       ${related.length ? `<div class="section-title" style="margin-top:44px">${t('related')}</div><div class="item-grid">${related.map(itemCard).join('')}</div>` : ''}`;
@@ -389,14 +407,14 @@
   }
 
   function pageGuides() {
-    return `${crumbs([['Wiki', '#/'], [t('guides')]])}<h1 class="page-title">${t('guides')}</h1><p class="page-sub">${t('guides_desc')}</p>
+    return `${crumbs([['Wiki', '#/wiki'], [t('guides')]])}<h1 class="page-title">${t('guides')}</h1><p class="page-sub">${t('guides_desc')}</p>
       <div class="grid">${W.guides.map((g) => `<a class="tile tall" href="#/guides/${g.slug}"><span class="tile-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}</div>`;
   }
   function pageGuide(slug) {
     const i = W.guides.findIndex((g) => g.slug === slug);
     if (i < 0) return `<div class="empty-state">404</div>`;
     const g = W.guides[i], c = L(g), prev = W.guides[i - 1], next = W.guides[i + 1];
-    return `${crumbs([['Wiki', '#/'], [t('guides'), '#/guides'], [c.title]])}
+    return `${crumbs([['Wiki', '#/wiki'], [t('guides'), '#/guides'], [c.title]])}
       <h1 class="page-title">${esc(c.title)}</h1><p class="page-sub">${esc(c.description)}</p>
       <article class="prose">${md(c.body)}</article>
       <div class="pager">${prev ? `<a href="#/guides/${prev.slug}"><small>${t('prev')}</small><b>${esc(L(prev).title)}</b></a>` : '<span></span>'}
@@ -404,11 +422,11 @@
   }
   function pageFaq() {
     const list = W.faq[lang] || W.faq.en;
-    return `${crumbs([['Wiki', '#/'], ['FAQ']])}<h1 class="page-title">FAQ</h1><p class="page-sub">${t('faq_desc')}</p>
+    return `${crumbs([['Wiki', '#/wiki'], ['FAQ']])}<h1 class="page-title">FAQ</h1><p class="page-sub">${t('faq_desc')}</p>
       <div class="faq">${list.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>`;
   }
   function pageMedia() {
-    return `${crumbs([['Wiki', '#/'], [t('media_title')]])}<h1 class="page-title">${t('media_title')}</h1><p class="page-sub">${t('media_desc')}</p>
+    return `${crumbs([['Wiki', '#/wiki'], [t('media_title')]])}<h1 class="page-title">${t('media_title')}</h1><p class="page-sub">${t('media_desc')}</p>
       <div class="box">${W.media.map((m) => `<div class="obtain">${svg(m.kind === 'video' ? 'video' : 'image')}<code>media/${m.id}.${m.kind === 'video' ? 'mp4' : 'webp'}</code><span class="muted">— ${esc(m.caption)}</span><a href="#/guides/${m.guide}" style="margin-left:auto" class="muted">${esc(m.guide)}</a></div>`).join('')}</div>`;
   }
 
@@ -515,6 +533,72 @@
       <p class="fine">${t('store_fine')}</p>`;
   }
 
+  // ---------------------------------------------------------------- home (landing)
+  const LANDING_MEDIA = [['spawn', 'spawn'], ['gather-tools', 'resource-gathering'], ['first-house', 'base-building'], ['vehicles', 'world-and-events'], ['build-wheel', 'base-building'], ['upgrade', 'base-building']];
+  const fmtDate = (d) => { const [y, m, dd] = d.split('-'); return lang === 'pt' ? `${dd}/${m}/${y}` : `${m}/${dd}/${y}`; };
+  let newsAll = false;
+  function pageLanding() {
+    const H = window.HAVOK || {};
+    const so = Object.assign({ discord: H.discord }, H.socials || {});
+    const caption = (id) => (W.media.find((m) => m.id === id) || {}).caption || '';
+    const loop = (id) => `<video autoplay muted loop playsinline preload="metadata" poster="" aria-label="${esc(caption(id))}"><source src="media/${id}.webm" type="video/webm"><source src="media/${id}.mp4" type="video/mp4"></video>`;
+    const news = (window.HAVOK_NEWS || []);
+    const shown = newsAll ? news : news.slice(0, 2);
+    setTimeout(() => {
+      // os vídeos da galeria só tocam quando aparecem na tela (economiza banda e CPU)
+      const vids = document.querySelectorAll('.l-gallery video');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause())), { threshold: 0.25 });
+        vids.forEach((v) => { v.removeAttribute('autoplay'); v.pause(); io.observe(v); });
+      }
+      const more = $('#newsMore');
+      if (more) more.onclick = () => { newsAll = true; route(); };
+    });
+    return `<section class="l-hero">
+        <video class="l-hero-bg" autoplay muted loop playsinline preload="auto" poster="media/hero.webp" aria-hidden="true"><source src="media/hero.webm" type="video/webm"><source src="media/hero.mp4" type="video/mp4"></video>
+        <div class="l-hero-in">
+          <img class="l-logo" src="logo-text.png" alt="HAVOK">
+          <h1 class="l-h1"><span>${t('l_h1a')}</span> <span>${t('l_h1b')}</span> <span class="hot">${t('l_h1c')}</span></h1>
+          <p class="l-sub">${t('l_sub')}</p>
+          <div class="l-cta">
+            <a class="l-btn primary" href="play/">${svg('play')} ${t('l_play')}</a>
+            <a class="l-btn discord" href="${esc(so.discord || '#')}" target="_blank" rel="noopener">${svg('discord')} Discord</a>
+            <a class="l-btn" href="#/wiki">${svg('book')} ${t('l_wiki')}</a>
+          </div>
+        </div>
+        <div class="l-scroll" aria-hidden="true"></div>
+      </section>
+      <div class="l-body">
+        <div class="section-title">${t('l_feat')}</div>
+        <div class="l-feats">${T[lang].feats.map((f) => `<a class="l-feat" href="#/guides/${f[3]}"><span class="tile-ic">${svg(f[0])}</span><b>${esc(f[1])}</b><small>${esc(f[2])}</small></a>`).join('')}</div>
+
+        <div class="l-new">
+          <div class="l-new-txt">
+            <h2>${t('l_new')}</h2>
+            <p>${t('l_new_sub')}</p>
+            <ol>${T[lang].l_steps.map((x) => `<li>${esc(x)}</li>`).join('')}</ol>
+            <a class="l-btn primary" href="#/guides/getting-started">${svg('rocket')} ${t('l_new_btn')}</a>
+          </div>
+          <div class="l-new-media">${loop('hud')}</div>
+        </div>
+
+        <div class="section-title">${t('l_media')}</div>
+        <div class="l-gallery">${LANDING_MEDIA.map(([id, g]) => `<a href="#/guides/${g}" class="l-shot">${loop(id)}<span>${esc(caption(id))}</span></a>`).join('')}</div>
+
+        <div class="section-title">${t('l_news')}</div>
+        <div class="l-news">${shown.map((n) => `<article class="l-post">
+            <header><time datetime="${n.date}">${fmtDate(n.date)}</time><h3>${esc(n.title[lang] || n.title.en)}</h3></header>
+            <ul>${n.items.map((i) => `<li><span class="tag ${i.tag}">${esc(T[lang].tags[i.tag] || i.tag)}</span><span>${esc(i[lang] || i.en)}</span></li>`).join('')}</ul>
+          </article>`).join('')}
+          ${news.length > shown.length ? `<button class="l-more" id="newsMore">${t('l_all_news')}</button>` : ''}</div>
+
+        <div class="l-social">
+          <div><h2>${t('l_social')}</h2><p>${t('l_social_sub')}</p></div>
+          <div class="l-social-links">${[['discord', 'Discord'], ['youtube', 'YouTube'], ['tiktok', 'TikTok'], ['instagram', 'Instagram']].filter(([k]) => so[k]).map(([k, n]) => `<a class="l-soc ${k}" href="${esc(so[k])}" target="_blank" rel="noopener">${svg(k)}<span>${n}</span></a>`).join('')}</div>
+        </div>
+      </div>`;
+  }
+
   // ---------------------------------------------------------------- plano de mídias + roteiro de teste
   // Página de trabalho da equipe (fora do menu): lê o MIDIAS.md, então editar o arquivo atualiza a página.
   // "- [ ] tarefa" vira uma caixinha; o que foi marcado fica salvo só neste navegador.
@@ -546,7 +630,7 @@
         };
       });
     });
-    return `${crumbs([['Wiki', '#/'], ['Plano']])}<div id="plan" class="prose plan"><p class="muted">Carregando...</p></div>`;
+    return `${crumbs([['Wiki', '#/wiki'], ['Plano']])}<div id="plan" class="prose plan"><p class="muted">Carregando...</p></div>`;
   }
 
   // ---------------------------------------------------------------- router
@@ -554,7 +638,10 @@
     const h = (location.hash || '#/').slice(1) || '/';
     const parts = h.split('/').filter(Boolean);
     let html;
-    if (!parts.length) html = pageHome();
+    const landing = !parts.length;
+    document.body.classList.toggle('landing', landing);
+    if (landing) html = pageLanding();
+    else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
     else if (parts[0] === 'items') html = pageList(null);
     else if (parts[0] === 'category') html = pageList(parts[1]);
@@ -569,9 +656,9 @@
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (['badges', 'store'].includes(parts[0]) ? parts[0] : 'wiki')));
+    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['badges', 'store'].includes(parts[0]) ? parts[0] : 'wiki')));
     const it = parts[0] === 'items' && byId[parts[1]];
-    document.title = (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
+    document.title = landing ? 'HAVOK — Rust Survival' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);
   }
 

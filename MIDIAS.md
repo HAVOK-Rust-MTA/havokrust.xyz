@@ -30,6 +30,10 @@ Os 30 CLIPs (formato vertical de TikTok) **não servem bem**: o jogo fica numa f
 
 ---
 
+**Para melhorar depois:** alguns vídeos já no site batem com a descrição, mas dá para trocar por cenas melhores (mais claras, mais focadas no assunto) quando tiver gravação nova.
+
+---
+
 ## 2. Print + motion (telas — é aqui que o motion faz diferença)
 
 | Mídia | O que mostrar | Como chegar na tela |

@@ -4,6 +4,12 @@ window.HAVOK = {
   discord: 'https://discord.gg/caVytDM',
   // endereço do servidor MTA para a página /play (ex.: '203.0.113.10:22003'). Vazio = página sem o botão.
   server: '',
+  // redes sociais da home (vazio = escondido)
+  socials: {
+    youtube: 'https://www.youtube.com/@havokrust',
+    tiktok: '',
+    instagram: '',
+  },
 
   // vídeos do YouTube por nome (o mesmo nome da lista de mídias). Pode colar o link inteiro.
   // ex.: spawn: 'https://youtu.be/XXXXXXXXXXX',
