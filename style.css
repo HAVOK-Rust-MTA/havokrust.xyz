@@ -369,3 +369,11 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .compare.wide { max-width: none; min-width: 620px; }
 .compare.wide .crow { grid-template-columns: 1.6fr repeat(4, 1fr); }
 @media (max-width: 900px) { .tiers { grid-template-columns: 1fr; } .tier-sub { min-height: 0; } }
+
+/* plano de mídias / roteiro de teste */
+.plan h1.page-title { margin-bottom: 18px; }
+.plan-hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+.plan li.check { list-style: none; margin-left: -22px; }
+.plan li.check label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; padding: 4px 0; }
+.plan li.check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: none; }
+.plan li.check input:checked + span { color: var(--dim); text-decoration: line-through; }

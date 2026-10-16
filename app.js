@@ -515,6 +515,40 @@
       <p class="fine">${t('store_fine')}</p>`;
   }
 
+  // ---------------------------------------------------------------- plano de mídias + roteiro de teste
+  // Página de trabalho da equipe (fora do menu): lê o MIDIAS.md, então editar o arquivo atualiza a página.
+  // "- [ ] tarefa" vira uma caixinha; o que foi marcado fica salvo só neste navegador.
+  function pagePlan() {
+    setTimeout(async () => {
+      const box = $('#plan');
+      if (!box) return;
+      let src = '';
+      try {
+        const r = await fetch('MIDIAS.md', { cache: 'no-cache' });
+        src = r.ok ? await r.text() : '';
+      } catch (e) { src = ''; }
+      if (!src) { box.innerHTML = '<p class="muted">Não consegui carregar o MIDIAS.md.</p>'; return; }
+      const title = (src.match(/^# (.+)$/m) || [])[1] || 'Plano';
+      src = src.replace(/^# .+$/m, '').replace(/^---$/gm, '@@HR@@');
+      box.innerHTML = `<h1 class="page-title">${esc(title)}</h1>` + md(src).replace(/<p>@@HR@@<\/p>/g, '<hr class="plan-hr">');
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem('havok:plan') || '{}'); } catch (e) { saved = {}; }
+      box.querySelectorAll('li').forEach((li) => {
+        const m = li.innerHTML.match(/^\[( |x)\] ?([\s\S]*)$/i);
+        if (!m) return;
+        const key = li.textContent.replace(/^\[( |x)\] ?/i, '').trim();
+        const done = key in saved ? saved[key] : m[1].toLowerCase() === 'x';
+        li.classList.add('check');
+        li.innerHTML = `<label><input type="checkbox" ${done ? 'checked' : ''}><span>${m[2]}</span></label>`;
+        li.querySelector('input').onchange = (e) => {
+          saved[key] = e.target.checked;
+          try { localStorage.setItem('havok:plan', JSON.stringify(saved)); } catch (err) { /* sem storage: só não lembra */ }
+        };
+      });
+    });
+    return `${crumbs([['Wiki', '#/'], ['Plano']])}<div id="plan" class="prose plan"><p class="muted">Carregando...</p></div>`;
+  }
+
   // ---------------------------------------------------------------- router
   function route() {
     const h = (location.hash || '#/').slice(1) || '/';
@@ -528,6 +562,7 @@
     else if (parts[0] === 'guides') html = pageGuides();
     else if (parts[0] === 'faq') html = pageFaq();
     else if (parts[0] === 'media') html = pageMedia();
+    else if (parts[0] === 'plano' || parts[0] === 'plan') html = pagePlan();
     else if (parts[0] === 'badges') html = pageBadges();
     else if (parts[0] === 'store') html = pageStore();
     else html = pageHome();
