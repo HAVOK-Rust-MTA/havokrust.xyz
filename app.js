@@ -19,7 +19,7 @@
       faq_desc: 'Quick answers to the most common questions about progression, survival, and support.',
       guides_desc: 'Practical guides for progression, farming, loot, crafting, building, and combat.',
       weapon_stats: 'Weapon Stats', damage: 'Base damage', damage_hint: '% of max health', range: 'Range', mag: 'Magazine Size', ammo: 'Ammunition',
-      recipe: 'Crafting Recipe', receive: 'You receive', anywhere: 'Anywhere', needs_bench: 'At a Workbench', level: 'Level {n}', vip_level: 'VIP: Level {n}',
+      recipe: 'Crafting Recipe', receive: 'You receive', anywhere: 'Anywhere', needs_bench: 'At a Workbench', level: 'Level {n}', vip_level: 'Legendary: Level {n}',
       properties: 'Properties', type: 'Type', stack: 'Max Stack', bench_req: 'Workbench Required', yes: 'Yes', no: 'No', level_req: 'Level Required',
       blueprint: 'Blueprint', bp_cost: '{n} Scrap', bp_loot: 'Loot only', health: 'Health', slots: 'Storage Slots', limit: 'Placement Limit', upgrade: 'Upgrades To',
       how_obtain: 'How To Obtain', obtain_craft: 'Can be crafted', obtain_furnace: 'Smelting / Cooking', obtain_recycler: 'Recycling other items',
@@ -31,13 +31,17 @@
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
       nav_badges: 'Badges', nav_store: 'Store', badges_desc: 'Collectible badges earned through gameplay, community contributions, and special events.',
       all_categories: 'All categories', all_rarities: 'All rarities', showing_badges: 'Showing {n} of {t} badges',
-      store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Bigger backpack, bigger base, half the upkeep and a golden name — support HAVOK and survive in style.',
+      store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
       store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Day, month or permanent',
       store_perks: 'Everything you get', store_compare: 'Compare', perk: 'Perk', player: 'Player', store_plans: 'Plans',
-      cmp_inv: 'Inventory slots', cmp_base: 'Base piece limit', cmp_upkeep: 'Upkeep cost', cmp_lvl: 'Level required', cmp_respawn: 'Choose respawn region', cmp_name: 'Golden name',
+      cmp_inv: 'Inventory slots', cmp_base: 'Base piece limit', cmp_upkeep: 'Upkeep cost', cmp_respawn: 'Choose respawn region',
       plan_day: 'Days', plan_day_d: 'Try it out — from 1 day.', plan_month: 'Months', plan_month_d: 'The best value for regular players.', plan_perm: 'Permanent', plan_perm_d: 'VIP forever, no renewals.', popular: 'Most popular',
+      tier_survivor: 'Survivor', tier_veteran: 'Veteran', tier_legendary: 'Legendary',
+      tier_survivor_d: 'Start supporting: more XP, a bigger backpack and a spare sleeping bag.', tier_veteran_d: 'Base perks: half the upkeep, faster respawns and the [VIP] tag.', tier_legendary_d: 'Everything, plus cheaper crafting, starter tools and the gold frame.',
+      store_get: 'Get on Discord', cmp_xp: 'XP boost', cmp_slot: 'Reserved slot', cmp_beds: 'Sleeping bags', cmp_bedtime: 'Sleeping bag cooldown', cmp_tools: 'Hatchet + pickaxe on respawn', cmp_craft: 'Crafting cost',
+      store_base_note: '* Normal players unlock up to 50 pieces as they level up (15 + level). Veteran gets 50 right away, Legendary 65. You always need a Wardrobe.',
       store_cta: 'Get VIP on Discord', store_fine: 'Open a ticket on our Discord to buy. Type /vip in game to see how much time you have left. Being VIP does not exempt anyone from the rules.',
-      discord: 'Discord',
+      discord: 'Discord', featured: 'Tutorial #1 — HUD & interface',
       media_title: 'Media checklist', media_desc: 'Every video and screenshot the guides are waiting for. Drop the file in media/ with the exact name.',
     },
     pt: {
@@ -48,7 +52,7 @@
       faq_desc: 'Respostas rápidas para as dúvidas mais comuns sobre progressão, sobrevivência e suporte.',
       guides_desc: 'Guias práticos de progressão, coleta, loot, fabricação, construção e combate.',
       weapon_stats: 'Estatísticas da Arma', damage: 'Dano base', damage_hint: '% da vida máxima', range: 'Alcance', mag: 'Tamanho do Carregador', ammo: 'Munição',
-      recipe: 'Receita de Fabricação', receive: 'Você recebe', anywhere: 'Em qualquer lugar', needs_bench: 'Na Bancada', level: 'Level {n}', vip_level: 'VIP: Level {n}',
+      recipe: 'Receita de Fabricação', receive: 'Você recebe', anywhere: 'Em qualquer lugar', needs_bench: 'Na Bancada', level: 'Level {n}', vip_level: 'Legendary: Level {n}',
       properties: 'Propriedades', type: 'Tipo', stack: 'Pilha Máxima', bench_req: 'Bancada Necessária', yes: 'Sim', no: 'Não', level_req: 'Nível Necessário',
       blueprint: 'Blueprint', bp_cost: '{n} de Sucata', bp_loot: 'Só no loot', health: 'Vida', slots: 'Slots de Armazenamento', limit: 'Limite de Colocação', upgrade: 'Melhora Para',
       how_obtain: 'Como Obter', obtain_craft: 'Pode ser fabricado', obtain_furnace: 'Fundição / Cozimento', obtain_recycler: 'Reciclando outros itens',
@@ -60,13 +64,17 @@
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
       nav_badges: 'Badges', nav_store: 'Loja', badges_desc: 'Badges colecionáveis conquistadas jogando, ajudando a comunidade e em eventos especiais.',
       all_categories: 'Todas as categorias', all_rarities: 'Todas as raridades', showing_badges: 'Mostrando {n} de {t} badges',
-      store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Mochila maior, base maior, metade do upkeep e nome dourado — apoie o HAVOK e sobreviva com estilo.',
+      store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
       store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Dias, meses ou permanente',
       store_perks: 'Tudo que você ganha', store_compare: 'Compare', perk: 'Vantagem', player: 'Jogador', store_plans: 'Planos',
-      cmp_inv: 'Slots no inventário', cmp_base: 'Limite de peças da base', cmp_upkeep: 'Custo do upkeep', cmp_lvl: 'Level exigido', cmp_respawn: 'Escolher região do respawn', cmp_name: 'Nome dourado',
+      cmp_inv: 'Slots no inventário', cmp_base: 'Limite de peças da base', cmp_upkeep: 'Custo do upkeep', cmp_respawn: 'Escolher região do respawn',
       plan_day: 'Dias', plan_day_d: 'Para experimentar — a partir de 1 dia.', plan_month: 'Meses', plan_month_d: 'O melhor custo para quem joga sempre.', plan_perm: 'Permanente', plan_perm_d: 'VIP para sempre, sem renovar.', popular: 'Mais escolhido',
+      tier_survivor: 'Survivor', tier_veteran: 'Veteran', tier_legendary: 'Legendary',
+      tier_survivor_d: 'Para começar a apoiar: mais XP, mochila maior e uma cama extra.', tier_veteran_d: 'Vantagens de base: metade do upkeep, respawn mais rápido e tag [VIP].', tier_legendary_d: 'Tudo, mais craft mais barato, ferramentas ao nascer e moldura dourada.',
+      store_get: 'Pegar no Discord', cmp_xp: 'Bônus de XP', cmp_slot: 'Vaga reservada', cmp_beds: 'Camas (sleeping bags)', cmp_bedtime: 'Espera da cama', cmp_tools: 'Machado + picareta ao nascer', cmp_craft: 'Custo de craft',
+      store_base_note: '* Jogador comum libera até 50 peças subindo de level (15 + level). Veteran já começa com 50, Legendary com 65. O Armário é sempre obrigatório.',
       store_cta: 'Pegar VIP no Discord', store_fine: 'Abra um ticket no nosso Discord para comprar. Digite /vip no jogo para ver quanto tempo falta. Ser VIP não livra ninguém das regras.',
-      discord: 'Discord',
+      discord: 'Discord', featured: 'Tutorial #1 — HUD e interface',
       media_title: 'Checklist de mídias', media_desc: 'Todos os vídeos e prints que os guias estão esperando. Coloque o arquivo em media/ com o nome exato.',
     },
   };
@@ -197,10 +205,17 @@
   // ---------------------------------------------------------------- pages
   const crumbs = (parts) => `<div class="crumbs">${parts.map((p, i) => (i < parts.length - 1 ? `<a href="${p[1]}">${esc(p[0])}</a>${svg('chevron')}` : `<span class="cur">${esc(p[0])}</span>`)).join('')}</div>`;
 
+  function featuredVideo() {
+    const yt = youtubeId((window.HAVOK || {}).featured);
+    if (!yt) return '';
+    return `<div class="section-title">${t('featured')}</div>
+      <figure class="media"><div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0" title="${t('featured')}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div></figure>`;
+  }
   function pageHome() {
     const count = (id) => W.items.filter((i) => i.cat === id).length;
     return `${crumbs([['Wiki', '#/']])}
       <h1 class="page-title">${t('wiki_title')}</h1><p class="page-sub">${t('wiki_sub')}</p>
+      ${featuredVideo()}
       <div class="section-title">${t('categories')}</div>
       <div class="grid">${CATS.map((c) => `<a class="tile" href="#/category/${c.id}"><span class="tile-ic">${svg(c.icon)}</span><span><b>${esc(c[lang])}</b><small>${t('items_count', { n: count(c.id) })}</small></span></a>`).join('')}</div>
       <div class="section-title">${t('systems')}</div>
@@ -284,7 +299,7 @@
     const props = [`<div class="row"><span>${t('type')}</span><b>${esc(typeName(it.type))}</b></div>`];
     if (it.stack) props.push(`<div class="row"><span>${t('stack')}</span><b>${it.stack}</b></div>`);
     if (it.recipe) props.push(`<div class="row"><span>${t('bench_req')}</span><b>${it.bench ? t('yes') : t('no')}</b></div>`);
-    if (it.level) props.push(`<div class="row"><span>${t('level_req')}</span><b>Lv. ${it.level} <small class="muted">(VIP ${Math.floor(it.level * 0.75)})</small></b></div>`);
+    if (it.level) props.push(`<div class="row"><span>${t('level_req')}</span><b>Lv. ${it.level} <small class="muted">(Legendary ${Math.floor(it.level * 0.75)})</small></b></div>`);
     if (it.blueprint !== undefined) props.push(`<div class="row"><span>${t('blueprint')}</span><b class="gold">${it.blueprint ? t('bp_cost', { n: it.blueprint }) : t('bp_loot')}</b></div>`);
     if (it.hp) props.push(`<div class="row"><span>${t('health')}</span><b>${it.hp}</b></div>`);
     if (it.slots) props.push(`<div class="row"><span>${t('slots')}</span><b>${it.slots}</b></div>`);
@@ -313,8 +328,19 @@
   function inline(s) {
     return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/`(.+?)`/g, '<code>$1</code>');
   }
+  // aceita o ID puro ou qualquer link do YouTube (watch, youtu.be, shorts, embed)
+  function youtubeId(v) {
+    if (!v) return '';
+    const m = String(v).match(/(?:youtu\.be\/|v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/) || String(v).match(/^([\w-]{11})$/);
+    return m ? m[1] : '';
+  }
   function media(kind, id, caption) {
     const soon = `<div class="soon"><div>${svg(kind === 'video' ? 'video' : 'image')}<b>${t(kind === 'video' ? 'soon_video' : 'soon_shot')}</b>${esc(caption)}<br><code>media/${id}.${kind === 'video' ? 'mp4' : 'webp'}</code></div></div>`;
+    // vídeo no YouTube: o link vai em config.js (HAVOK.youtube), pelo nome da mídia (serve até no lugar de um print)
+    const yt = youtubeId(((window.HAVOK || {}).youtube || {})[id]);
+    if (yt) {
+      return `<figure class="media"><div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0" title="${esc(caption)}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div><figcaption>${esc(caption)}</figcaption></figure>`;
+    }
     if (kind === 'video') {
       return `<figure class="media"><video src="media/${id}.mp4" autoplay muted loop playsinline preload="metadata" onerror="this.outerHTML=this.nextElementSibling.innerHTML"></video><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
     }
@@ -385,14 +411,16 @@
   // ---------------------------------------------------------------- badges
   const RARITY = {
     common: ['Common', 'Comum', '#a8a39d'], uncommon: ['Uncommon', 'Incomum', '#6cc070'], rare: ['Rare', 'Rara', '#5b9dff'],
-    epic: ['Epic', 'Épica', '#b36bff'], legendary: ['Legendary', 'Lendária', '#ff8a33'], vip: ['VIP', 'VIP', '#f5b83d'],
+    epic: ['Epic', 'Épica', '#b36bff'], legendary: ['Legendary', 'Lendária', '#ff8a33'], bronze: ['VIP Bronze', 'VIP Bronze', '#cd7f32'], silver: ['VIP Silver', 'VIP Prata', '#c9ced6'], vip: ['VIP Gold', 'VIP Ouro', '#f5b83d'],
   };
   const BADGE_CATS = { special: ['Special', 'Especial'], community: ['Community', 'Comunidade'], gameplay: ['Gameplay', 'Gameplay'], vip: ['VIP', 'VIP'] };
   const BADGES = [
     { icon: 'flask', rarity: 'rare', cat: 'special', en: ['Beta Tester', 'Played 3+ hours during beta'], pt: ['Beta Tester', 'Jogou 3+ horas durante o beta'] },
     { icon: 'bug', rarity: 'common', cat: 'community', en: ['Bug Reporter', 'Reported a confirmed bug'], pt: ['Caçador de Bug', 'Reportou um bug confirmado'] },
     { icon: 'sword', rarity: 'uncommon', cat: 'gameplay', en: ['First Blood', 'Got the first kill'], pt: ['Primeiro Sangue', 'Conseguiu a primeira kill'] },
-    { icon: 'crown', rarity: 'vip', cat: 'vip', en: ['VIP Supporter', 'Active VIP — a supporter who keeps HAVOK running.'], pt: ['Apoiador VIP', 'VIP ativo — quem mantém o HAVOK de pé.'] },
+    { icon: 'tree', rarity: 'bronze', cat: 'vip', en: ['VIP Survivor', 'Supporter on the Survivor plan.'], pt: ['VIP Survivor', 'Apoiador no plano Survivor.'] },
+    { icon: 'shield', rarity: 'silver', cat: 'vip', en: ['VIP Veteran', 'Supporter on the Veteran plan.'], pt: ['VIP Veteran', 'Apoiador no plano Veteran.'] },
+    { icon: 'crown', rarity: 'vip', cat: 'vip', en: ['VIP Legendary', 'Supporter on the Legendary plan — keeps HAVOK running.'], pt: ['VIP Legendary', 'Apoiador no plano Legendary — mantém o HAVOK de pé.'] },
     { icon: 'search', rarity: 'rare', cat: 'community', en: ['Bug Hunter', 'Reported 10+ confirmed bugs'], pt: ['Exterminador de Bugs', 'Reportou 10+ bugs confirmados'] },
     { icon: 'rocket', rarity: 'epic', cat: 'special', en: ['Early Adopter', 'Among the first 100 registered survivors'], pt: ['Pioneiro', 'Entre os 100 primeiros sobreviventes registrados'] },
     { icon: 'skull', rarity: 'legendary', cat: 'gameplay', en: ['Serial Killer', 'Reached 1000 kills'], pt: ['Serial Killer', 'Chegou a 1000 kills'] },
@@ -428,33 +456,57 @@
   }
 
   // ---------------------------------------------------------------- store (VIP)
-  const VIP_PERKS = [
-    { icon: 'bag', en: ['Bigger backpack', '42 inventory slots instead of 28.'], pt: ['Mochila maior', '42 slots de inventário em vez de 28.'] },
-    { icon: 'building', en: ['Bigger base', 'Build up to 65 pieces (players: max 50).'], pt: ['Base maior', 'Construa até 65 peças (jogadores: máximo 50).'] },
-    { icon: 'clock', en: ['Half the upkeep', 'Your Wardrobe spends 50% less to keep the base standing.'], pt: ['Metade do upkeep', 'Seu Armário gasta 50% menos para manter a base de pé.'] },
-    { icon: 'star', en: ['25% less Level', 'Craft and build with 25% lower Level requirements.'], pt: ['25% menos Level', 'Crafte e construa com 25% menos Level exigido.'] },
-    { icon: 'map', en: ['Choose where you respawn', 'Pick the region of the map when you die.'], pt: ['Escolha onde renascer', 'Escolha a região do mapa quando morrer.'] },
-    { icon: 'crown', en: ['Gold name', 'Golden name in the chat and in the player list.'], pt: ['Nome dourado', 'Nome dourado no chat e na lista de jogadores.'] },
+  // os 3 planos (mesma tabela do servidor: VIP_TIERS em gamemode/scripts/global/g.utils.lua)
+  const TIERS = [
+    { id: 'survivor', icon: 'tree', color: '#cd8a4e', perks: [
+      ['star', '+15% XP boost', '+15% de XP'], ['user', 'Reserved server slot', 'Vaga reservada no servidor'],
+      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+1 extra sleeping bag', '+1 cama extra'],
+      ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
+      ['megaphone', 'Soft name in global chat + scoreboard', 'Nome destacado no chat global e no placar'],
+      ['award', 'Bronze VIP badge', 'Badge VIP de bronze'] ] },
+    { id: 'veteran', icon: 'shield', color: '#ff6a00', hot: true, perks: [
+      ['star', '+30% XP boost', '+30% de XP'], ['user', 'Reserved server slot', 'Vaga reservada no servidor'],
+      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+2 extra sleeping bags', '+2 camas extras'],
+      ['clock', 'Faster sleeping bag respawn', 'Respawn mais rápido na cama'], ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
+      ['building', 'Base limit 50 + 50% less upkeep', 'Limite de 50 peças + 50% menos upkeep'],
+      ['megaphone', '[VIP] tag in global chat + highlighted scoreboard row', 'Tag [VIP] no chat global + linha destacada no placar'],
+      ['award', 'Silver VIP badge', 'Badge VIP de prata'] ] },
+    { id: 'legendary', icon: 'crown', color: '#f5b83d', perks: [
+      ['star', '+50% XP boost', '+50% de XP'], ['user', 'Reserved server slot', 'Vaga reservada no servidor'],
+      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+3 extra sleeping bags', '+3 camas extras'],
+      ['clock', 'Fastest sleeping bag respawn', 'Respawn na cama ainda mais rápido'], ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
+      ['building', 'Base limit 65 + 50% less upkeep', 'Limite de 65 peças + 50% menos upkeep'],
+      ['pickaxe', 'Hatchet and pickaxe when you respawn', 'Nasce com machado e picareta'],
+      ['hammer', '25% less crafting cost (materials and level)', '25% menos custo de craft (material e level)'],
+      ['megaphone', 'Gold [VIP] tag in global chat + legendary scoreboard frame', 'Tag [VIP] dourada no chat + moldura lendária no placar'],
+      ['award', 'Gold VIP badge', 'Badge VIP de ouro'] ] },
   ];
   const COMPARE = [
-    ['inv', '28', '42'], ['base', '50', '65'], ['upkeep', '100%', '50%'], ['lvl', '100%', '75%'], ['respawn', '—', '✓'], ['name', '—', '✓'],
+    ['xp', '—', '+15%', '+30%', '+50%'], ['slot', '—', '✓', '✓', '✓'], ['inv', '28', '42', '42', '42'], ['beds', '1', '2', '3', '4'],
+    ['bedtime', '10 min', '10 min', '5 min', '3 min'], ['respawn', '—', '✓', '✓', '✓'], ['base', '15–50*', '15–50*', '50', '65'],
+    ['upkeep', '100%', '100%', '50%', '50%'], ['tools', '—', '—', '—', '✓'], ['craft', '100%', '100%', '100%', '75%'],
   ];
   function pageStore() {
     const d = (window.HAVOK || {}).discord || '#';
-    const P2 = (p) => p[lang] || p.en;
+    const L = lang === 'pt' ? 2 : 1;
     return `<section class="store-hero">
         <span class="pill">${svg('shield')} HAVOK VIP</span>
         <h1>${t('store_h1a')} <span>${t('store_h1b')}</span></h1>
         <p>${t('store_sub')}</p>
         <div class="trust"><span>${svg('user')} ${t('store_t1')}</span><span>${svg('zap')} ${t('store_t2')}</span><span>${svg('clock')} ${t('store_t3')}</span></div>
       </section>
-      <div class="section-title">${t('store_perks')}</div>
-      <div class="grid">${VIP_PERKS.map((p) => `<div class="tile tall"><span class="tile-ic">${svg(p.icon)}</span><span><b>${esc(P2(p)[0])}</b><small>${esc(P2(p)[1])}</small></span></div>`).join('')}</div>
+      <div class="tiers">${TIERS.map((tr) => `<div class="tier${tr.hot ? ' hot' : ''}" style="--tc:${tr.color}">
+          ${tr.hot ? `<span class="hot-tag">${t('popular')}</span>` : ''}
+          <div class="tier-head"><span class="tier-ic">${svg(tr.icon)}</span><b>${t('tier_' + tr.id)}</b></div>
+          <small class="tier-sub">${t('tier_' + tr.id + '_d')}</small>
+          <div class="tier-label">${t('store_perks')}</div>
+          <ul>${tr.perks.map((p) => `<li>${svg(p[0])}<span>${esc(p[L])}</span></li>`).join('')}</ul>
+          <a class="tier-btn" href="${esc(d)}" target="_blank" rel="noopener">${t('store_get')} ${svg('chevron')}</a>
+        </div>`).join('')}</div>
       <div class="section-title">${t('store_compare')}</div>
-      <div class="compare"><div class="crow head"><span>${t('perk')}</span><span>${t('player')}</span><span class="vipc">VIP</span></div>
-        ${COMPARE.map(([k, a, b]) => `<div class="crow"><span>${t('cmp_' + k)}</span><span class="muted">${a}</span><span class="vipc">${b}</span></div>`).join('')}</div>
-      <div class="section-title">${t('store_plans')}</div>
-      <div class="plans">${['day', 'month', 'perm'].map((k, i) => `<div class="plan${i === 1 ? ' hot' : ''}">${i === 1 ? `<span class="hot-tag">${t('popular')}</span>` : ''}<b>${t('plan_' + k)}</b><small>${t('plan_' + k + '_d')}</small></div>`).join('')}</div>
+      <div class="table-wrap"><div class="compare wide"><div class="crow head"><span>${t('perk')}</span><span>${t('player')}</span>${TIERS.map((tr) => `<span style="color:${tr.color}">${t('tier_' + tr.id)}</span>`).join('')}</div>
+        ${COMPARE.map(([k, ...v]) => `<div class="crow"><span>${t('cmp_' + k)}</span>${v.map((x, i) => `<span${i ? ` style="color:${TIERS[i - 1].color}"` : ' class="muted"'}>${x}</span>`).join('')}</div>`).join('')}</div></div>
+      <p class="fine">${t('store_base_note')}</p>
       <a class="cta" href="${esc(d)}" target="_blank" rel="noopener">${svg('discord')} ${t('store_cta')}</a>
       <p class="fine">${t('store_fine')}</p>`;
   }
