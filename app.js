@@ -341,6 +341,10 @@
     if (yt) {
       return `<figure class="media"><div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0" title="${esc(caption)}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div><figcaption>${esc(caption)}</figcaption></figure>`;
     }
+    // "GIF": mp4 mudo, em loop, sem controles (no lugar de um print ou de um vídeo)
+    if (((window.HAVOK || {}).loops || []).includes(id)) {
+      return `<figure class="media"><video class="loop" autoplay muted loop playsinline preload="auto" aria-label="${esc(caption)}"><source src="media/${id}.webm" type="video/webm"><source src="media/${id}.mp4" type="video/mp4"></video><figcaption>${esc(caption)}</figcaption></figure>`;
+    }
     if (kind === 'video') {
       return `<figure class="media"><video src="media/${id}.mp4" autoplay muted loop playsinline preload="metadata" onerror="this.outerHTML=this.nextElementSibling.innerHTML"></video><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
     }

@@ -8,8 +8,10 @@ window.HAVOK = {
   // vídeos do YouTube por nome (o mesmo nome da lista de mídias). Pode colar o link inteiro.
   // ex.: spawn: 'https://youtu.be/XXXXXXXXXXX',
   youtube: {
-    hud: 'https://youtu.be/_FYxtfppeKk', // TUTORIALS #1 — HUD & interface (no lugar do print)
   },
+  // mídias que são um "GIF" (vídeo mudo em loop, bem mais leve que .gif): media/<nome>.webm + .mp4
+  loops: ['hud'],
+
   // vídeo em destaque na página inicial da wiki ('' esconde)
   featured: '',
 };
