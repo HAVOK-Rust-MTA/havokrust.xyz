@@ -10,7 +10,7 @@ window.HAVOK = {
   youtube: {
   },
   // mídias que são um "GIF" (vídeo mudo em loop, bem mais leve que .gif): media/<nome>.webm + .mp4
-  loops: ['hud'],
+  loops: ['hud', 'spawn', 'gather-tools', 'barrels', 'crates', 'build-wheel', 'place-object', 'first-house', 'upgrade', 'vehicles'],
 
   // vídeo em destaque na página inicial da wiki ('' esconde)
   featured: '',
