@@ -68,7 +68,7 @@ test('Discord fora depois de uma leitura = devolve a última, marcada stale', as
   mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
   discordReturns(() => reply(200, { [ROLE]: 12 }), () => reply(429, { retry_after: 5 }, { 'Retry-After': '5' }));
   await worker.fetch(req(), env);
-  mock.timers.tick(61_000);
+  mock.timers.tick(31_000);
   const body = await (await worker.fetch(req(), env)).json();
   assert.equal(body.count, 12);
   assert.equal(body.stale, true);

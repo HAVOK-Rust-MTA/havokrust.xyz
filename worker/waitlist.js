@@ -8,7 +8,7 @@
 // leitura recente guardada, responde erro.
 
 const API = 'https://discord.com/api/v10';
-const FRESH_MS = 60_000;            // leitura nova no máximo a cada 60 s
+const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
 const STALE_MS = 6 * 60 * 60_000;   // se o Discord cair, ainda serve a última leitura por até 6 h
 const TIMEOUT_MS = 8_000;
 const SNOWFLAKE = /^\d{17,20}$/;
@@ -153,10 +153,10 @@ export default {
       const r = await getCount(env, Date.now());
       if (cache && !r.stale && r.at !== before) {
         try {
-          await cache.put(key, new Response(JSON.stringify({ count: r.count, at: r.at }), { headers: { 'Cache-Control': 'max-age=60' } }));
+          await cache.put(key, new Response(JSON.stringify({ count: r.count, at: r.at }), { headers: { 'Cache-Control': 'max-age=30' } }));
         } catch (e) { /* idem */ }
       }
-      return json({ count: r.count, goal, updatedAt: new Date(r.at).toISOString(), stale: r.stale }, 200, origin, r.stale ? 30 : 60);
+      return json({ count: r.count, goal, updatedAt: new Date(r.at).toISOString(), stale: r.stale }, 200, origin, r.stale ? 15 : 30);
     } catch (e) {
       // o motivo fica no log do Worker; o site só recebe "indisponível"
       console.error('waitlist:', e.message);

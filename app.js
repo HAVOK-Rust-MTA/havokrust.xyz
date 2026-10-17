@@ -570,7 +570,7 @@
 
   // lista de espera: barra com uma marca por vaga (até 60; acima disso vira barra contínua)
   let wlTimer = null, wlLast = null;
-  const WL_EVERY = 60000;
+  const WL_EVERY = 30000;
   const wlGoal = () => (wlLast && wlLast.goal) || ((window.HAVOK || {}).waitlist || {}).goal || 30;
   function waitlistCard() {
     const H = window.HAVOK || {}, cfg = H.waitlist || {};
