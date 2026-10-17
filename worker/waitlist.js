@@ -2,10 +2,13 @@
 // Conta quantos membros do Discord têm o cargo "Waiting List" e devolve em JSON para o site.
 //
 //   GET /waitlist  ->  { count, goal, updatedAt, stale }
+//   cron (1 min)   ->  edita o painel da lista no canal do Discord (panel.js)
 //
 // O token do bot fica só no Secret DISCORD_BOT_TOKEN; GUILD_ID, ROLE_ID, GOAL e ALLOWED_ORIGINS
 // ficam em [vars] no wrangler.toml. Nunca inventa número: se o Discord falhar e não houver
 // leitura recente guardada, responde erro.
+
+import { updatePanel } from './panel.js';
 
 const API = 'https://discord.com/api/v10';
 const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
@@ -121,6 +124,11 @@ function configError(env) {
 }
 
 export default {
+  // a cada minuto: edita o painel da lista no canal do Discord (panel.js)
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(updatePanel(env).then((r) => { if (r === 'updated') console.log('panel: updated'); }).catch((e) => console.error('panel:', e.message)));
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
     const origin = allowedOrigin(request, env);
