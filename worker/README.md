@@ -77,3 +77,14 @@ O motivo exato fica no log: `npx wrangler tail`. O site nunca mostra número inv
 
 - **CORS**: só as origens de `ALLOWED_ORIGINS` recebem o cabeçalho de liberação.
 - **Testes**: `node --test` nesta pasta (Discord simulado, não precisa de token).
+
+## Painel no canal #waiting-list
+
+O Worker também edita, a cada minuto (Cron Trigger), **uma mensagem fixa** no canal da lista:
+número, vagas, barra de 50 e a fila numerada (`panel.js`). Ninguém precisa reenviar nada.
+
+- O link do webhook do canal fica no Secret `WAITLIST_WEBHOOK` (`npx wrangler secret put WAITLIST_WEBHOOK`).
+- `WAITLIST_MESSAGE_ID` no `wrangler.toml` é a mensagem que o webhook enviou uma vez. Para recriar o painel:
+  apague a mensagem, envie uma nova pelo webhook com `?wait=true`, troque o ID e rode `npx wrangler deploy`.
+- A ordem da fila fica guardada no link do título do próprio painel (sem banco). Quem perde o cargo sai da fila.
+- O bot precisa poder listar membros: Developer Portal → Bot → **Server Members Intent** ligado.
