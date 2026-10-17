@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" width="160" height="140">
+  <defs>
+    <linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#40372f"/><stop offset=".55" stop-color="#1d1916"/><stop offset="1" stop-color="#0d0b09"/></linearGradient>
+    <linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff3d52"/><stop offset=".5" stop-color="#5e0716"/><stop offset="1" stop-color="#ff3d52"/></linearGradient>
+    <radialGradient id="g" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#ff3d52" stop-opacity=".5"/><stop offset="1" stop-color="#ff3d52" stop-opacity="0"/></radialGradient>
+    <radialGradient id="a" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#ff3d52" stop-opacity=".22"/><stop offset="1" stop-color="#ff3d52" stop-opacity="0"/></radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <circle cx="80" cy="74" r="62" fill="url(#a)"/><g fill="#ff3d52" opacity=".92"><path d="M36 44 Q8 40 2 58 Q20 60 38 62 Z"/><path d="M29 56 Q5 54 4 72 Q20 72 38 74 Z"/><path d="M22 68 Q2 68 6 86 Q20 84 38 86 Z"/><path d="M15 80 Q-1 82 8 100 Q20 96 38 98 Z"/><path d="M124 44 Q152 40 158 58 Q140 60 122 62 Z"/><path d="M131 56 Q155 54 156 72 Q140 72 122 74 Z"/><path d="M138 68 Q158 68 154 86 Q140 84 122 86 Z"/><path d="M145 80 Q161 82 152 100 Q140 96 122 98 Z"/></g><path d="M62 22 L66 8 L72 18 L80 4 L88 18 L94 8 L98 22 Z" fill="#ff3d52"/>
+  <path d="M80 22 L122 36 V70 C122 98 105 116 80 128 C55 116 38 98 38 70 V36 Z" fill="url(#m)" stroke="url(#r)" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M80 31 L114 42 V70 C114 93 100 108 80 118 C60 108 46 93 46 70 V42 Z" fill="url(#g)" stroke="#ff3d52" stroke-opacity=".4" stroke-width="1.5"/>
+  <path d="M50 46 L80 36 L110 46" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="3" stroke-linecap="round"/>
+  <g filter="url(#glow)" transform="translate(51 43) scale(2.42)" fill="none" stroke="#ff3d52" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4.5 3L12 4l4.5 7L21 8l-2 10H5z"/><path d="M5 21h14"/></g>
+</svg>

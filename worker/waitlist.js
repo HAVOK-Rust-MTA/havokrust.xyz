@@ -8,7 +8,7 @@
 // ficam em [vars] no wrangler.toml. Nunca inventa número: se o Discord falhar e não houver
 // leitura recente guardada, responde erro.
 
-import { updatePanel } from './panel.js';
+import { updatePanel, readFirst } from './panel.js';
 
 const API = 'https://discord.com/api/v10';
 const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
@@ -19,7 +19,8 @@ const SNOWFLAKE = /^\d{17,20}$/;
 // cache do isolate; por cima dele, o Cache API (testado: funciona no workers.dev) divide a leitura entre todos os isolates
 let memo = null;       // { count, at }
 let inflight = null;   // uma só ida ao Discord por vez
-let pauseUntil = 0;    // depois de uma falha, espera antes de tentar de novo (não martela o Discord)
+let pauseUntil = 0;
+let firstMemo = null;  // mural: { list, at }    // depois de uma falha, espera antes de tentar de novo (não martela o Discord)
 
 class DiscordError extends Error {
   constructor(status, retryAfter) {
@@ -133,6 +134,17 @@ export default {
     const url = new URL(request.url);
     const origin = allowedOrigin(request, env);
 
+    // mural dos 15 primeiros (página de badges do site)
+    if (url.pathname === '/waitlist/first' && request.method === 'GET') {
+      try {
+        if (!firstMemo || Date.now() - firstMemo.at > 60_000) firstMemo = { list: await readFirst(env), at: Date.now() };
+        return json({ first: firstMemo.list }, 200, origin, 60);
+      } catch (e) {
+        console.error('first:', e.message);
+        return json({ error: 'unavailable' }, 502, origin);
+      }
+    }
+    if (request.method === 'OPTIONS' && url.pathname === '/waitlist/first') return new Response(null, { status: origin ? 204 : 403, headers: corsHeaders(origin) });
     if (url.pathname !== '/waitlist') return json({ error: 'not_found' }, 404, origin);
     if (request.method === 'OPTIONS') return new Response(null, { status: origin ? 204 : 403, headers: corsHeaders(origin) });
     if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, origin);

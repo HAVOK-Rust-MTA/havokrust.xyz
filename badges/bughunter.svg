@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" width="160" height="140">
+  <defs>
+    <linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#40372f"/><stop offset=".55" stop-color="#1d1916"/><stop offset="1" stop-color="#0d0b09"/></linearGradient>
+    <linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4ea8ff"/><stop offset=".5" stop-color="#123a66"/><stop offset="1" stop-color="#4ea8ff"/></linearGradient>
+    <radialGradient id="g" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#4ea8ff" stop-opacity=".5"/><stop offset="1" stop-color="#4ea8ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="a" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#4ea8ff" stop-opacity=".22"/><stop offset="1" stop-color="#4ea8ff" stop-opacity="0"/></radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  
+  <path d="M80 22 L122 36 V70 C122 98 105 116 80 128 C55 116 38 98 38 70 V36 Z" fill="url(#m)" stroke="url(#r)" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M80 31 L114 42 V70 C114 93 100 108 80 118 C60 108 46 93 46 70 V42 Z" fill="url(#g)" stroke="#4ea8ff" stroke-opacity=".4" stroke-width="1.5"/>
+  <path d="M50 46 L80 36 L110 46" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="3" stroke-linecap="round"/>
+  <g filter="url(#glow)" transform="translate(51 43) scale(2.42)" fill="none" stroke="#4ea8ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="7" width="8" height="12" rx="4"/><path d="M12 7V4M8 11H4M8 15H4M16 11h4M16 15h4M8 18l-2.5 2.5M16 18l2.5 2.5"/></g>
+</svg>

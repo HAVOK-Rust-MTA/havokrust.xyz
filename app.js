@@ -29,7 +29,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVER', footer_copy: '© 2026 HAVOK — Rust Survival. Not affiliated with Facepunch Studios.',
       bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench', bp_tip: 'Needs a blueprint: you must learn this recipe before you can craft it.', bench_tip: 'Needs a Workbench nearby to craft.', bp_explain: 'You must learn this blueprint before crafting. Put the item and Scrap in a Research Table to get the blueprint, or find one in airdrops and the patrol helicopter, then right click it → Learn. Learning is permanent.', bp_explain_loot: 'This blueprint cannot be researched. Find it in loot, then right click it → Learn. Learning is permanent.', bp_how: 'How blueprints work', legend_bp: 'needs a blueprint (learn the recipe first)', legend_bench: 'needs a Workbench',
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
-      nav_store: 'Store', nav_play: 'Play',
+      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play',
      
       store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
       store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Monthly price; other periods on Discord',
@@ -63,7 +63,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVIDOR', footer_copy: '© 2026 HAVOK — Rust Survival. Sem afiliação com a Facepunch Studios.',
       bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada', bp_tip: 'Precisa de blueprint: você tem que aprender esta receita antes de craftar.', bench_tip: 'Precisa de uma Bancada perto para craftar.', bp_explain: 'Você precisa aprender esta blueprint antes de craftar. Coloque o item e Sucata na Mesa de Pesquisa para ganhar a blueprint, ou ache uma no airdrop e no helicóptero de patrulha. Depois clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_explain_loot: 'Esta blueprint não dá para pesquisar. Ache no loot e clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_how: 'Como funcionam as blueprints', legend_bp: 'precisa de blueprint (aprender a receita antes)', legend_bench: 'precisa de Bancada',
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
-      nav_store: 'Loja', nav_play: 'Jogar',
+      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar',
      
       store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
       store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Preço por mês; outros períodos no Discord',
@@ -134,6 +134,7 @@
     rocket: '<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/><path d="M12 15l-3-3a22 22 0 0 1 2-4A13 13 0 0 1 22 2c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/><path d="M9 12H4s.6-3 2-4c1.6-1.1 5 0 5 0M12 15v5s3-.6 4-2c1.1-1.6 0-5 0-5"/>',
     'heart-pulse': '<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/><path d="M3.2 12H9l.5-1 2 4.5 2-7 1.5 3.5h5.3"/>',
     pickaxe: '<path d="M14.5 12.5 4 23 1 20l10.5-10.5"/><path d="M16 3a14 14 0 0 1 5 5M3 8a14 14 0 0 1 13-5l5 5a14 14 0 0 1-5 13"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
     scroll: '<path d="M8 21h11a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 0 0-2-2 2 2 0 0 0-2 2v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M10 8h6M10 12h6"/>',
     flask: '<path d="M9 3h6M10 3v6L4 20a1 1 0 0 0 .9 1.5h14.2A1 1 0 0 0 20 20L14 9V3"/><path d="M7 15h10"/>',
     flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3.2.3 1.8 1.4 2.7 2.5 2.7z"/>',
@@ -459,6 +460,67 @@
   function pageMedia() {
     return `${crumbs([['Wiki', '#/wiki'], [t('media_title')]])}<h1 class="page-title">${t('media_title')}</h1><p class="page-sub">${t('media_desc')}</p>
       <div class="box">${W.media.map((m) => `<div class="obtain">${svg(m.kind === 'video' ? 'video' : 'image')}<code>media/${m.id}.${m.kind === 'video' ? 'mp4' : 'webp'}</code><span class="muted">— ${esc(m.caption)}</span><a href="#/guides/${m.guide}" style="margin-left:auto" class="muted">${esc(m.guide)}</a></div>`).join('')}</div>`;
+  }
+
+
+  // ---------------------------------------------------------------- badges (as mesmas do jogo: havok_badges)
+  const BRAR = { common: ['Common', '#c9c2b6'], rare: ['Rare', '#4ea8ff'], epic: ['Epic', '#b07bff'], legendary: ['Legendary', '#ffae2e'], mythic: ['Mythic', '#ff3d52'] };
+  const BADGE_LIST = [
+    ['founder', 'Founder', 'mythic', 'team', 'Part of the team that built HAVOK.', 'Faz parte da equipe que construiu o HAVOK.'],
+    ['vanguard', 'Vanguard', 'mythic', 'list', 'One of the first 5 on the waiting list.', 'Um dos 5 primeiros da lista de espera.'],
+    ['pioneer', 'Pioneer', 'legendary', 'list', 'Spot 6 to 10 on the waiting list.', 'Posição 6 a 10 da lista de espera.'],
+    ['champion', 'Wipe Champion', 'legendary', 'auto', 'Be in the #1 group when the wipe ends. Stacks every wipe.', 'Estar no grupo nº 1 quando o wipe fecha. Acumula a cada wipe.'],
+    ['creator', 'Content Creator', 'legendary', 'ticket', 'Make videos or streams of HAVOK.', 'Gravar vídeos ou fazer lives do HAVOK.'],
+    ['early', 'Early Survivor', 'epic', 'list', 'Spot 11 to 15 on the waiting list.', 'Posição 11 a 15 da lista de espera.'],
+    ['podium', 'Podium', 'epic', 'auto', 'Be in the #2 or #3 group when the wipe ends.', 'Estar no grupo nº 2 ou nº 3 quando o wipe fecha.'],
+    ['hunter', 'Hunter Slayer', 'epic', 'auto', 'Shoot down the patrol helicopter.', 'Derrubar o helicóptero de patrulha.'],
+    ['firstblood', 'First Blood', 'rare', 'auto', 'Get the first kill after a wipe.', 'Fazer a primeira kill depois de um wipe.'],
+    ['killer', 'Killer', 'rare', 'auto', 'Reach 100 kills in a single wipe.', 'Chegar a 100 kills num mesmo wipe.'],
+    ['immortal', 'Immortal', 'rare', 'auto', 'Stay alive for 12 hours of play. Offline and AFK do not count.', 'Ficar 12 horas vivo jogando. Offline e AFK não contam.'],
+    ['bughunter', 'Bug Hunter', 'rare', 'ticket', 'Report a real bug.', 'Reportar um bug de verdade.'],
+    ['veteran', 'Veteran', 'common', 'auto', 'Reach level 50.', 'Chegar ao level 50.'],
+  ];
+  const BT = {
+    en: { title: 'BADGES', sub: 'Earned in game, kept forever. A wipe resets everything except your badge collection.', all: 'All', how: { auto: 'Automatic in game', ticket: 'Ask with a Discord ticket', list: 'Waiting list reward', team: 'HAVOK team only' },
+      ingame: 'In game, every badge you own shows next to your name and in the player list. Type /badges to see your collection.',
+      wall: 'Waiting list founders', wall_sub: 'The first 15 on the waiting list get a badge for life, plus VIP Survivor days at launch.',
+      tiers: [['vanguard', '#01–05', '30 days VIP Survivor'], ['pioneer', '#06–10', '15 days VIP Survivor'], ['early', '#11–15', '7 days VIP Survivor']],
+      open: 'Open spot', join: 'Join the waiting list', wall_err: 'Could not load the list right now.' },
+    pt: { title: 'BADGES', sub: 'Conquistadas no jogo, guardadas para sempre. O wipe zera tudo, menos a sua coleção de badges.', all: 'Todas', how: { auto: 'Automática no jogo', ticket: 'Peça por ticket no Discord', list: 'Prêmio da lista de espera', team: 'Só a equipe do HAVOK' },
+      ingame: 'No jogo, todas as badges que você tem aparecem do lado do seu nome e na lista de jogadores. Digite /badges para ver a sua coleção.',
+      wall: 'Fundadores da lista de espera', wall_sub: 'Os 15 primeiros da lista ganham uma badge para sempre e dias de VIP Survivor na inauguração.',
+      tiers: [['vanguard', '#01–05', '30 dias de VIP Survivor'], ['pioneer', '#06–10', '15 dias de VIP Survivor'], ['early', '#11–15', '7 dias de VIP Survivor']],
+      open: 'Vaga aberta', join: 'Entrar na lista de espera', wall_err: 'Não deu para carregar a lista agora.' },
+  };
+  let bRar = '';
+  function pageBadges() {
+    const B = BT[lang], H = window.HAVOK || {};
+    const api = ((H.waitlist || {}).api || '').replace(/\/waitlist$/, '/waitlist/first');
+    setTimeout(async () => {
+      document.querySelectorAll('.bd-filter button').forEach((b) => b.onclick = () => { bRar = b.dataset.r; route(); });
+      const wall = $('#bdWall');
+      if (!wall || !api) return;
+      let first = null;
+      try { const r = await fetch(api, { cache: 'no-cache' }); const j = r.ok ? await r.json() : null; first = j && Array.isArray(j.first) ? j.first : null; } catch (e) { first = null; }
+      if (!$('#bdWall')) return;
+      if (!first) { wall.innerHTML = `<p class="muted">${B.wall_err}</p>`; return; }
+      wall.innerHTML = B.tiers.map(([id, range, prize], t) => {
+        const slots = Array.from({ length: 5 }, (_, i) => { const pos = t * 5 + i + 1, who = first.find((f) => f.pos === pos);
+          return `<li class="${who ? '' : 'open'}"><span>#${String(pos).padStart(2, '0')}</span>${who ? `<b>${esc(who.name)}</b>` : `<i>${B.open}</i>`}</li>`; }).join('');
+        const [, name, rar] = BADGE_LIST.find((b) => b[0] === id);
+        return `<div class="bd-tier" style="--rc:${BRAR[rar][1]}"><header><img src="badges/${id}.svg" alt=""><div><b>${name}</b><small>${range} · ${prize}</small></div></header><ol>${slots}</ol></div>`;
+      }).join('');
+    });
+    const list = BADGE_LIST.filter((b) => !bRar || b[2] === bRar);
+    return `<section class="bd-hero"><p class="l-kicker">HAVOK · ${B.all === 'All' ? 'Collection' : 'Coleção'}</p><h1 class="page-title">${B.title}</h1><p class="page-sub">${B.sub}</p></section>
+      <div class="bd-filter">${[['', B.all], ...Object.entries(BRAR).reverse().map(([k, v]) => [k, v[0]])].map(([k, n]) => `<button type="button" class="chip ${bRar === k ? 'on' : ''}" data-r="${k}" ${k ? `style="--rc:${BRAR[k][1]}"` : ''}>${n}</button>`).join('')}</div>
+      <div class="bd-grid">${list.map(([id, name, rar, how, en, pt]) => `<article class="bd-card r-${rar}" style="--rc:${BRAR[rar][1]}">
+          <div class="bd-art"><img src="badges/${id}.svg" alt="${esc(name)}" loading="lazy"></div>
+          <b>${esc(name)}</b><span class="bd-rar">${BRAR[rar][0]}</span>
+          <p>${esc(lang === 'pt' ? pt : en)}</p><small class="bd-how how-${how}">${B.how[how]}</small></article>`).join('')}</div>
+      <p class="bd-ingame">${svg('info')} ${B.ingame}</p>
+      <section class="bd-wall-sec"><p class="l-kicker">${B.wall}</p><p class="page-sub">${B.wall_sub}</p><div class="bd-wall" id="bdWall"><p class="muted">…</p></div>
+        <a class="wl-btn inline" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${B.join}</span></a></section>`;
   }
 
   // ---------------------------------------------------------------- loja VIP
@@ -812,7 +874,7 @@
     let html;
     const landing = !parts.length;
     document.body.classList.toggle('landing', landing);
-    document.body.classList.toggle('standalone', parts[0] === 'store');
+    document.body.classList.toggle('standalone', parts[0] === 'store' || parts[0] === 'badges');
     if (landing) html = pageLanding();
     else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
@@ -824,11 +886,12 @@
     else if (parts[0] === 'media') html = pageMedia();
     else if (parts[0] === 'plano' || parts[0] === 'plan') html = pagePlan();
     else if (parts[0] === 'store') html = pageStore();
+    else if (parts[0] === 'badges') html = pageBadges();
     else html = pageHome();
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : parts[0] === 'store' ? 'store' : 'wiki')));
+    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['store', 'badges'].includes(parts[0]) ? parts[0] : 'wiki')));
     const it = parts[0] === 'items' && byId[parts[1]];
     document.title = landing ? 'HAVOK — Rust Survival' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);

@@ -90,3 +90,16 @@ export async function updatePanel(env, fetchImpl = fetch) {
   await discordFetch(fetchImpl, msgUrl, { method: 'PATCH', body: JSON.stringify({ embeds: [embed] }) });
   return 'updated';
 }
+
+// os 15 primeiros da fila, lidos do próprio painel (para o mural do site). Sem nomes de quem não está no painel.
+export async function readFirst(env, fetchImpl = fetch, limit = 15) {
+  if (!env.WAITLIST_WEBHOOK || !env.WAITLIST_MESSAGE_ID) return [];
+  const msg = await discordFetch(fetchImpl, `${env.WAITLIST_WEBHOOK.replace(/\/$/, '')}/messages/${env.WAITLIST_MESSAGE_ID}`);
+  const field = ((msg && msg.embeds && msg.embeds[0] && msg.embeds[0].fields) || []).find((f) => /First survivors/.test(f.name));
+  const out = [];
+  for (const line of String((field && field.value) || '').split('\n')) {
+    const m = line.match(/^`#(\d+)`\s+(.+)$/);
+    if (m && out.length < limit) out.push({ pos: parseInt(m[1], 10), name: m[2].trim() });
+  }
+  return out;
+}
