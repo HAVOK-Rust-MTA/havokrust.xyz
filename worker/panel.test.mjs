@@ -14,11 +14,12 @@ test('fila: quem já estava mantém a posição, novos vão para o fim, quem sai
 test('embed: número, vagas, barra de 50, nomes sem markdown, ordem guardada no link', () => {
   const q = [mem('100000000000000001', '**hack**', 'x'), mem('200000000000000002', 'b', 'y')];
   const e = buildEmbed(q, 50);
-  assert.equal(e.fields[0].value, '**02 / 50**');
-  assert.equal(e.fields[1].value, '**48**');
-  assert.equal((e.fields[2].value.match(/🟧/g) || []).length, 2);
-  assert.equal((e.fields[2].value.match(/⬛/g) || []).length, 48);
-  assert.ok(e.fields[3].value.includes('`#01` hack'));
+  assert.equal(e.fields[0].value, '### 02 / 50');
+  assert.equal(e.fields[1].value, '### 48');
+  assert.equal((e.fields[3].value.match(/🟧/g) || []).length, 1);
+  assert.equal((e.fields[3].value.match(/⬛/g) || []).length, 19);
+  assert.ok(e.fields[4].value.includes('`#01` hack'));
+  assert.ok(e.fields[4].value.includes('`#03` ─'));
   assert.deepEqual(idsFromEmbed(e), ['100000000000000001', '200000000000000002']);
 });
 
@@ -32,7 +33,7 @@ test('updatePanel: lê membros + painel, edita só quando mudou, nunca vaza o to
     return new Response(JSON.stringify(prev));
   };
   assert.equal(await updatePanel(env, fake), 'updated');
-  assert.equal(patched.embeds[0].fields[0].value, '**01 / 50**');
+  assert.equal(patched.embeds[0].fields[0].value, '### 01 / 50');
   assert.equal(await updatePanel(env, fake), 'same');
   const failing = async () => new Response('{}', { status: 404 });
   await assert.rejects(updatePanel(env, failing), (e) => !e.message.includes('SECRET'));

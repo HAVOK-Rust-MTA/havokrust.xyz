@@ -46,32 +46,45 @@ export function idsFromEmbed(embed) {
 }
 
 function bar(n, goal) {
-  const cells = 50, per = cells / 2;
+  const cells = 20;
   const lit = Math.min(cells, Math.round((Math.min(n, goal) / goal) * cells));
-  const row = (from) => Array.from({ length: per }, (_, i) => (from + i < lit ? '🟧' : '⬛')).join('');
-  return row(0) + '\n' + row(per);
+  const pct = Math.floor((Math.min(n, goal) / goal) * 100);
+  return `${'🟧'.repeat(lit)}${'⬛'.repeat(cells - lit)}  **${pct}%**`;
 }
+
+// colunas dos prêmios: #01–05, #06–10, #11–15
+const TIERS = [['🔴 Vanguard', 0, 5], ['🟠 Pioneer', 5, 10], ['🟣 Early Survivor', 10, 15]];
+const line = (m, i) => `\`#${String(i + 1).padStart(2, '0')}\` ${display(m)}`;
 
 export function buildEmbed(queue, goal) {
   const n = queue.length, left = Math.max(0, goal - n);
   // guarda a ordem no link do título (limite do Discord para URL: deixa folga)
   let ids = queue.map((m) => m.user.id);
   while (ids.length && (SITE.length + 4 + ids.join('.').length) > 1900) ids = ids.slice(0, -1);
-  const names = queue.slice(0, SHOW).map((m, i) => `\`#${String(i + 1).padStart(2, '0')}\` ${display(m)}`);
-  if (n > SHOW) names.push(`+ ${n - SHOW} more / mais`);
+  const tierFields = TIERS.map(([name, from, to]) => {
+    const rows = [];
+    for (let i = from; i < to; i++) rows.push(queue[i] ? line(queue[i], i) : `\`#${String(i + 1).padStart(2, '0')}\` ─`);
+    return { name, value: rows.join('\n'), inline: true };
+  });
+  const rest = queue.slice(15, 15 + SHOW).map((m, i) => line(m, i + 15));
+  if (n > 15 + SHOW) rest.push(`+ ${n - 15 - SHOW} more · mais`);
+  const fields = [
+    { name: 'Survivors · Sobreviventes', value: `### ${String(n).padStart(2, '0')} / ${goal}`, inline: true },
+    { name: 'Spots left · Vagas', value: `### ${left}`, inline: true },
+    { name: 'Launch · Inauguração', value: `### ${goal} 🎯`, inline: true },
+    { name: 'Progress · Progresso', value: bar(n, goal), inline: false },
+    ...tierFields,
+  ];
+  if (rest.length) fields.push({ name: 'Next in line · Próximos da fila', value: rest.join('\n'), inline: false });
   return {
-    title: '🎟️ HAVOK · WAITING LIST',
+    title: '🎟️ WAITING LIST · STATUS',
     url: `${SITE}?wl=${ids.join('.')}`,
     color: 0xff6a00,
-    description: `🇺🇸 The server opens when **${goal} survivors** are on the list. Join by picking the **Waiting List** option in the welcome questions.\n\n`
-      + `🇧🇷 O servidor abre quando **${goal} sobreviventes** estiverem na lista. Entre escolhendo a opção **Waiting List** nas perguntas de boas-vindas.`,
-    fields: [
-      { name: 'Survivors · Sobreviventes', value: `**${String(n).padStart(2, '0')} / ${goal}**`, inline: true },
-      { name: 'Spots left · Vagas restantes', value: left ? `**${left}**` : '**0** 🎉', inline: true },
-      { name: 'Progress · Progresso', value: bar(n, goal), inline: false },
-      { name: 'First survivors · Primeiros sobreviventes', value: names.length ? names.join('\n') : '—', inline: false },
-    ],
-    footer: { text: '🇺🇸 Updates every minute · 🇧🇷 Atualiza a cada minuto · havokrust.xyz' },
+    thumbnail: { url: `${SITE}apple-touch-icon.png` },
+    description: `🇺🇸 Join by picking **Waiting List** in the welcome questions. The launch date is set at **${goal}** survivors.\n`
+      + `🇧🇷 Entre escolhendo **Waiting List** nas perguntas de boas-vindas. A data sai com **${goal}** sobreviventes.`,
+    fields,
+    footer: { text: '🇺🇸 Live · updates every minute  ·  🇧🇷 Ao vivo · atualiza a cada minuto' },
   };
 }
 
@@ -91,15 +104,17 @@ export async function updatePanel(env, fetchImpl = fetch) {
   return 'updated';
 }
 
-// os 15 primeiros da fila, lidos do próprio painel (para o mural do site). Sem nomes de quem não está no painel.
+// os 15 primeiros da fila, lidos do próprio painel (para o mural do site)
 export async function readFirst(env, fetchImpl = fetch, limit = 15) {
   if (!env.WAITLIST_WEBHOOK || !env.WAITLIST_MESSAGE_ID) return [];
   const msg = await discordFetch(fetchImpl, `${env.WAITLIST_WEBHOOK.replace(/\/$/, '')}/messages/${env.WAITLIST_MESSAGE_ID}`);
-  const field = ((msg && msg.embeds && msg.embeds[0] && msg.embeds[0].fields) || []).find((f) => /First survivors/.test(f.name));
+  const fields = (msg && msg.embeds && msg.embeds[0] && msg.embeds[0].fields) || [];
   const out = [];
-  for (const line of String((field && field.value) || '').split('\n')) {
-    const m = line.match(/^`#(\d+)`\s+(.+)$/);
-    if (m && out.length < limit) out.push({ pos: parseInt(m[1], 10), name: m[2].trim() });
+  for (const f of fields) {
+    for (const ln of String(f.value || '').split('\n')) {
+      const m = ln.match(/^`#(\d+)`\s+(.+)$/);
+      if (m && m[2].trim() !== '─') out.push({ pos: parseInt(m[1], 10), name: m[2].trim() });
+    }
   }
-  return out;
+  return out.sort((a, b) => a.pos - b.pos).slice(0, limit);
 }
