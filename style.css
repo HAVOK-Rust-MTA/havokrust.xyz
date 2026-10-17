@@ -431,8 +431,9 @@ body.landing .main { padding: 0; }
 .l-step small { color: var(--muted); font-size: 14.5px; line-height: 1.5; }
 .l-step:hover b { color: var(--accent2); }
 
-.l-join { position: relative; padding: 44px 44px 40px; background: linear-gradient(135deg, rgba(255, 106, 0, .09), var(--panel) 50%); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
-.l-join::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: repeating-linear-gradient(-45deg, var(--accent) 0 12px, #140a02 12px 24px); opacity: .85; }
+.l-join { position: relative; padding: 50px 44px 40px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden;
+  /* faixa de perigo no topo (amarelo/preto de obra) + fundo */
+  background: repeating-linear-gradient(-45deg, rgba(255, 106, 0, .85) 0 12px, #140a02 12px 24px) top / 100% 6px no-repeat, linear-gradient(135deg, rgba(255, 106, 0, .09), var(--panel) 50%); }
 .l-steps { list-style: none; counter-reset: s; margin: 0 0 22px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .l-steps li { counter-increment: s; display: flex; flex-direction: column; gap: 6px; padding-top: 58px; position: relative; }
 .l-steps li::before { content: counter(s, decimal-leading-zero); position: absolute; top: 0; left: 0; font: 700 46px/1 var(--mono); color: transparent; -webkit-text-stroke: 1.5px var(--accent); }
