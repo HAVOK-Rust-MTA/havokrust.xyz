@@ -4,7 +4,7 @@ window.HAVOK = {
   discord: 'https://discord.gg/w4hqcT8ufS',
   // lista de espera: URL do Worker (worker/README.md). Vazio = o contador não aparece.
   // ex.: api: 'https://havok-waitlist.SEU-USUARIO.workers.dev/waitlist'
-  waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 30 },
+  waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 50 },
   // endereço do servidor MTA para a página /play (ex.: '203.0.113.10:22003'). Vazio = página sem o botão.
   server: '',
   // redes sociais da home (vazio = escondido)

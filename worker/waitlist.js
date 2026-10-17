@@ -13,7 +13,7 @@ const STALE_MS = 6 * 60 * 60_000;   // se o Discord cair, ainda serve a última 
 const TIMEOUT_MS = 8_000;
 const SNOWFLAKE = /^\d{17,20}$/;
 
-// cache do isolate (o Cache API do Cloudflare não funciona em *.workers.dev, então este é o principal)
+// cache do isolate; por cima dele, o Cache API (testado: funciona no workers.dev) divide a leitura entre todos os isolates
 let memo = null;       // { count, at }
 let inflight = null;   // uma só ida ao Discord por vez
 let pauseUntil = 0;    // depois de uma falha, espera antes de tentar de novo (não martela o Discord)
@@ -136,8 +136,26 @@ export default {
     }
 
     const goal = Math.max(1, parseInt(env.GOAL, 10) || 30);
+    // cache compartilhado entre isolates (Cache API); se não estiver disponível, segue só com o memo
+    const cache = typeof caches !== 'undefined' ? caches.default : null;
+    const key = new Request(`https://cache.havok/waitlist/${env.GUILD_ID}/${env.ROLE_ID}`);
+    if (!memo || Date.now() - memo.at >= FRESH_MS) {
+      try {
+        const hit = cache && await cache.match(key);
+        if (hit) {
+          const c = await hit.json();
+          if (Number.isInteger(c.count) && Date.now() - c.at < FRESH_MS) memo = c;
+        }
+      } catch (e) { /* sem cache: tudo bem */ }
+    }
     try {
+      const before = memo && memo.at;
       const r = await getCount(env, Date.now());
+      if (cache && !r.stale && r.at !== before) {
+        try {
+          await cache.put(key, new Response(JSON.stringify({ count: r.count, at: r.at }), { headers: { 'Cache-Control': 'max-age=60' } }));
+        } catch (e) { /* idem */ }
+      }
       return json({ count: r.count, goal, updatedAt: new Date(r.at).toISOString(), stale: r.stale }, 200, origin, r.stale ? 30 : 60);
     } catch (e) {
       // o motivo fica no log do Worker; o site só recebe "indisponível"

@@ -9,7 +9,7 @@ site (havokrust.xyz) --GET /waitlist--> Worker --Bot token--> Discord API
 ```
 
 Tudo grátis: plano Free do Cloudflare Workers (100 mil requisições/dia) e um bot do Discord.
-O Worker lê o Discord no máximo 1 vez por minuto, não importa quantas pessoas abram o site.
+O Worker lê o Discord no máximo 1 vez por minuto (cache compartilhado do Cloudflare), não importa quantas pessoas abram o site.
 
 ## 1. Criar o bot do Discord
 

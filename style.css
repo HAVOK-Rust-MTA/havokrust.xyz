@@ -401,7 +401,7 @@ body.landing .main { padding: 0; }
 .wl-count b { font-size: clamp(56px, 7vw, 76px); line-height: .9; font-weight: 700; color: var(--accent); letter-spacing: -.02em; }
 .wl-count span { font-size: 22px; color: var(--muted); }
 .wl[data-state="error"] .wl-count b, .wl[data-state="loading"] .wl-count b { color: var(--dim); }
-.wl-cells { display: grid; grid-template-columns: repeat(15, 1fr); gap: 5px; margin-bottom: 14px; }
+.wl-cells { display: grid; grid-template-columns: repeat(var(--cols, 15), 1fr); gap: 4px; margin-bottom: 14px; }
 .wl-cells i { height: 14px; background: #2a241f; border: 1px solid #352d26; transform: skewX(-14deg); opacity: .9; transition: background .35s, border-color .35s, box-shadow .35s; }
 .wl-cells i.on { background: var(--accent); border-color: var(--accent2); box-shadow: 0 0 12px rgba(255, 106, 0, .45); }
 .wl[data-state="full"] .wl-cells i.on { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 12px rgba(245, 184, 61, .5); }
@@ -487,7 +487,7 @@ body.landing .main { padding: 0; }
   .wl { order: 1; margin-bottom: 18px; }
   .l-links { order: 2; }
   .wl { padding: 20px 16px 16px; }
-  .wl-cells { gap: 4px; }
+  .wl-cells { grid-template-columns: repeat(var(--cols-m, 10), 1fr); gap: 4px; }
   .l-body { padding: 48px 16px 56px; }
   .l-sec { margin-bottom: 60px; }
   .l-loop { grid-template-columns: 1fr; }

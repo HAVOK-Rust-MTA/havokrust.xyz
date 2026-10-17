@@ -580,7 +580,7 @@
     return `<div class="wl" id="wl" data-state="${cfg.api ? 'loading' : 'error'}">
         <div class="wl-top"><span class="wl-label"><i class="wl-live"></i>${lt('wl')}</span><span class="wl-of">${lt('wl_of', { n: goal })}</span></div>
         <div class="wl-count" aria-live="polite"><b id="wlNum">--</b><span>/${goal}</span></div>
-        <div class="wl-cells${goal > 60 ? ' cont' : ''}" id="wlCells" role="progressbar" aria-label="${lt('wl')}" aria-valuemin="0" aria-valuemax="${goal}">${cells}</div>
+        <div class="wl-cells${goal > 60 ? ' cont' : ''}" style="--cols:${Math.ceil(goal / 2)};--cols-m:${goal % 10 ? Math.ceil(goal / 3) : 10}" id="wlCells" role="progressbar" aria-label="${lt('wl')}" aria-valuemin="0" aria-valuemax="${goal}">${cells}</div>
         <p class="wl-msg" id="wlMsg">${cfg.api ? lt('wl_load') : lt('wl_err')}</p>
         <a class="wl-btn" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${lt('wl_join')}</span></a>
         <small class="wl-note">${lt('wl_note')}</small>
