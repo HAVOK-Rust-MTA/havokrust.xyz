@@ -5,6 +5,9 @@ window.HAVOK = {
   // lista de espera: URL do Worker (worker/README.md). Vazio = o contador não aparece.
   // ex.: api: 'https://havok-waitlist.SEU-USUARIO.workers.dev/waitlist'
   waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 50 },
+  // wipe: os mesmos números do havok_wipe (g.config.lua). start = inauguração em Brasília 'AAAA-MM-DD HH:MM', '' = sem contagem.
+  // Antes da data o site conta para a inauguração; depois, para o próximo wipe.
+  wipe: { start: '', everyDays: 45, pvpHours: 24 },
   // preços do VIP (por mês) em reais e dólar. Tirar um preço = mostra "Consulte no Discord".
   vip: {
     period: 'month',

@@ -563,6 +563,7 @@
         ['Can I play with friends?', 'Yes. Groups have up to 8 members, with their own tag, emblem and color, plus a group ranking.'],
         ['Does it run on a weak PC?', 'MTA runs on modest hardware. The server interface was built to stay light.'],
       ],
+      cd_launch: 'Server launch in', cd_wipe: 'Next wipe in', cd_pvp: 'INSANE PvP: weapons in every barrel until the wipe', cd_every: 'Full wipe every {n} days',
       news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and the launch countdown.',
     },
     pt: {
@@ -594,6 +595,7 @@
         ['Dá para jogar com amigos?', 'Sim. Grupos têm até 8 membros, com tag, emblema e cor próprios, e um ranking de grupos.'],
         ['Roda em PC fraco?', 'O MTA roda em máquinas modestas. A interface do servidor foi feita para ser leve.'],
       ],
+      cd_launch: 'Inauguração em', cd_wipe: 'Próximo wipe em', cd_pvp: 'PvP INSANO: armas em todo barril até o wipe', cd_every: 'Wipe completo a cada {n} dias',
       news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e a contagem para a inauguração.',
     },
   };
@@ -662,6 +664,37 @@
     paintWaitlist(data);
   }
 
+  // contagem: inauguração (antes de wipe.start) ou próximo wipe (a cada wipe.everyDays). Mesma conta do havok_wipe.
+  let cdTimer = null;
+  function wipeTimes() {
+    const w = (window.HAVOK || {}).wipe || {};
+    const m = String(w.start || '').match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/);
+    if (!m) return null;
+    const start = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4] + 3, +m[5]); // Brasília = UTC-3
+    const period = (w.everyDays || 45) * 86400000, now = Date.now();
+    if (now < start) return { kind: 'launch', at: start, every: w.everyDays || 45 };
+    const at = start + (Math.floor((now - start) / period) + 1) * period;
+    return { kind: 'wipe', at, every: w.everyDays || 45, pvp: at - now <= (w.pvpHours || 24) * 3600000 };
+  }
+  function countdownBox() {
+    const w = wipeTimes();
+    if (!w) return '';
+    const paint = () => {
+      const el = $('#cdLeft');
+      if (!el) { clearInterval(cdTimer); return; }
+      const cur = wipeTimes();
+      let s = Math.max(0, Math.floor((cur.at - Date.now()) / 1000));
+      const d = Math.floor(s / 86400); s %= 86400;
+      const h = Math.floor(s / 3600); s %= 3600;
+      const mi = Math.floor(s / 60), se = s % 60;
+      const p2 = (n) => String(n).padStart(2, '0');
+      el.innerHTML = `<b>${d}</b><i>d</i><b>${p2(h)}</b><i>h</i><b>${p2(mi)}</b><i>m</i><b>${p2(se)}</b><i>s</i>`;
+    };
+    setTimeout(() => { clearInterval(cdTimer); paint(); cdTimer = setInterval(paint, 1000); });
+    return `<div class="cd${w.pvp ? ' pvp' : ''}"><span class="cd-label">${lt(w.kind === 'launch' ? 'cd_launch' : 'cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
+      <small>${w.pvp ? lt('cd_pvp') : lt('cd_every', { n: w.every })}</small></div>`;
+  }
+
   function pageLanding() {
     const H = window.HAVOK || {};
     const so = Object.assign({ discord: H.discord }, H.socials || {});
@@ -690,6 +723,7 @@
             <p class="l-eyebrow">${lt('eyebrow')}</p>
             <h1 class="l-h1"><span>${lt('h1a')}</span> <span class="hot">${lt('h1b')}</span></h1>
             <p class="l-sub">${lt('sub', { n: goal })}</p>
+            ${countdownBox()}
             <div class="l-links"><a href="#/wiki">${svg('book')} ${lt('wiki')}</a><button type="button" id="toHow">${svg('chevron')} ${lt('scroll')}</button></div>
           </div>
           ${waitlistCard()}

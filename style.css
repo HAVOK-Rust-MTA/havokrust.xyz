@@ -662,3 +662,14 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
   .sp-desc { min-height: 0; }
   body.standalone .main { padding: 28px 16px 56px; }
 }
+
+/* contagem: inauguração / próximo wipe */
+.cd { display: inline-grid; grid-template-columns: auto auto; align-items: center; gap: 4px 16px; margin: 0 0 24px; padding: 12px 16px; border: 1px solid var(--line2); border-radius: 4px; background: rgba(14, 13, 12, .6); animation: l-in .7s .3s both; }
+.cd-label { font: 500 11.5px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent2); }
+.cd-left { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text); }
+.cd-left b { font-size: 24px; font-weight: 700; }
+.cd-left i { font-style: normal; font-size: 13px; color: var(--muted); margin: 0 8px 0 2px; }
+.cd small { grid-column: 1 / -1; color: var(--dim); font-size: 12.5px; }
+.cd.pvp { border-color: var(--red); background: rgba(229, 84, 75, .1); }
+.cd.pvp .cd-label, .cd.pvp small { color: #ff8a80; }
+@media (max-width: 600px) { .cd { margin-bottom: 18px; } }
