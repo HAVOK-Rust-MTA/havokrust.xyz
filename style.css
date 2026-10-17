@@ -475,3 +475,20 @@ body.landing .main { padding: 0; }
 @media (prefers-reduced-motion: reduce) {
   .l-logo, .l-h1 span, .l-sub, .l-cta, .l-scroll::after { animation: none; }
 }
+
+/* lista de espera (contador do Discord) */
+.wl { width: min(520px, 100%); margin: 6px auto 18px; padding: 16px 18px; text-align: left;
+  background: rgba(14, 13, 12, .72); border: 1px solid var(--line2); border-radius: 12px; backdrop-filter: blur(6px); }
+.wl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.wl-head b { font-size: 15px; letter-spacing: .02em; }
+.wl-num { font: 700 18px/1 var(--font); color: var(--accent); font-variant-numeric: tabular-nums; }
+.wl-bar { height: 8px; margin: 12px 0 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.wl-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: inherit; transition: width .8s ease; }
+.wl-msg { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); text-align: center; }
+.wl[data-state="error"] .wl-num { color: var(--muted); }
+.wl[data-state="error"] .wl-msg { font-size: 12.5px; }
+.wl-btn { display: flex; align-items: center; justify-content: center; gap: 9px; padding: 13px 16px; border-radius: 9px;
+  background: #5865f2; color: #fff; font-weight: 700; letter-spacing: .02em; text-decoration: none; }
+.wl-btn:hover { background: #4752c4; }
+.wl-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+.wl-note { display: block; margin-top: 9px; text-align: center; font-size: 12px; color: var(--muted); }

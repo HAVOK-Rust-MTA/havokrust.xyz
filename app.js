@@ -43,6 +43,7 @@
       store_cta: 'Get VIP on Discord', store_fine: 'Open a ticket on our Discord to buy. Type /vip in game to see how much time you have left. Being VIP does not exempt anyone from the rules.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD & interface', nav_home: 'Home',
       l_h1a: 'SURVIVE.', l_h1b: 'BUILD.', l_h1c: 'RAID.', l_sub: 'Rust survival on the streets of San Andreas. Wake up with nothing, farm, craft, build your base and fight for everything you own.',
+      wl_title: 'Waiting list', wl_join: 'Join the waiting list', wl_note: 'Free • Through Discord • PC', wl_goal: 'We are gathering the first {n} survivors to schedule the server launch.', wl_full: 'Goal reached! The launch date will be announced on Discord.', wl_err: 'Counter unavailable right now.', wl_load: 'Loading...',
       l_play: 'Play now', l_wiki: 'Open the wiki', l_feat: 'What awaits you', l_new: 'New to the server?', l_new_sub: 'Your first 10 minutes, step by step: from waking up with nothing to your first safe box.',
       l_new_btn: 'Read the starter guide', l_steps: ['Break barrels and hit trees and rocks', 'Craft a hatchet and a pickaxe', 'Build a small house with a Wardrobe inside'],
       l_media: 'See the game', l_news: 'News', l_social: 'Follow HAVOK', l_social_sub: 'Clips, updates and events first-hand.', l_all_news: 'Show older news',
@@ -82,6 +83,7 @@
       store_cta: 'Pegar VIP no Discord', store_fine: 'Abra um ticket no nosso Discord para comprar. Digite /vip no jogo para ver quanto tempo falta. Ser VIP não livra ninguém das regras.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD e interface', nav_home: 'Início',
       l_h1a: 'SOBREVIVA.', l_h1b: 'CONSTRUA.', l_h1c: 'RAIDE.', l_sub: 'Sobrevivência no estilo Rust nas ruas de San Andreas. Acorde sem nada, farme, crafte, construa sua base e lute por tudo que é seu.',
+      wl_title: 'Lista de espera', wl_join: 'Entrar na lista de espera', wl_note: 'Grátis • Pelo Discord • PC', wl_goal: 'Estamos reunindo os primeiros {n} sobreviventes para marcar a inauguração do servidor.', wl_full: 'Meta batida! A data da inauguração sai no Discord.', wl_err: 'Contador indisponível no momento.', wl_load: 'Carregando...',
       l_play: 'Jogar agora', l_wiki: 'Abrir a wiki', l_feat: 'O que te espera', l_new: 'Novo no servidor?', l_new_sub: 'Seus primeiros 10 minutos, passo a passo: de acordar sem nada até a sua primeira caixa segura.',
       l_new_btn: 'Ler o guia inicial', l_steps: ['Quebre barris e bata em árvores e pedras', 'Crafte um machado e uma picareta', 'Faça uma casinha com um Armário dentro'],
       l_media: 'Veja o jogo', l_news: 'Novidades', l_social: 'Siga o HAVOK', l_social_sub: 'Clipes, atualizações e eventos em primeira mão.', l_all_news: 'Ver novidades antigas',
@@ -534,6 +536,53 @@
       <p class="fine">${t('store_fine')}</p>`;
   }
 
+  // ---------------------------------------------------------------- lista de espera
+  // Lê o contador do Worker (worker/waitlist.js), que conta o cargo "Waiting List" no Discord.
+  // Sem config.waitlist.api o bloco não aparece. Erro = aviso discreto, nunca número inventado.
+  let wlTimer = null;
+  const WL_EVERY = 60000;
+  function waitlistBox() {
+    const H = window.HAVOK || {}, cfg = H.waitlist || {};
+    if (!cfg.api) return '';
+    const goal = cfg.goal || 30;
+    setTimeout(() => { loadWaitlist(); wlTimer = setInterval(() => { if (!document.hidden) loadWaitlist(); }, WL_EVERY); });
+    return `<div class="wl" id="wl" data-state="loading" aria-live="polite">
+        <div class="wl-head"><b>${t('wl_title')}</b><span class="wl-num" id="wlNum">— / ${goal}</span></div>
+        <div class="wl-bar" role="progressbar" aria-label="${t('wl_title')}" aria-valuemin="0" aria-valuemax="${goal}"><i id="wlBar"></i></div>
+        <p class="wl-msg" id="wlMsg">${t('wl_load')}</p>
+        <a class="wl-btn" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')} ${t('wl_join')}</a>
+        <small class="wl-note">${t('wl_note')}</small>
+      </div>`;
+  }
+  async function loadWaitlist() {
+    const box = $('#wl');
+    if (!box) return;
+    const cfg = (window.HAVOK || {}).waitlist || {};
+    let data = null;
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 10000);
+      const r = await fetch(cfg.api, { signal: ctrl.signal, cache: 'no-cache' });
+      clearTimeout(to);
+      const j = r.ok ? await r.json() : null;
+      if (j && Number.isInteger(j.count) && j.count >= 0) data = j;
+    } catch (e) { data = null; }
+    if (!$('#wl')) return; // saiu da página enquanto carregava
+    const goal = (data && data.goal) || cfg.goal || 30;
+    const bar = $('#wlBar'), num = $('#wlNum'), msg = $('#wlMsg');
+    if (!data) {
+      // mantém o último número real na tela se já tinha um; senão fica sem número
+      if (box.dataset.state !== 'ok') { box.dataset.state = 'error'; num.textContent = `— / ${goal}`; bar.style.width = '0'; }
+      msg.textContent = t('wl_err');
+      return;
+    }
+    box.dataset.state = 'ok';
+    num.textContent = `${data.count} / ${goal}`;
+    bar.style.width = Math.min(100, (data.count / goal) * 100) + '%';
+    bar.parentElement.setAttribute('aria-valuenow', data.count);
+    msg.textContent = data.count >= goal ? t('wl_full') : t('wl_goal', { n: goal });
+  }
+
   // ---------------------------------------------------------------- home (landing)
   const LANDING_MEDIA = [['spawn', 'spawn'], ['gather-tools', 'resource-gathering'], ['first-house', 'base-building'], ['vehicles', 'world-and-events'], ['build-wheel', 'base-building'], ['upgrade', 'base-building']];
   const fmtDate = (d) => { const [y, m, dd] = d.split('-'); return lang === 'pt' ? `${dd}/${m}/${y}` : `${m}/${dd}/${y}`; };
@@ -561,6 +610,7 @@
           <img class="l-logo" src="logo-text.png" alt="HAVOK">
           <h1 class="l-h1"><span>${t('l_h1a')}</span> <span>${t('l_h1b')}</span> <span class="hot">${t('l_h1c')}</span></h1>
           <p class="l-sub">${t('l_sub')}</p>
+          ${waitlistBox()}
           <div class="l-cta">
             <a class="l-btn primary" href="play/">${svg('play')} ${t('l_play')}</a>
             <a class="l-btn discord" href="${esc(so.discord || '#')}" target="_blank" rel="noopener">${svg('discord')} Discord</a>
@@ -636,6 +686,7 @@
 
   // ---------------------------------------------------------------- router
   function route() {
+    clearInterval(wlTimer);
     const h = (location.hash || '#/').slice(1) || '/';
     const parts = h.split('/').filter(Boolean);
     let html;

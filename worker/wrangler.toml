@@ -1,0 +1,11 @@
+name = "havok-waitlist"
+main = "waitlist.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+GUILD_ID = "1560345146703482890"
+ROLE_ID = ""          # ID do cargo "Waiting List" (ver README)
+GOAL = "30"
+ALLOWED_ORIGINS = "https://havokrust.xyz,https://www.havokrust.xyz,http://127.0.0.1:8080,http://localhost:8080"
+
+# O token NÃO vai aqui. Rode: npx wrangler secret put DISCORD_BOT_TOKEN
