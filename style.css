@@ -483,7 +483,7 @@ body.landing .main { padding: 0; }
 .wl-head b { font-size: 15px; letter-spacing: .02em; }
 .wl-num { font: 700 18px/1 var(--font); color: var(--accent); font-variant-numeric: tabular-nums; }
 .wl-bar { height: 8px; margin: 12px 0 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
-.wl-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: inherit; transition: width .8s ease; }
+.wl-bar i { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: inherit; transition: transform .8s ease; }
 .wl-msg { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); text-align: center; }
 .wl[data-state="error"] .wl-num { color: var(--muted); }
 .wl[data-state="error"] .wl-msg { font-size: 12.5px; }

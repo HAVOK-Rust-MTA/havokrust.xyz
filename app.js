@@ -572,13 +572,13 @@
     const bar = $('#wlBar'), num = $('#wlNum'), msg = $('#wlMsg');
     if (!data) {
       // mantém o último número real na tela se já tinha um; senão fica sem número
-      if (box.dataset.state !== 'ok') { box.dataset.state = 'error'; num.textContent = `— / ${goal}`; bar.style.width = '0'; }
+      if (box.dataset.state !== 'ok') { box.dataset.state = 'error'; num.textContent = `— / ${goal}`; bar.style.transform = 'scaleX(0)'; }
       msg.textContent = t('wl_err');
       return;
     }
     box.dataset.state = 'ok';
     num.textContent = `${data.count} / ${goal}`;
-    bar.style.width = Math.min(100, (data.count / goal) * 100) + '%';
+    bar.style.transform = `scaleX(${Math.min(1, data.count / goal)})`;
     bar.parentElement.setAttribute('aria-valuenow', data.count);
     msg.textContent = data.count >= goal ? t('wl_full') : t('wl_goal', { n: goal });
   }
