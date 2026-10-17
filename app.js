@@ -472,12 +472,12 @@
     pickup: ['Pickups & vans', 'Picapes e vans'], bike: ['Motorcycles', 'Motos'], utility: ['Utility', 'Utilitários'], boat: ['Boats', 'Barcos'] };
   const VT = {
     en: { title: 'Vehicles', sub: 'Every vehicle on the server and what it needs to run.', all: 'All', map: 'On the map', mapv: 'up to {n}', trunk: 'Trunk', slots: '{n} slots', slot1: '1 slot',
-      fuel: 'Fuel', fuelv: 'up to {n}', spawn: 'Spawns', sp: { car: 'Roads and cities', boat: 'Coast and docks', armored: 'Special spots only' },
+      fuel: 'Fuel', fuelv: 'up to {n}', spawn: 'Spawns', sp: { car: 'Roads and cities', boat: 'Coast and docks', armored: 'Military areas only', bike: 'Trails and back roads', offroad: 'Countryside and hills', pickup: 'Farms and dealers', van: 'City streets', motorhome: 'One spot only' },
       armor: 'Armored: takes half the bullet damage', needs: 'Needs to run', how: 'How to get one running',
       howtxt: 'Abandoned vehicles are missing parts. Hold right click on one to see what it needs, install the parts, refuel with a Gas Can and press K to start the engine. Without tires a car does not move.',
       none: 'Not on the map yet' },
     pt: { title: 'Veículos', sub: 'Todos os veículos do servidor e o que cada um precisa para andar.', all: 'Todos', map: 'No mapa', mapv: 'até {n}', trunk: 'Porta-malas', slots: '{n} slots', slot1: '1 slot',
-      fuel: 'Gasolina', fuelv: 'até {n}', spawn: 'Nasce em', sp: { car: 'Estradas e cidades', boat: 'Litoral e cais', armored: 'Só em pontos especiais' },
+      fuel: 'Gasolina', fuelv: 'até {n}', spawn: 'Nasce em', sp: { car: 'Estradas e cidades', boat: 'Litoral e cais', armored: 'Só em áreas militares', bike: 'Trilhas e estradas de terra', offroad: 'Interior e morros', pickup: 'Fazendas e concessionárias', van: 'Ruas da cidade', motorhome: 'Um único ponto' },
       armor: 'Blindado: leva metade do dano de bala', needs: 'Precisa para andar', how: 'Como colocar um para andar',
       howtxt: 'Veículos abandonados estão sem peças. Segure o clique direito num deles para ver o que falta, instale as peças, abasteça com um Galão com Gasolina e aperte K para ligar o motor. Sem pneu o carro não sai do lugar.',
       none: 'Ainda não nasce no mapa' },
@@ -500,7 +500,7 @@
             ${v.armored ? `<p class="vh-armor">${svg('shield')} ${V.armor}</p>` : ''}
             <div class="vh-needs"><span>${V.needs}</span><div>${part('engine', v.engine)}${part('car-battery', v.battery)}${part('tire', v.tires)}</div></div>
             <dl><div><dt>${V.fuel}</dt><dd>${fmt(V.fuelv, v.fuel)}</dd></div><div><dt>${V.trunk}</dt><dd>${v.slots === 1 ? V.slot1 : fmt(V.slots, v.slots)}</dd></div>
-              <div><dt>${V.map}</dt><dd>${fmt(V.mapv, v.max)}</dd></div><div><dt>${V.spawn}</dt><dd>${V.sp[v.spawn] || v.spawn}</dd></div></dl></div>
+              <div><dt>${V.map}</dt><dd>${fmt(V.mapv, v.max)}</dd></div><div><dt>${V.spawn}</dt><dd>${V.sp[String(v.spawn).split(',')[0]] || v.spawn}</dd></div></dl></div>
         </article>`).join('')}</div>`;
   }
 
