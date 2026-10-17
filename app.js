@@ -607,19 +607,21 @@
   const fmtDate = (d) => { const [y, m, dd] = d.split('-'); return lang === 'pt' ? `${dd}/${m}/${y}` : `${m}/${dd}/${y}`; };
   let newsAll = false;
 
-  // lista de espera: barra com uma marca por vaga (até 60; acima disso vira barra contínua)
+  // lista de espera: barra com uma marca por vaga (até 60; acima disso 50 marcas proporcionais)
   let wlTimer = null, wlLast = null;
   const WL_EVERY = 30000;
   const wlGoal = () => (wlLast && wlLast.goal) || ((window.HAVOK || {}).waitlist || {}).goal || 30;
   function waitlistCard() {
     const H = window.HAVOK || {}, cfg = H.waitlist || {};
     const goal = wlGoal();
-    const cells = goal <= 60 ? Array.from({ length: goal }, () => '<i></i>').join('') : '<i class="fill"></i>';
+    // até 60 vagas: uma marca por vaga; acima disso, 50 marcas proporcionais (igual ao painel do Discord)
+    const nCells = goal <= 60 ? goal : 50;
+    const cells = Array.from({ length: nCells }, () => '<i></i>').join('');
     if (cfg.api) setTimeout(() => { if (wlLast) paintWaitlist(wlLast); loadWaitlist(); wlTimer = setInterval(() => { if (!document.hidden) loadWaitlist(); }, WL_EVERY); });
     return `<div class="wl" id="wl" data-state="${cfg.api ? 'loading' : 'error'}">
         <div class="wl-top"><span class="wl-label"><i class="wl-live"></i>${lt('wl')}</span><span class="wl-of">${lt('wl_of', { n: goal })}</span></div>
         <div class="wl-count" aria-live="polite"><b id="wlNum">--</b><span>/${goal}</span></div>
-        <div class="wl-cells${goal > 60 ? ' cont' : ''}" style="--cols:${Math.ceil(goal / 2)};--cols-m:${goal % 10 ? Math.ceil(goal / 3) : 10}" id="wlCells" role="progressbar" aria-label="${lt('wl')}" aria-valuemin="0" aria-valuemax="${goal}">${cells}</div>
+        <div class="wl-cells" style="--cols:${Math.ceil(nCells / 2)};--cols-m:${nCells % 10 ? Math.ceil(nCells / 3) : 10}" id="wlCells" role="progressbar" aria-label="${lt('wl')}" aria-valuemin="0" aria-valuemax="${goal}">${cells}</div>
         <p class="wl-msg" id="wlMsg">${cfg.api ? lt('wl_load') : lt('wl_err')}</p>
         <a class="wl-btn" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${lt('wl_join')}</span></a>
         <small class="wl-note">${lt('wl_note')}</small>
@@ -639,8 +641,8 @@
     box.dataset.state = n >= goal ? 'full' : 'ok';
     num.textContent = String(n).padStart(2, '0');
     cells.setAttribute('aria-valuenow', n);
-    if (cells.classList.contains('cont')) cells.firstElementChild.style.transform = `scaleX(${Math.min(1, n / goal)})`;
-    else [...cells.children].forEach((c, i) => { c.classList.toggle('on', i < n); c.style.transitionDelay = (i * 25) + 'ms'; });
+    const total = cells.children.length, lit = total === goal ? n : Math.round((Math.min(n, goal) / goal) * total);
+    [...cells.children].forEach((c, i) => { c.classList.toggle('on', i < lit); c.style.transitionDelay = (i * 25) + 'ms'; });
     const left = goal - n;
     msg.textContent = left <= 0 ? lt('wl_full') : left === 1 ? lt('wl_left1') : lt('wl_left', { n: left });
   }

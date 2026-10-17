@@ -63,15 +63,15 @@ export function buildEmbed(queue, goal) {
     title: '🎟️ HAVOK · WAITING LIST',
     url: `${SITE}?wl=${ids.join('.')}`,
     color: 0xff6a00,
-    description: `The server opens when **${goal} survivors** are on the list. Join by picking the **Waiting List** option in the welcome questions.\n\n`
-      + `O servidor abre quando **${goal} sobreviventes** estiverem na lista. Entre escolhendo a opção **Waiting List** nas perguntas de boas-vindas.`,
+    description: `🇺🇸 The server opens when **${goal} survivors** are on the list. Join by picking the **Waiting List** option in the welcome questions.\n\n`
+      + `🇧🇷 O servidor abre quando **${goal} sobreviventes** estiverem na lista. Entre escolhendo a opção **Waiting List** nas perguntas de boas-vindas.`,
     fields: [
       { name: 'Survivors · Sobreviventes', value: `**${String(n).padStart(2, '0')} / ${goal}**`, inline: true },
       { name: 'Spots left · Vagas restantes', value: left ? `**${left}**` : '**0** 🎉', inline: true },
       { name: 'Progress · Progresso', value: bar(n, goal), inline: false },
       { name: 'First survivors · Primeiros sobreviventes', value: names.length ? names.join('\n') : '—', inline: false },
     ],
-    footer: { text: 'Updates every minute · Atualiza a cada minuto · havokrust.xyz' },
+    footer: { text: '🇺🇸 Updates every minute · 🇧🇷 Atualiza a cada minuto · havokrust.xyz' },
   };
 }
 
