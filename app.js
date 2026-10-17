@@ -13,9 +13,9 @@
   const T = {
     en: {
       nav_wiki: 'Wiki', search: 'Search items...', browse: 'Browse', guides_h: 'Guides', all_items: 'All Items', all_guides: 'All Guides',
-      wiki_title: 'Game Wiki', wiki_sub: 'Complete game reference for HAVOK — Rust Survival', categories: 'Categories', systems: 'Systems', guides: 'Guides',
+      wiki_title: 'Game Wiki', wiki_sub: 'Every item, recipe and system on HAVOK, checked against the server.', categories: 'Categories', systems: 'Systems', guides: 'Guides',
       items_count: '{n} items', items_title: 'Items', items_desc: 'Browse every item in the game', showing: 'Showing {n} of {t} items',
-      no_results: 'No items found', all_types: 'All types', craftable: 'Craftable', has_bp: 'Needs Blueprint', workbench: 'Workbench',
+      no_results: 'No items found', all_types: 'All types', craftable: 'Craftable', has_bp: 'Needs Blueprint', workbench: 'Workbench', filter_here: 'Filter this list...', sort: 'Sort', sort_name: 'A–Z', sort_level: 'By level', open_search: 'Search',
       faq_desc: 'Quick answers to the most common questions about progression, survival, and support.',
       guides_desc: 'Practical guides for progression, farming, loot, crafting, building, and combat.',
       weapon_stats: 'Weapon Stats', damage: 'Base damage', damage_hint: '% of max health', range: 'Range', mag: 'Magazine Size', ammo: 'Ammunition',
@@ -47,9 +47,9 @@
     },
     pt: {
       nav_wiki: 'Wiki', search: 'Buscar itens...', browse: 'Navegar', guides_h: 'Guias', all_items: 'Todos os Itens', all_guides: 'Todos os Guias',
-      wiki_title: 'Wiki do Jogo', wiki_sub: 'Referência completa do HAVOK — Rust Survival', categories: 'Categorias', systems: 'Sistemas', guides: 'Guias',
+      wiki_title: 'Wiki do Jogo', wiki_sub: 'Todos os itens, receitas e sistemas do HAVOK, conferidos com o servidor.', categories: 'Categorias', systems: 'Sistemas', guides: 'Guias',
       items_count: '{n} itens', items_title: 'Itens', items_desc: 'Navegue por todos os itens do jogo', showing: 'Mostrando {n} de {t} itens',
-      no_results: 'Nenhum item encontrado', all_types: 'Todos os tipos', craftable: 'Fabricável', has_bp: 'Precisa de Blueprint', workbench: 'Bancada',
+      no_results: 'Nenhum item encontrado', all_types: 'Todos os tipos', craftable: 'Fabricável', has_bp: 'Precisa de Blueprint', workbench: 'Bancada', filter_here: 'Filtrar esta lista...', sort: 'Ordenar', sort_name: 'A–Z', sort_level: 'Por level', open_search: 'Buscar',
       faq_desc: 'Respostas rápidas para as dúvidas mais comuns sobre progressão, sobrevivência e suporte.',
       guides_desc: 'Guias práticos de progressão, coleta, loot, fabricação, construção e combate.',
       weapon_stats: 'Estatísticas da Arma', damage: 'Dano base', damage_hint: '% da vida máxima', range: 'Alcance', mag: 'Tamanho do Carregador', ammo: 'Munição',
@@ -112,7 +112,7 @@
     'default-box': ['Loot crates', 'Caixas de loot'], 'military-box': ['Military crates', 'Caixas militares'], 'military-barrel': ['Military barrels', 'Barris militares'],
     helicopter: ['Patrol helicopter wreck', 'Destroços do helicóptero'], airdrop: ['Airdrop', 'Airdrop'], hospital: ['Hospital med packs', 'Kits médicos dos hospitais'],
     tree: ['Trees', 'Árvores'], rock: ['Grey rocks', 'Pedras cinzas'], 'iron-rock': ['Iron rocks', 'Pedras de ferro'], 'sulfur-rock': ['Yellow sulfur rocks', 'Pedras amarelas de enxofre'],
-    planter: ['Grown in a Planter', 'Plantado num Canteiro'], fill: ['Fill a canteen at a lake, river, Well or Water Barrel', 'Encha o cantil num lago, rio, Poço ou Barril de Água'],
+    planter: ['Grown in a Planter', 'Plantado na Plantadora'], fill: ['Fill a canteen at a lake, river, Well or Water Barrel', 'Encha o cantil num lago, rio, Poço ou Barril de Água'],
     cook: ['Cook Raw Meat on a Campfire or Furnace', 'Cozinhe Carne Crua na Fogueira ou Fornalha'],
   };
   const SRC_ICON = { tree: 'tree', rock: 'pickaxe', 'iron-rock': 'pickaxe', 'sulfur-rock': 'pickaxe', planter: 'sprout', fill: 'droplet', cook: 'flame', helicopter: 'zap', airdrop: 'package', hospital: 'cross' };
@@ -221,51 +221,73 @@
   }
   function pageHome() {
     const count = (id) => W.items.filter((i) => i.cat === id).length;
-    return `${crumbs([['Wiki', '#/wiki']])}
-      <h1 class="page-title">${t('wiki_title')}</h1><p class="page-sub">${t('wiki_sub')}</p>
+    setTimeout(() => {
+      // a busca grande da wiki usa a mesma busca global
+      const big = $('#wikiSearch');
+      if (big) big.onclick = () => openSearch();
+    });
+    return `<section class="w-hero">
+        <p class="l-kicker">HAVOK · Wiki</p>
+        <h1 class="page-title">${t('wiki_title')}</h1><p class="page-sub">${t('wiki_sub')}</p>
+        <button type="button" class="w-search" id="wikiSearch">${svg('search')}<span>${t('search')}</span><kbd>Ctrl K</kbd></button>
+      </section>
       ${featuredVideo()}
       <div class="section-title">${t('categories')}</div>
-      <div class="grid">${CATS.map((c) => `<a class="tile" href="#/category/${c.id}"><span class="tile-ic">${svg(c.icon)}</span><span><b>${esc(c[lang])}</b><small>${t('items_count', { n: count(c.id) })}</small></span></a>`).join('')}</div>
-      <div class="section-title">${t('systems')}</div>
-      <div class="grid"><a class="tile tall" href="#/faq"><span class="tile-ic">${svg('help')}</span><span><b>FAQ</b><small>${t('faq_desc')}</small></span></a></div>
+      <div class="w-cats">${CATS.map((c) => `<a class="w-cat" href="#/category/${c.id}"><span class="w-cat-ic">${svg(c.icon)}</span><b>${esc(c[lang])}</b><small>${t('items_count', { n: count(c.id) })}</small></a>`).join('')}
+        <a class="w-cat" href="#/items"><span class="w-cat-ic">${svg('grid')}</span><b>${t('all_items')}</b><small>${t('items_count', { n: W.items.length })}</small></a></div>
       <div class="section-title">${t('guides')}</div>
-      <div class="grid">${W.guides.map((g) => `<a class="tile tall" href="#/guides/${g.slug}"><span class="tile-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}</div>`;
+      <div class="w-guides">${W.guides.map((g, i) => `<a class="w-guide" href="#/guides/${g.slug}"><span class="w-guide-n">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}
+        <a class="w-guide" href="#/faq"><span class="w-guide-n">?</span><span><b>FAQ</b><small>${t('faq_desc')}</small></span></a></div>`;
   }
 
-  const filt = { q: '', type: '', craft: false, bp: false, bench: false };
+  const filt = { q: '', type: '', craft: false, bp: false, bench: false, sort: 'name' };
   function itemCard(it) {
-    const tags = [];
-    if (it.blueprint !== undefined) tags.push(`<span class="dot" title="Blueprint"></span>`);
-    return `<a class="item-card" href="#/items/${it.id}">${iconOf(it)}<span><b>${esc(name(it))}</b><small>${esc(typeName(it.type))}</small></span><span class="tags">${tags.join('')}</span></a>`;
+    if (!it) return '';
+    const marks = [];
+    if (it.blueprint !== undefined) marks.push(`<span class="m bp" title="Blueprint">BP</span>`);
+    if (it.bench) marks.push(`<span class="m bench" title="${t('bench_badge')}">${svg('hammer')}</span>`);
+    return `<a class="item-card" href="#/items/${it.id}">${iconOf(it)}<span class="ic-txt"><b>${esc(name(it))}</b><small>${esc(typeName(it.type))}</small></span>${marks.length ? `<span class="tags">${marks.join('')}</span>` : ''}</a>`;
   }
   function pageList(catId) {
     const cat = CATS.find((c) => c.id === catId);
     const base = W.items.filter((i) => !catId || i.cat === catId);
-    const types = [...new Set(base.map((i) => i.type))];
+    const types = [...new Set(base.map((i) => i.type))].sort((a, b) => typeName(a).localeCompare(typeName(b)));
+    if (filt.type && !types.includes(filt.type)) filt.type = '';
     const title = cat ? cat[lang] : t('items_title');
+    const tab = (href, label, on) => `<a href="${href}" class="${on ? 'on' : ''}">${esc(label)}</a>`;
     const html = `${crumbs(cat ? [['Wiki', '#/wiki'], [t('items_title'), '#/items'], [title]] : [['Wiki', '#/wiki'], [title]])}
-      <h1 class="page-title">${esc(title)}</h1><p class="page-sub">${t('items_desc')}</p>
-      <div class="filters">
-        <input type="search" id="fq" placeholder="${t('search')}" value="${esc(filt.q)}">
-        ${types.length > 1 ? `<select id="ftype"><option value="">${t('all_types')}</option>${types.map((ty) => `<option value="${esc(ty)}" ${filt.type === ty ? 'selected' : ''}>${esc(typeName(ty))}</option>`).join('')}</select>` : ''}
-        <label class="chip ${filt.craft ? 'on' : ''}"><input type="checkbox" id="fcraft" ${filt.craft ? 'checked' : ''}>${t('craftable')}</label>
-        <label class="chip ${filt.bp ? 'on' : ''}"><input type="checkbox" id="fbp" ${filt.bp ? 'checked' : ''}>${t('has_bp')}</label>
-        <label class="chip ${filt.bench ? 'on' : ''}"><input type="checkbox" id="fbench" ${filt.bench ? 'checked' : ''}>${t('workbench')}</label>
+      <h1 class="page-title">${esc(title)}</h1>
+      <nav class="w-tabs" aria-label="${t('categories')}">${tab('#/items', t('all_items'), !catId)}${CATS.map((c) => tab('#/category/' + c.id, c[lang], c.id === catId)).join('')}</nav>
+      <div class="w-filters">
+        <label class="w-q">${svg('search')}<input type="search" id="fq" placeholder="${t('filter_here')}" value="${esc(filt.q)}" autocomplete="off"></label>
+        <div class="w-toggles">
+          <button type="button" class="chip ${filt.craft ? 'on' : ''}" data-f="craft" aria-pressed="${filt.craft}">${t('craftable')}</button>
+          <button type="button" class="chip ${filt.bp ? 'on' : ''}" data-f="bp" aria-pressed="${filt.bp}">${t('has_bp')}</button>
+          <button type="button" class="chip ${filt.bench ? 'on' : ''}" data-f="bench" aria-pressed="${filt.bench}">${t('workbench')}</button>
+          <select id="fsort" aria-label="${t('sort')}"><option value="name">${t('sort_name')}</option><option value="level" ${filt.sort === 'level' ? 'selected' : ''}>${t('sort_level')}</option></select>
+        </div>
+        ${types.length > 1 ? `<div class="w-types">${[['', t('all_types')], ...types.map((ty) => [ty, typeName(ty)])].map(([v, l]) => `<button type="button" class="chip type ${filt.type === v ? 'on' : ''}" data-type="${esc(v)}">${esc(l)}</button>`).join('')}</div>` : ''}
       </div>
-      <div class="count" id="fcount"></div><div class="item-grid" id="flist"></div>`;
+      <div class="count" id="fcount" aria-live="polite"></div><div class="item-grid" id="flist"></div>`;
     setTimeout(() => {
       const draw = () => {
         const q = norm(filt.q);
-        const list = base.filter((i) => (!q || norm(name(i)).includes(q) || norm(i.name.en).includes(q))
-          && (!filt.type || i.type === filt.type) && (!filt.craft || i.recipe) && (!filt.bp || i.blueprint !== undefined) && (!filt.bench || i.bench)).sort(sortByName);
+        const list = base.filter((i) => (!q || norm(name(i)).includes(q) || norm(i.name.en).includes(q) || norm(i.name.pt).includes(q) || norm(typeName(i.type)).includes(q))
+          && (!filt.type || i.type === filt.type) && (!filt.craft || i.recipe) && (!filt.bp || i.blueprint !== undefined) && (!filt.bench || i.bench))
+          .sort(filt.sort === 'level' ? (a, b) => (a.level || 0) - (b.level || 0) || sortByName(a, b) : sortByName);
         $('#fcount').textContent = t('showing', { n: list.length, t: base.length });
         $('#flist').innerHTML = list.length ? list.map(itemCard).join('') : `<div class="empty-state">${t('no_results')}</div>`;
       };
       $('#fq').oninput = (e) => { filt.q = e.target.value; draw(); };
-      if ($('#ftype')) $('#ftype').onchange = (e) => { filt.type = e.target.value; draw(); };
-      [['fcraft', 'craft'], ['fbp', 'bp'], ['fbench', 'bench']].forEach(([id, k]) => {
-        $('#' + id).onchange = (e) => { filt[k] = e.target.checked; e.target.parentElement.classList.toggle('on', filt[k]); draw(); };
+      $('#fsort').onchange = (e) => { filt.sort = e.target.value; draw(); };
+      document.querySelectorAll('.w-toggles .chip').forEach((b) => b.onclick = () => {
+        const k = b.dataset.f; filt[k] = !filt[k]; b.classList.toggle('on', filt[k]); b.setAttribute('aria-pressed', filt[k]); draw();
       });
+      document.querySelectorAll('.w-types .chip').forEach((b) => b.onclick = () => {
+        filt.type = b.dataset.type; document.querySelectorAll('.w-types .chip').forEach((x) => x.classList.toggle('on', x === b)); draw();
+      });
+      const on = $('.w-tabs .on');
+      if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
       draw();
     });
     return html;
@@ -289,7 +311,7 @@
     if (it.weapon) {
       const w = it.weapon;
       left.push(`<div class="section-title">${t('weapon_stats')}</div><div class="box">
-        <div class="row"><span>${t('damage')} <small class="muted">(${t('damage_hint')})</small></span><b>${w.damage}%</b></div>
+        ${w.damage != null ? `<div class="row"><span>${t('damage')} <small class="muted">(${t('damage_hint')})</small></span><b>${w.damage}%</b></div>` : ''}
         <div class="row"><span>${t('range')}</span><b>${w.range} m</b></div>
         ${w.mag ? `<div class="row"><span>${t('mag')}</span><b>${w.mag}</b></div>` : ''}
         ${w.ammo ? `<div class="row" style="border:0;padding-bottom:6px"><span>${t('ammo')}</span></div><div class="ammo-card">${itemCard(byId[w.ammo])}</div>` : ''}
@@ -743,6 +765,7 @@
     document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
     document.querySelectorAll('#lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
     $('#search').placeholder = t('search');
+    $('#searchBtn').setAttribute('aria-label', t('open_search'));
     document.querySelectorAll('[data-discord]').forEach((x) => { x.href = (window.HAVOK || {}).discord || '#'; });
   }
   document.querySelectorAll('#lang button').forEach((b) => b.addEventListener('click', () => {
@@ -760,9 +783,14 @@
   function search() {
     const q = norm(sIn.value.trim());
     if (!q) { sRes.classList.remove('open'); return; }
-    const hits = W.items.filter((i) => norm(i.name.en).includes(q) || norm(i.name.pt).includes(q)).sort(sortByName).slice(0, 12);
+    // nome começando com o termo vem antes de nome que só contém o termo
+    const score = (i) => { const a = norm(name(i)), b = norm(lang === 'pt' ? i.name.en : i.name.pt); return a.startsWith(q) ? 0 : a.includes(q) ? 1 : b.includes(q) ? 2 : 9; };
+    const hits = W.items.map((i) => [i, score(i)]).filter((x) => x[1] < 9).sort((a, b) => a[1] - b[1] || sortByName(a[0], b[0])).slice(0, 10).map((x) => x[0]);
+    const guides = W.guides.filter((g) => norm(L(g).title).includes(q) || norm(L(g).description).includes(q)).slice(0, 3);
     sel = 0;
-    sRes.innerHTML = hits.length ? hits.map((i, n) => `<a href="#/items/${i.id}" class="${n === 0 ? 'sel' : ''}">${iconOf(i)}<span>${esc(name(i))}<small>${esc(typeName(i.type))}</small></span></a>`).join('') : `<div class="empty">${t('no_results')}</div>`;
+    const rows = hits.map((i) => `<a href="#/items/${i.id}">${iconOf(i)}<span>${esc(name(i))}<small>${esc(typeName(i.type))}</small></span></a>`)
+      .concat(guides.map((g) => `<a href="#/guides/${g.slug}"><span class="ic">${svg(g.icon)}</span><span>${esc(L(g).title)}<small>${t('guides')}</small></span></a>`));
+    sRes.innerHTML = rows.length ? rows.join('').replace('<a ', '<a class="sel" ') : `<div class="empty">${t('no_results')}</div>`;
     sRes.classList.add('open');
   }
   sIn.addEventListener('input', search);
@@ -779,9 +807,16 @@
   });
   sRes.addEventListener('click', () => { sIn.value = ''; sRes.classList.remove('open'); });
   document.addEventListener('click', (e) => { if (!e.target.closest('.search')) sRes.classList.remove('open'); });
+  // no celular a busca mora no menu lateral: abre o menu e já foca o campo
+  function openSearch() {
+    if (window.matchMedia('(max-width: 860px)').matches) $('#sidebar').classList.add('open');
+    else if (document.body.classList.contains('landing')) { location.hash = '#/wiki'; setTimeout(() => sIn.focus(), 60); return; }
+    sIn.focus(); sIn.select();
+  }
   document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); sIn.focus(); sIn.select(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); }
   });
+  $('#searchBtn').addEventListener('click', openSearch);
 
   window.addEventListener('hashchange', route);
   applyLang();
