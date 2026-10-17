@@ -27,12 +27,12 @@
       back: 'Back', not_found: 'Item not found', prev: 'Previous Guide', next: 'Next Guide', soon_video: 'Video coming soon', soon_shot: 'Screenshot coming soon',
       footer_desc: 'A Rust survival gamemode for Multi Theft Auto: farm, craft, build your base and raid — on the streets of San Andreas.',
       footer_wiki: 'WIKI', footer_server: 'SERVER', footer_copy: '© 2026 HAVOK — Rust Survival. Not affiliated with Facepunch Studios.',
-      bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench',
+      bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench', bp_tip: 'Needs a blueprint: you must learn this recipe before you can craft it.', bench_tip: 'Needs a Workbench nearby to craft.', bp_explain: 'You must learn this blueprint before crafting. Put the item and Scrap in a Research Table to get the blueprint, or find one in airdrops and the patrol helicopter, then right click it → Learn. Learning is permanent.', bp_explain_loot: 'This blueprint cannot be researched. Find it in loot, then right click it → Learn. Learning is permanent.', bp_how: 'How blueprints work', legend_bp: 'needs a blueprint (learn the recipe first)', legend_bench: 'needs a Workbench',
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
       nav_store: 'Store', nav_play: 'Play',
      
       store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
-      store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Day, month or permanent',
+      store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Monthly price; other periods on Discord',
       store_perks: 'Everything you get', store_compare: 'Compare', perk: 'Perk', player: 'Player', store_plans: 'Plans',
       cmp_inv: 'Inventory slots', cmp_base: 'Base piece limit', cmp_upkeep: 'Upkeep cost', cmp_respawn: 'Choose respawn region',
       plan_day: 'Days', plan_day_d: 'Try it out — from 1 day.', plan_month: 'Months', plan_month_d: 'The best value for regular players.', plan_perm: 'Permanent', plan_perm_d: 'VIP forever, no renewals.', popular: 'Most popular',
@@ -40,7 +40,7 @@
       tier_survivor_d: 'Start supporting: more XP, a bigger backpack and a spare bed.', tier_veteran_d: 'Base perks: half the upkeep, faster respawns and the [VIP] tag.', tier_legendary_d: 'Everything, plus cheaper crafting, starter tools and the gold frame.',
       store_get: 'Get on Discord', cmp_xp: 'XP boost', cmp_slot: 'Reserved slot', cmp_beds: 'Beds', cmp_bedtime: 'Bed respawn cooldown', cmp_tools: 'Hatchet + pickaxe on respawn', cmp_craft: 'Crafting cost',
       store_base_note: '* Without a Wardrobe the limit is 15 pieces for everyone, VIP included. With a Wardrobe it is 15 + your level, up to 50. Veteran gets 50 right away, Legendary 65.',
-      store_cta: 'Get VIP on Discord', store_fine: 'Open a ticket on our Discord to buy. Type /vip in game to see how much time you have left. Being VIP does not exempt anyone from the rules.',
+      store_cta: 'Get VIP on Discord', per_month: '/month', per_period: '/period', price_ask: 'Ask on Discord', currency: 'Currency', price: 'Price', free: 'Free', store_fine: 'Open a ticket on our Discord to buy. Type /vip in game to see how much time you have left. Being VIP does not exempt anyone from the rules.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD & interface', nav_home: 'Home',
       tags: { new: 'New', fix: 'Fix', balance: 'Balance', event: 'Event' },
       media_title: 'Media checklist', media_desc: 'Every video and screenshot the guides are waiting for. Drop the file in media/ with the exact name.',
@@ -61,12 +61,12 @@
       back: 'Voltar', not_found: 'Item não encontrado', prev: 'Guia Anterior', next: 'Próximo Guia', soon_video: 'Vídeo em breve', soon_shot: 'Print em breve',
       footer_desc: 'Um modo de sobrevivência no estilo Rust para o Multi Theft Auto: farme, crafte, construa sua base e raide — nas ruas de San Andreas.',
       footer_wiki: 'WIKI', footer_server: 'SERVIDOR', footer_copy: '© 2026 HAVOK — Rust Survival. Sem afiliação com a Facepunch Studios.',
-      bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada',
+      bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada', bp_tip: 'Precisa de blueprint: você tem que aprender esta receita antes de craftar.', bench_tip: 'Precisa de uma Bancada perto para craftar.', bp_explain: 'Você precisa aprender esta blueprint antes de craftar. Coloque o item e Sucata na Mesa de Pesquisa para ganhar a blueprint, ou ache uma no airdrop e no helicóptero de patrulha. Depois clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_explain_loot: 'Esta blueprint não dá para pesquisar. Ache no loot e clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_how: 'Como funcionam as blueprints', legend_bp: 'precisa de blueprint (aprender a receita antes)', legend_bench: 'precisa de Bancada',
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
       nav_store: 'Loja', nav_play: 'Jogar',
      
       store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
-      store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Dias, meses ou permanente',
+      store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Preço por mês; outros períodos no Discord',
       store_perks: 'Tudo que você ganha', store_compare: 'Compare', perk: 'Vantagem', player: 'Jogador', store_plans: 'Planos',
       cmp_inv: 'Slots no inventário', cmp_base: 'Limite de peças da base', cmp_upkeep: 'Custo do upkeep', cmp_respawn: 'Escolher região do respawn',
       plan_day: 'Dias', plan_day_d: 'Para experimentar — a partir de 1 dia.', plan_month: 'Meses', plan_month_d: 'O melhor custo para quem joga sempre.', plan_perm: 'Permanente', plan_perm_d: 'VIP para sempre, sem renovar.', popular: 'Mais escolhido',
@@ -74,7 +74,7 @@
       tier_survivor_d: 'Para começar a apoiar: mais XP, mochila maior e uma cama extra.', tier_veteran_d: 'Vantagens de base: metade do upkeep, respawn mais rápido e tag [VIP].', tier_legendary_d: 'Tudo, mais craft mais barato, ferramentas ao nascer e moldura dourada.',
       store_get: 'Pegar no Discord', cmp_xp: 'Bônus de XP', cmp_slot: 'Vaga reservada', cmp_beds: 'Camas', cmp_bedtime: 'Espera da cama', cmp_tools: 'Machado + picareta ao nascer', cmp_craft: 'Custo de craft',
       store_base_note: '* Sem Armário o limite é 15 peças para todo mundo, VIP incluso. Com Armário é 15 + o seu level, até 50. Veteran já começa com 50, Legendary com 65.',
-      store_cta: 'Pegar VIP no Discord', store_fine: 'Abra um ticket no nosso Discord para comprar. Digite /vip no jogo para ver quanto tempo falta. Ser VIP não livra ninguém das regras.',
+      store_cta: 'Pegar VIP no Discord', per_month: '/mês', per_period: '/período', price_ask: 'Consulte no Discord', currency: 'Moeda', price: 'Preço', free: 'Grátis', store_fine: 'Abra um ticket no nosso Discord para comprar. Digite /vip no jogo para ver quanto tempo falta. Ser VIP não livra ninguém das regras.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD e interface', nav_home: 'Início',
       tags: { new: 'Novo', fix: 'Correção', balance: 'Ajuste', event: 'Evento' },
       media_title: 'Checklist de mídias', media_desc: 'Todos os vídeos e prints que os guias estão esperando. Coloque o arquivo em media/ com o nome exato.',
@@ -134,6 +134,7 @@
     rocket: '<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/><path d="M12 15l-3-3a22 22 0 0 1 2-4A13 13 0 0 1 22 2c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/><path d="M9 12H4s.6-3 2-4c1.6-1.1 5 0 5 0M12 15v5s3-.6 4-2c1.1-1.6 0-5 0-5"/>',
     'heart-pulse': '<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/><path d="M3.2 12H9l.5-1 2 4.5 2-7 1.5 3.5h5.3"/>',
     pickaxe: '<path d="M14.5 12.5 4 23 1 20l10.5-10.5"/><path d="M16 3a14 14 0 0 1 5 5M3 8a14 14 0 0 1 13-5l5 5a14 14 0 0 1-5 13"/>',
+    scroll: '<path d="M8 21h11a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 0 0-2-2 2 2 0 0 0-2 2v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M10 8h6M10 12h6"/>',
     flask: '<path d="M9 3h6M10 3v6L4 20a1 1 0 0 0 .9 1.5h14.2A1 1 0 0 0 20 20L14 9V3"/><path d="M7 15h10"/>',
     flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3.2.3 1.8 1.4 2.7 2.5 2.7z"/>',
     users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
@@ -244,8 +245,8 @@
   function itemCard(it) {
     if (!it) return '';
     const marks = [];
-    if (it.blueprint !== undefined) marks.push(`<span class="m bp" title="Blueprint">BP</span>`);
-    if (it.bench) marks.push(`<span class="m bench" title="${t('bench_badge')}">${svg('hammer')}</span>`);
+    if (it.blueprint !== undefined) marks.push(`<span class="m bp" title="${esc(t('bp_tip'))}">${svg('scroll')}BP</span>`);
+    if (it.bench) marks.push(`<span class="m bench" title="${esc(t('bench_tip'))}">${svg('hammer')}</span>`);
     return `<a class="item-card" href="#/items/${it.id}">${iconOf(it)}<span class="ic-txt"><b>${esc(name(it))}</b><small>${esc(typeName(it.type))}</small></span>${marks.length ? `<span class="tags">${marks.join('')}</span>` : ''}</a>`;
   }
   function pageList(catId) {
@@ -268,7 +269,9 @@
         </div>
         ${types.length > 1 ? `<div class="w-types">${[['', t('all_types')], ...types.map((ty) => [ty, typeName(ty)])].map(([v, l]) => `<button type="button" class="chip type ${filt.type === v ? 'on' : ''}" data-type="${esc(v)}">${esc(l)}</button>`).join('')}</div>` : ''}
       </div>
-      <div class="count" id="fcount" aria-live="polite"></div><div class="item-grid" id="flist"></div>`;
+      <div class="w-meta"><div class="count" id="fcount" aria-live="polite"></div>
+        <div class="w-legend"><span><span class="m bp">${svg('scroll')}BP</span> ${t('legend_bp')}</span><span><span class="m bench">${svg('hammer')}</span> ${t('legend_bench')}</span></div></div>
+      <div class="item-grid" id="flist"></div>`;
     setTimeout(() => {
       const draw = () => {
         const q = norm(filt.q);
@@ -304,8 +307,8 @@
     const left = [];
     const right = [];
     const badges = [`<span class="badge type">${esc(typeName(it.type))}</span>`];
-    if (it.blueprint) badges.push(`<span class="badge bp">${t('bp_badge', { n: it.blueprint })}</span>`);
-    else if (it.blueprint === 0) badges.push(`<span class="badge bp">Blueprint · ${t('loot_badge')}</span>`);
+    if (it.blueprint) badges.push(`<span class="badge bp" title="${esc(t('bp_tip'))}">${svg('scroll')} ${t('bp_badge', { n: it.blueprint })}</span>`);
+    else if (it.blueprint === 0) badges.push(`<span class="badge bp" title="${esc(t('bp_tip'))}">${svg('scroll')} Blueprint · ${t('loot_badge')}</span>`);
     if (it.bench) badges.push(`<span class="badge bench">${svg('hammer')} ${t('bench_badge')}</span>`);
 
     if (it.weapon) {
@@ -322,6 +325,7 @@
       if (it.level) foot.push(`<span>${svg('star')} ${t('level', { n: it.level })}</span><span class="vip">${t('vip_level', { n: Math.floor(it.level * 0.75) })}</span>`);
       if (it.receive) foot.push(`<span>${t('receive')}: <b>x${it.receive}</b></span>`);
       left.push(`<div class="section-title">${t('recipe')}</div><div class="box">${it.recipe.map((r) => ingRow(r.id, r.qty)).join('')}<div class="box-foot">${foot.join('')}</div></div>`);
+      if (it.blueprint !== undefined) left.push(`<div class="bp-note">${svg('scroll')}<div><b>Blueprint</b><p>${t(it.blueprint ? 'bp_explain' : 'bp_explain_loot')}</p><a href="#/guides/loot-crafting-and-blueprints">${t('bp_how')} ${svg('chevron')}</a></div></div>`);
     }
     if (it.ammoFor) left.push(`<div class="section-title">${t('compatible')}</div><div class="item-grid">${it.ammoFor.map((x) => itemCard(byId[x])).join('')}</div>`);
     if (it.usedIn) left.push(`<div class="section-title">${t('used_in')}</div><div class="item-grid">${it.usedIn.map((x) => itemCard(byId[x])).filter(Boolean).join('')}</div>`);
@@ -330,7 +334,7 @@
     if (it.stack) props.push(`<div class="row"><span>${t('stack')}</span><b>${it.stack}</b></div>`);
     if (it.recipe) props.push(`<div class="row"><span>${t('bench_req')}</span><b>${it.bench ? t('yes') : t('no')}</b></div>`);
     if (it.level) props.push(`<div class="row"><span>${t('level_req')}</span><b>Lv. ${it.level} <small class="muted">(Legendary ${Math.floor(it.level * 0.75)})</small></b></div>`);
-    if (it.blueprint !== undefined) props.push(`<div class="row"><span>${t('blueprint')}</span><b class="gold">${it.blueprint ? t('bp_cost', { n: it.blueprint }) : t('bp_loot')}</b></div>`);
+    if (it.blueprint !== undefined) props.push(`<div class="row"><span>${t('blueprint')}</span><b class="blue">${it.blueprint ? t('bp_cost', { n: it.blueprint }) : t('bp_loot')}</b></div>`);
     if (it.hp) props.push(`<div class="row"><span>${t('health')}</span><b>${it.hp}</b></div>`);
     if (it.slots) props.push(`<div class="row"><span>${t('slots')}</span><b>${it.slots}</b></div>`);
     if (it.limit) props.push(`<div class="row"><span>${t('limit')}</span><b>${esc(L(it.limit))}</b></div>`);
@@ -355,8 +359,23 @@
   }
 
   // ---------------------------------------------------------------- markdown (o suficiente para os guias)
+  // nomes de itens nos guias: "**Machado**" vira link para a página do item (nos dois idiomas, aceita plural simples)
+  let itemNames = null;
+  function itemByName(txt) {
+    if (!itemNames) {
+      itemNames = new Map();
+      W.items.forEach((i) => [i.name.en, i.name.pt].forEach((n) => { const k = norm(n); if (k && !itemNames.has(k)) itemNames.set(k, i.id); }));
+      // apelidos usados nos guias
+      Object.entries({ machado: 'hatchet', atadura: 'bandage', britadeira: 'jackhammer', bancada: 'workbench', 'cans of beans': 'can-of-beans',
+        'latas de feijao': 'can-of-beans', 'hq metal ore': 'hq-metal-ore', 'minerio de metal de alta': 'hq-metal-ore' })
+        .forEach(([k, id]) => { if (byId[id] && !itemNames.has(k)) itemNames.set(k, id); });
+    }
+    const k = norm(txt.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&'));
+    if (k === 'arrows' || k === 'setas') return null; // "setas" do teclado, não as flechas da besta
+    return itemNames.get(k) || itemNames.get(k.replace(/(es|s)$/, '')) || itemNames.get(k.replace(/s$/, ''));
+  }
   function inline(s) {
-    return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/`(.+?)`/g, '<code>$1</code>');
+    return esc(s).replace(/\*\*(.+?)\*\*/g, (m, txt) => { const id = itemByName(txt); return id ? `<a class="item-link" href="#/items/${id}"><strong>${txt}</strong></a>` : `<strong>${txt}</strong>`; }).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/`(.+?)`/g, '<code>$1</code>');
   }
   // aceita o ID puro ou qualquer link do YouTube (watch, youtu.be, shorts, embed)
   function youtubeId(v) {
@@ -469,29 +488,45 @@
     ['bedtime', '10 min', '10 min', '5 min', '3 min'], ['respawn', '—', '✓', '✓', '✓'], ['base', '15–50*', '15–50*', '50', '65'],
     ['upkeep', '100%', '100%', '50%', '50%'], ['tools', '—', '—', '—', '✓'], ['craft', '100%', '100%', '100%', '75%'],
   ];
+  // Loja: página própria (sem o menu da wiki). Preços em config.js (vip.prices), em reais e em dólar.
+  let cur = null;
+  const money = (v, c) => (c === 'brl' ? 'R$ ' + v.toFixed(2).replace('.', ',') : 'US$ ' + v.toFixed(2));
   function pageStore() {
-    const d = (window.HAVOK || {}).discord || '#';
+    const H = window.HAVOK || {}, d = H.discord || '#';
+    const vip = H.vip || {}, prices = vip.prices || {};
+    if (!cur) cur = lang === 'pt' ? 'brl' : 'usd';
     const L = lang === 'pt' ? 2 : 1;
-    return `<section class="store-hero">
-        <span class="pill">${svg('shield')} HAVOK VIP</span>
-        <h1>${t('store_h1a')} <span>${t('store_h1b')}</span></h1>
-        <p>${t('store_sub')}</p>
-        <div class="trust"><span>${svg('user')} ${t('store_t1')}</span><span>${svg('zap')} ${t('store_t2')}</span><span>${svg('clock')} ${t('store_t3')}</span></div>
+    const per = t(vip.period === 'month' ? 'per_month' : 'per_period');
+    setTimeout(() => document.querySelectorAll('.cur-toggle button').forEach((b) => b.onclick = () => { cur = b.dataset.cur; route(); }));
+    const price = (id) => {
+      const p = prices[id];
+      if (!p || p[cur] == null) return `<div class="sp-price"><b class="ask">${t('price_ask')}</b></div>`;
+      const other = cur === 'brl' ? 'usd' : 'brl';
+      return `<div class="sp-price"><b>${money(p[cur], cur)}</b><span>${per}</span></div>${p[other] != null ? `<small class="sp-alt">≈ ${money(p[other], other)}</small>` : ''}`;
+    };
+    return `<section class="sp-head">
+        <div>
+          <p class="l-kicker">HAVOK · VIP</p>
+          <h1>${t('store_h1a')} <span>${t('store_h1b')}</span></h1>
+          <p class="sp-sub">${t('store_sub')}</p>
+        </div>
+        <div class="cur-toggle" role="group" aria-label="${t('currency')}"><button data-cur="brl" class="${cur === 'brl' ? 'on' : ''}">R$ BRL</button><button data-cur="usd" class="${cur === 'usd' ? 'on' : ''}">US$ USD</button></div>
       </section>
-      <div class="tiers">${TIERS.map((tr) => `<div class="tier${tr.hot ? ' hot' : ''}" style="--tc:${tr.color}">
-          ${tr.hot ? `<span class="hot-tag">${t('popular')}</span>` : ''}
-          <div class="tier-head"><span class="tier-ic">${svg(tr.icon)}</span><b>${t('tier_' + tr.id)}</b></div>
-          <small class="tier-sub">${t('tier_' + tr.id + '_d')}</small>
-          <div class="tier-label">${t('store_perks')}</div>
+      <div class="sp-plans">${TIERS.map((tr, i) => `<article class="sp-plan${tr.hot ? ' hot' : ''}" style="--tc:${tr.color}">
+          ${tr.hot ? `<span class="sp-flag">${t('popular')}</span>` : ''}
+          <header><span class="sp-rank">${String(i + 1).padStart(2, '0')}</span><span class="tier-ic">${svg(tr.icon)}</span><b>${t('tier_' + tr.id)}</b></header>
+          ${price(tr.id)}
+          <p class="sp-desc">${t('tier_' + tr.id + '_d')}</p>
           <ul>${tr.perks.map((p) => `<li>${svg(p[0])}<span>${esc(p[L])}</span></li>`).join('')}</ul>
-          <a class="tier-btn" href="${esc(d)}" target="_blank" rel="noopener">${t('store_get')} ${svg('chevron')}</a>
-        </div>`).join('')}</div>
+          <a class="sp-btn" href="${esc(d)}" target="_blank" rel="noopener">${svg('discord')} ${t('store_get')}</a>
+        </article>`).join('')}</div>
+      <div class="sp-trust"><span>${svg('user')} ${t('store_t1')}</span><span>${svg('zap')} ${t('store_t2')}</span><span>${svg('clock')} ${t('store_t3')}</span></div>
       <div class="section-title">${t('store_compare')}</div>
       <div class="table-wrap"><div class="compare wide"><div class="crow head"><span>${t('perk')}</span><span>${t('player')}</span>${TIERS.map((tr) => `<span style="color:${tr.color}">${t('tier_' + tr.id)}</span>`).join('')}</div>
+        <div class="crow price"><span>${t('price')}</span><span class="muted">${t('free')}</span>${TIERS.map((tr) => { const p = prices[tr.id]; return `<span style="color:${tr.color}">${p && p[cur] != null ? money(p[cur], cur) : '—'}</span>`; }).join('')}</div>
         ${COMPARE.map(([k, ...v]) => `<div class="crow"><span>${t('cmp_' + k)}</span>${v.map((x, i) => `<span${i ? ` style="color:${TIERS[i - 1].color}"` : ' class="muted"'}>${x}</span>`).join('')}</div>`).join('')}</div></div>
       <p class="fine">${t('store_base_note')}</p>
-      <a class="cta" href="${esc(d)}" target="_blank" rel="noopener">${svg('discord')} ${t('store_cta')}</a>
-      <p class="fine">${t('store_fine')}</p>`;
+      <div class="sp-cta"><a class="cta" href="${esc(d)}" target="_blank" rel="noopener">${svg('discord')} ${t('store_cta')}</a><p class="fine">${t('store_fine')}</p></div>`;
   }
 
   // ---------------------------------------------------------------- home (pré-lançamento)
@@ -513,6 +548,7 @@
         ['gather-tools', 'Gather', 'Hit trees, rocks and ore nodes. Better tools, faster farming.', 'resource-gathering'],
         ['first-house', 'Build', 'Foundation, walls, door and a Wardrobe to keep your base standing.', 'base-building'],
         ['vehicles', 'Explore', 'Fix up cars, loot military zones and fight for airdrops.', 'world-and-events'],
+        ['pvp', 'Fight', 'Take on other players and shoot down the patrol helicopter for its loot.', 'combat-raiding-and-recovery'],
       ],
       join: 'How to join the launch', join_h: 'Three steps. Less than a minute.',
       steps: [
@@ -543,6 +579,7 @@
         ['gather-tools', 'Colete', 'Bata em árvores, pedras e minérios. Ferramenta melhor, coleta mais rápida.', 'resource-gathering'],
         ['first-house', 'Construa', 'Fundação, paredes, porta e um Armário para manter a base de pé.', 'base-building'],
         ['vehicles', 'Explore', 'Monte carros, saqueie zonas militares e dispute airdrops.', 'world-and-events'],
+        ['pvp', 'Lute', 'Enfrente outros jogadores e derrube o helicóptero de patrulha para pegar o loot.', 'combat-raiding-and-recovery'],
       ],
       join: 'Como participar da inauguração', join_h: 'Três passos. Menos de um minuto.',
       steps: [
@@ -739,6 +776,7 @@
     let html;
     const landing = !parts.length;
     document.body.classList.toggle('landing', landing);
+    document.body.classList.toggle('standalone', parts[0] === 'store');
     if (landing) html = pageLanding();
     else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);

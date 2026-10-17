@@ -5,6 +5,15 @@ window.HAVOK = {
   // lista de espera: URL do Worker (worker/README.md). Vazio = o contador não aparece.
   // ex.: api: 'https://havok-waitlist.SEU-USUARIO.workers.dev/waitlist'
   waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 50 },
+  // preços do VIP (por mês) em reais e dólar. Tirar um preço = mostra "Consulte no Discord".
+  vip: {
+    period: 'month',
+    prices: {
+      survivor: { brl: 9.90, usd: 2.99 },
+      veteran: { brl: 19.90, usd: 4.99 },
+      legendary: { brl: 34.90, usd: 7.99 },
+    },
+  },
   // endereço do servidor MTA para a página /play (ex.: '203.0.113.10:22003'). Vazio = página sem o botão.
   server: '',
   // redes sociais da home (vazio = escondido)
