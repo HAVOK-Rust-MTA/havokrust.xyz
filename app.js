@@ -29,26 +29,20 @@
       footer_wiki: 'WIKI', footer_server: 'SERVER', footer_copy: '© 2026 HAVOK — Rust Survival. Not affiliated with Facepunch Studios.',
       bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench',
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
-      nav_badges: 'Badges', nav_store: 'Store', nav_play: 'Play', badges_desc: 'Collectible badges earned through gameplay, community contributions, and special events.',
-      all_categories: 'All categories', all_rarities: 'All rarities', showing_badges: 'Showing {n} of {t} badges',
+      nav_store: 'Store', nav_play: 'Play',
+     
       store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
       store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Day, month or permanent',
       store_perks: 'Everything you get', store_compare: 'Compare', perk: 'Perk', player: 'Player', store_plans: 'Plans',
       cmp_inv: 'Inventory slots', cmp_base: 'Base piece limit', cmp_upkeep: 'Upkeep cost', cmp_respawn: 'Choose respawn region',
       plan_day: 'Days', plan_day_d: 'Try it out — from 1 day.', plan_month: 'Months', plan_month_d: 'The best value for regular players.', plan_perm: 'Permanent', plan_perm_d: 'VIP forever, no renewals.', popular: 'Most popular',
       tier_survivor: 'Survivor', tier_veteran: 'Veteran', tier_legendary: 'Legendary',
-      tier_survivor_d: 'Start supporting: more XP, a bigger backpack and a spare sleeping bag.', tier_veteran_d: 'Base perks: half the upkeep, faster respawns and the [VIP] tag.', tier_legendary_d: 'Everything, plus cheaper crafting, starter tools and the gold frame.',
-      store_get: 'Get on Discord', cmp_xp: 'XP boost', cmp_slot: 'Reserved slot', cmp_beds: 'Sleeping bags', cmp_bedtime: 'Sleeping bag cooldown', cmp_tools: 'Hatchet + pickaxe on respawn', cmp_craft: 'Crafting cost',
-      store_base_note: '* Normal players unlock up to 50 pieces as they level up (15 + level). Veteran gets 50 right away, Legendary 65. You always need a Wardrobe.',
+      tier_survivor_d: 'Start supporting: more XP, a bigger backpack and a spare bed.', tier_veteran_d: 'Base perks: half the upkeep, faster respawns and the [VIP] tag.', tier_legendary_d: 'Everything, plus cheaper crafting, starter tools and the gold frame.',
+      store_get: 'Get on Discord', cmp_xp: 'XP boost', cmp_slot: 'Reserved slot', cmp_beds: 'Beds', cmp_bedtime: 'Bed respawn cooldown', cmp_tools: 'Hatchet + pickaxe on respawn', cmp_craft: 'Crafting cost',
+      store_base_note: '* Without a Wardrobe the limit is 15 pieces for everyone, VIP included. With a Wardrobe it is 15 + your level, up to 50. Veteran gets 50 right away, Legendary 65.',
       store_cta: 'Get VIP on Discord', store_fine: 'Open a ticket on our Discord to buy. Type /vip in game to see how much time you have left. Being VIP does not exempt anyone from the rules.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD & interface', nav_home: 'Home',
-      l_h1a: 'SURVIVE.', l_h1b: 'BUILD.', l_h1c: 'RAID.', l_sub: 'Rust survival on the streets of San Andreas. Wake up with nothing, farm, craft, build your base and fight for everything you own.',
-      wl_title: 'Waiting list', wl_join: 'Join the waiting list', wl_note: 'Free • Through Discord • PC', wl_goal: 'We are gathering the first {n} survivors to schedule the server launch.', wl_full: 'Goal reached! The launch date will be announced on Discord.', wl_err: 'Counter unavailable right now.', wl_load: 'Loading...',
-      l_play: 'Play now', l_wiki: 'Open the wiki', l_feat: 'What awaits you', l_new: 'New to the server?', l_new_sub: 'Your first 10 minutes, step by step: from waking up with nothing to your first safe box.',
-      l_new_btn: 'Read the starter guide', l_steps: ['Break barrels and hit trees and rocks', 'Craft a hatchet and a pickaxe', 'Build a small house with a Wardrobe inside'],
-      l_media: 'See the game', l_news: 'News', l_social: 'Follow HAVOK', l_social_sub: 'Clips, updates and events first-hand.', l_all_news: 'Show older news',
       tags: { new: 'New', fix: 'Fix', balance: 'Balance', event: 'Event' },
-      feats: [['pickaxe', 'Farm', 'Trees, rocks and ore nodes all over the map.', 'resource-gathering'], ['hammer', 'Craft', 'Over 100 recipes, blueprints and a research table.', 'loot-crafting-and-blueprints'], ['building', 'Build', 'Bases piece by piece, upgraded from twig to armored.', 'base-building'], ['crosshair', 'Raid', 'C4, rockets and sentries. Nothing is safe offline.', 'combat-raiding-and-recovery'], ['users', 'Groups', 'Up to 8 friends with a tag, emblem and ranking.', 'teams-and-groups'], ['map', 'Events', 'Airdrops, a patrol helicopter, radiation and a military base.', 'world-and-events']],
       media_title: 'Media checklist', media_desc: 'Every video and screenshot the guides are waiting for. Drop the file in media/ with the exact name.',
     },
     pt: {
@@ -69,8 +63,8 @@
       footer_wiki: 'WIKI', footer_server: 'SERVIDOR', footer_copy: '© 2026 HAVOK — Rust Survival. Sem afiliação com a Facepunch Studios.',
       bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada',
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
-      nav_badges: 'Badges', nav_store: 'Loja', nav_play: 'Jogar', badges_desc: 'Badges colecionáveis conquistadas jogando, ajudando a comunidade e em eventos especiais.',
-      all_categories: 'Todas as categorias', all_rarities: 'Todas as raridades', showing_badges: 'Mostrando {n} de {t} badges',
+      nav_store: 'Loja', nav_play: 'Jogar',
+     
       store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
       store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Dias, meses ou permanente',
       store_perks: 'Tudo que você ganha', store_compare: 'Compare', perk: 'Vantagem', player: 'Jogador', store_plans: 'Planos',
@@ -78,17 +72,11 @@
       plan_day: 'Dias', plan_day_d: 'Para experimentar — a partir de 1 dia.', plan_month: 'Meses', plan_month_d: 'O melhor custo para quem joga sempre.', plan_perm: 'Permanente', plan_perm_d: 'VIP para sempre, sem renovar.', popular: 'Mais escolhido',
       tier_survivor: 'Survivor', tier_veteran: 'Veteran', tier_legendary: 'Legendary',
       tier_survivor_d: 'Para começar a apoiar: mais XP, mochila maior e uma cama extra.', tier_veteran_d: 'Vantagens de base: metade do upkeep, respawn mais rápido e tag [VIP].', tier_legendary_d: 'Tudo, mais craft mais barato, ferramentas ao nascer e moldura dourada.',
-      store_get: 'Pegar no Discord', cmp_xp: 'Bônus de XP', cmp_slot: 'Vaga reservada', cmp_beds: 'Camas (sleeping bags)', cmp_bedtime: 'Espera da cama', cmp_tools: 'Machado + picareta ao nascer', cmp_craft: 'Custo de craft',
-      store_base_note: '* Jogador comum libera até 50 peças subindo de level (15 + level). Veteran já começa com 50, Legendary com 65. O Armário é sempre obrigatório.',
+      store_get: 'Pegar no Discord', cmp_xp: 'Bônus de XP', cmp_slot: 'Vaga reservada', cmp_beds: 'Camas', cmp_bedtime: 'Espera da cama', cmp_tools: 'Machado + picareta ao nascer', cmp_craft: 'Custo de craft',
+      store_base_note: '* Sem Armário o limite é 15 peças para todo mundo, VIP incluso. Com Armário é 15 + o seu level, até 50. Veteran já começa com 50, Legendary com 65.',
       store_cta: 'Pegar VIP no Discord', store_fine: 'Abra um ticket no nosso Discord para comprar. Digite /vip no jogo para ver quanto tempo falta. Ser VIP não livra ninguém das regras.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD e interface', nav_home: 'Início',
-      l_h1a: 'SOBREVIVA.', l_h1b: 'CONSTRUA.', l_h1c: 'RAIDE.', l_sub: 'Sobrevivência no estilo Rust nas ruas de San Andreas. Acorde sem nada, farme, crafte, construa sua base e lute por tudo que é seu.',
-      wl_title: 'Lista de espera', wl_join: 'Entrar na lista de espera', wl_note: 'Grátis • Pelo Discord • PC', wl_goal: 'Estamos reunindo os primeiros {n} sobreviventes para marcar a inauguração do servidor.', wl_full: 'Meta batida! A data da inauguração sai no Discord.', wl_err: 'Contador indisponível no momento.', wl_load: 'Carregando...',
-      l_play: 'Jogar agora', l_wiki: 'Abrir a wiki', l_feat: 'O que te espera', l_new: 'Novo no servidor?', l_new_sub: 'Seus primeiros 10 minutos, passo a passo: de acordar sem nada até a sua primeira caixa segura.',
-      l_new_btn: 'Ler o guia inicial', l_steps: ['Quebre barris e bata em árvores e pedras', 'Crafte um machado e uma picareta', 'Faça uma casinha com um Armário dentro'],
-      l_media: 'Veja o jogo', l_news: 'Novidades', l_social: 'Siga o HAVOK', l_social_sub: 'Clipes, atualizações e eventos em primeira mão.', l_all_news: 'Ver novidades antigas',
       tags: { new: 'Novo', fix: 'Correção', balance: 'Ajuste', event: 'Evento' },
-      feats: [['pickaxe', 'Farme', 'Árvores, pedras e minérios pelo mapa inteiro.', 'resource-gathering'], ['hammer', 'Crafte', 'Mais de 100 receitas, blueprints e mesa de pesquisa.', 'loot-crafting-and-blueprints'], ['building', 'Construa', 'Bases peça por peça, do palito ao blindado.', 'base-building'], ['crosshair', 'Raide', 'C4, foguetes e sentinelas. Nada fica seguro offline.', 'combat-raiding-and-recovery'], ['users', 'Grupos', 'Até 8 amigos com tag, emblema e ranking.', 'teams-and-groups'], ['map', 'Eventos', 'Airdrops, helicóptero de patrulha, radiação e base militar.', 'world-and-events']],
       media_title: 'Checklist de mídias', media_desc: 'Todos os vídeos e prints que os guias estão esperando. Coloque o arquivo em media/ com o nome exato.',
     },
   };
@@ -217,7 +205,6 @@
       <div class="nav-group"><h5>HAVOK</h5>
         ${a('#/', 'rocket', t('nav_home'))}
         ${a('#/wiki', 'book', 'Wiki')}
-        ${a('#/badges', 'award', t('nav_badges'))}
         ${a('#/store', 'crown', t('nav_store'))}
         <a href="${esc((window.HAVOK || {}).discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>Discord ↗</span></a>
       </div>`;
@@ -433,78 +420,27 @@
       <div class="box">${W.media.map((m) => `<div class="obtain">${svg(m.kind === 'video' ? 'video' : 'image')}<code>media/${m.id}.${m.kind === 'video' ? 'mp4' : 'webp'}</code><span class="muted">— ${esc(m.caption)}</span><a href="#/guides/${m.guide}" style="margin-left:auto" class="muted">${esc(m.guide)}</a></div>`).join('')}</div>`;
   }
 
-  // ---------------------------------------------------------------- badges
-  const RARITY = {
-    common: ['Common', 'Comum', '#a8a39d'], uncommon: ['Uncommon', 'Incomum', '#6cc070'], rare: ['Rare', 'Rara', '#5b9dff'],
-    epic: ['Epic', 'Épica', '#b36bff'], legendary: ['Legendary', 'Lendária', '#ff8a33'], bronze: ['VIP Bronze', 'VIP Bronze', '#cd7f32'], silver: ['VIP Silver', 'VIP Prata', '#c9ced6'], vip: ['VIP Gold', 'VIP Ouro', '#f5b83d'],
-  };
-  const BADGE_CATS = { special: ['Special', 'Especial'], community: ['Community', 'Comunidade'], gameplay: ['Gameplay', 'Gameplay'], vip: ['VIP', 'VIP'] };
-  const BADGES = [
-    { icon: 'flask', rarity: 'rare', cat: 'special', en: ['Beta Tester', 'Played 3+ hours during beta'], pt: ['Beta Tester', 'Jogou 3+ horas durante o beta'] },
-    { icon: 'bug', rarity: 'common', cat: 'community', en: ['Bug Reporter', 'Reported a confirmed bug'], pt: ['Caçador de Bug', 'Reportou um bug confirmado'] },
-    { icon: 'sword', rarity: 'uncommon', cat: 'gameplay', en: ['First Blood', 'Got the first kill'], pt: ['Primeiro Sangue', 'Conseguiu a primeira kill'] },
-    { icon: 'tree', rarity: 'bronze', cat: 'vip', en: ['VIP Survivor', 'Supporter on the Survivor plan.'], pt: ['VIP Survivor', 'Apoiador no plano Survivor.'] },
-    { icon: 'shield', rarity: 'silver', cat: 'vip', en: ['VIP Veteran', 'Supporter on the Veteran plan.'], pt: ['VIP Veteran', 'Apoiador no plano Veteran.'] },
-    { icon: 'crown', rarity: 'vip', cat: 'vip', en: ['VIP Legendary', 'Supporter on the Legendary plan — keeps HAVOK running.'], pt: ['VIP Legendary', 'Apoiador no plano Legendary — mantém o HAVOK de pé.'] },
-    { icon: 'search', rarity: 'rare', cat: 'community', en: ['Bug Hunter', 'Reported 10+ confirmed bugs'], pt: ['Exterminador de Bugs', 'Reportou 10+ bugs confirmados'] },
-    { icon: 'rocket', rarity: 'epic', cat: 'special', en: ['Early Adopter', 'Among the first 100 registered survivors'], pt: ['Pioneiro', 'Entre os 100 primeiros sobreviventes registrados'] },
-    { icon: 'skull', rarity: 'legendary', cat: 'gameplay', en: ['Serial Killer', 'Reached 1000 kills'], pt: ['Serial Killer', 'Chegou a 1000 kills'] },
-    { icon: 'megaphone', rarity: 'uncommon', cat: 'community', en: ['Community Voice', 'Had 5+ suggestions accepted'], pt: ['Voz da Comunidade', 'Teve 5+ sugestões aceitas'] },
-    { icon: 'shield', rarity: 'epic', cat: 'special', en: ['Veteran', 'Account older than 1 year'], pt: ['Veterano', 'Conta com mais de 1 ano'] },
-  ];
-  const bf = { cat: '', rarity: '' };
-  function pageBadges() {
-    const R = (k) => RARITY[k][lang === 'pt' ? 1 : 0];
-    const html = `<div class="hero"><span class="hero-ic">${svg('award')}</span><div><h1 class="page-title">BADGES</h1><p class="page-sub">${t('badges_desc')}</p></div></div>
-      <div class="filters">
-        <select id="bcat"><option value="">${t('all_categories')}</option>${Object.keys(BADGE_CATS).map((k) => `<option value="${k}" ${bf.cat === k ? 'selected' : ''}>${BADGE_CATS[k][lang === 'pt' ? 1 : 0]}</option>`).join('')}</select>
-        <select id="brar"><option value="">${t('all_rarities')}</option>${Object.keys(RARITY).map((k) => `<option value="${k}" ${bf.rarity === k ? 'selected' : ''}>${R(k)}</option>`).join('')}</select>
-        <span class="count" id="bcount" style="margin:0 0 0 auto"></span>
-      </div>
-      <div class="grid" id="blist"></div>`;
-    setTimeout(() => {
-      const draw = () => {
-        const list = BADGES.filter((b) => (!bf.cat || b.cat === bf.cat) && (!bf.rarity || b.rarity === bf.rarity));
-        $('#bcount').textContent = t('showing_badges', { n: list.length, t: BADGES.length });
-        $('#blist').innerHTML = list.map((b) => {
-          const c = RARITY[b.rarity][2], tx = b[lang] || b.en;
-          return `<div class="badge-card${b.rarity === 'vip' ? ' gold' : ''}" style="--rc:${c}"><span class="badge-ic">${svg(b.icon)}</span>
-            <span class="badge-body"><b>${esc(tx[0])}</b><small>${esc(tx[1])}</small><span class="badge-meta">${svg('folder')} ${BADGE_CATS[b.cat][lang === 'pt' ? 1 : 0]}</span></span>
-            <span class="rarity">${R(b.rarity)}</span></div>`;
-        }).join('');
-      };
-      $('#bcat').onchange = (e) => { bf.cat = e.target.value; draw(); };
-      $('#brar').onchange = (e) => { bf.rarity = e.target.value; draw(); };
-      draw();
-    });
-    return html;
-  }
-
-  // ---------------------------------------------------------------- store (VIP)
-  // os 3 planos (mesma tabela do servidor: VIP_TIERS em gamemode/scripts/global/g.utils.lua)
+  // ---------------------------------------------------------------- loja VIP
   const TIERS = [
     { id: 'survivor', icon: 'tree', color: '#cd8a4e', perks: [
       ['star', '+15% XP boost', '+15% de XP'], ['user', 'Reserved server slot', 'Vaga reservada no servidor'],
-      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+1 extra sleeping bag', '+1 cama extra'],
+      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+1 extra bed', '+1 cama extra'],
       ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
-      ['megaphone', 'Soft name in global chat + scoreboard', 'Nome destacado no chat global e no placar'],
-      ['award', 'Bronze VIP badge', 'Badge VIP de bronze'] ] },
+      ['megaphone', 'Soft name in global chat + scoreboard', 'Nome destacado no chat global e no placar'] ] },
     { id: 'veteran', icon: 'shield', color: '#ff6a00', hot: true, perks: [
       ['star', '+30% XP boost', '+30% de XP'], ['user', 'Reserved server slot', 'Vaga reservada no servidor'],
-      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+2 extra sleeping bags', '+2 camas extras'],
-      ['clock', 'Faster sleeping bag respawn', 'Respawn mais rápido na cama'], ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
+      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+2 extra beds', '+2 camas extras'],
+      ['clock', 'Faster bed respawn', 'Respawn mais rápido na cama'], ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
       ['building', 'Base limit 50 + 50% less upkeep', 'Limite de 50 peças + 50% menos upkeep'],
-      ['megaphone', '[VIP] tag in global chat + highlighted scoreboard row', 'Tag [VIP] no chat global + linha destacada no placar'],
-      ['award', 'Silver VIP badge', 'Badge VIP de prata'] ] },
+      ['megaphone', '[VIP] tag in global chat + highlighted scoreboard row', 'Tag [VIP] no chat global + linha destacada no placar'] ] },
     { id: 'legendary', icon: 'crown', color: '#f5b83d', perks: [
       ['star', '+50% XP boost', '+50% de XP'], ['user', 'Reserved server slot', 'Vaga reservada no servidor'],
-      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+3 extra sleeping bags', '+3 camas extras'],
-      ['clock', 'Fastest sleeping bag respawn', 'Respawn na cama ainda mais rápido'], ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
+      ['bag', 'Expanded inventory (42 slots)', 'Inventário maior (42 slots)'], ['package', '+3 extra beds', '+3 camas extras'],
+      ['clock', 'Fastest bed respawn', 'Respawn na cama ainda mais rápido'], ['map', 'Choose your respawn region', 'Escolha a região onde renasce'],
       ['building', 'Base limit 65 + 50% less upkeep', 'Limite de 65 peças + 50% menos upkeep'],
       ['pickaxe', 'Hatchet and pickaxe when you respawn', 'Nasce com machado e picareta'],
       ['hammer', '25% less crafting cost (materials and level)', '25% menos custo de craft (material e level)'],
-      ['megaphone', 'Gold [VIP] tag in global chat + legendary scoreboard frame', 'Tag [VIP] dourada no chat + moldura lendária no placar'],
-      ['award', 'Gold VIP badge', 'Badge VIP de ouro'] ] },
+      ['megaphone', 'Gold [VIP] tag in global chat + legendary scoreboard frame', 'Tag [VIP] dourada no chat + moldura lendária no placar'] ] },
   ];
   const COMPARE = [
     ['xp', '—', '+15%', '+30%', '+50%'], ['slot', '—', '✓', '✓', '✓'], ['inv', '28', '42', '42', '42'], ['beds', '1', '2', '3', '4'],
@@ -536,27 +472,118 @@
       <p class="fine">${t('store_fine')}</p>`;
   }
 
-  // ---------------------------------------------------------------- lista de espera
-  // Lê o contador do Worker (worker/waitlist.js), que conta o cargo "Waiting List" no Discord.
-  // Sem config.waitlist.api o bloco não aparece. Erro = aviso discreto, nunca número inventado.
-  let wlTimer = null;
+  // ---------------------------------------------------------------- home (pré-lançamento)
+  // A página inicial gira em torno da inauguração: contador real da lista de espera (worker/waitlist.js,
+  // que conta o cargo "Waiting List" no Discord), como o jogo funciona, como participar e dúvidas.
+  // Loja e VIP ficam fora deste fluxo de propósito.
+  const LT = {
+    en: {
+      eyebrow: 'MTA: San Andreas · Rust survival · Pre-launch',
+      h1a: 'SURVIVE', h1b: 'THE FIRST DAY.',
+      sub: 'HAVOK opens its doors once {n} survivors are on the waiting list. Join now and get the launch date first, on Discord.',
+      wl: 'Waiting list', wl_of: 'of {n} survivors', wl_join: 'Join the waiting list', wl_note: 'Free · Through Discord · PC',
+      wl_left: '{n} spots to go until the launch is scheduled.', wl_left1: '1 spot to go until the launch is scheduled.',
+      wl_full: 'Goal reached! The launch date is coming on Discord.', wl_err: 'Counter unavailable right now.', wl_load: 'Checking the list...',
+      wiki: 'Explore the wiki', scroll: 'How it works',
+      how: 'How it works', how_h: 'You start with nothing. Everything else is earned.',
+      loop: [
+        ['spawn', 'Wake up', 'You spawn with almost nothing. Every survivor starts the same way.', 'getting-started'],
+        ['gather-tools', 'Gather', 'Hit trees, rocks and ore nodes. Better tools, faster farming.', 'resource-gathering'],
+        ['first-house', 'Build', 'Foundation, walls, door and a Wardrobe to keep your base standing.', 'base-building'],
+        ['vehicles', 'Explore', 'Fix up cars, loot military zones and fight for airdrops.', 'world-and-events'],
+      ],
+      join: 'How to join the launch', join_h: 'Three steps. Less than a minute.',
+      steps: [
+        ['Enter the Discord', 'Use the button below. It is free and takes a few seconds.'],
+        ['Pick the waiting list', 'In the welcome questions, choose the waiting list option. You get the Waiting List role and count on this page.'],
+        ['Wait for the call', 'When the bar fills up, the launch date is announced and everyone on the list gets pinged.'],
+      ],
+      faq: 'Questions', faqs: [
+        ['Do I have to pay to play?', 'No. The server is free. You only need GTA San Andreas for PC and Multi Theft Auto (MTA:SA), which is also free.'],
+        ['When does the server open?', 'When the waiting list reaches {n} survivors, the date is announced on Discord. The more people join, the sooner it opens.'],
+        ['Is it like Rust?', 'The loop is: gather, craft, build a base, protect it and raid others. Everything happens on the San Andreas map, with its own mechanics.'],
+        ['Can I play with friends?', 'Yes. Groups have up to 8 members, with their own tag, emblem and color, plus a group ranking.'],
+        ['Does it run on a weak PC?', 'MTA runs on modest hardware. The server interface was built to stay light.'],
+      ],
+      news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and the launch countdown.',
+    },
+    pt: {
+      eyebrow: 'MTA: San Andreas · Rust survival · Pré-lançamento',
+      h1a: 'SOBREVIVA', h1b: 'AO PRIMEIRO DIA.',
+      sub: 'O HAVOK abre as portas quando {n} sobreviventes estiverem na lista de espera. Entre agora e saiba a data antes de todo mundo, no Discord.',
+      wl: 'Lista de espera', wl_of: 'de {n} sobreviventes', wl_join: 'Entrar na lista de espera', wl_note: 'Grátis · Pelo Discord · PC',
+      wl_left: 'Faltam {n} vagas para marcar a inauguração.', wl_left1: 'Falta 1 vaga para marcar a inauguração.',
+      wl_full: 'Meta batida! A data da inauguração sai no Discord.', wl_err: 'Contador indisponível no momento.', wl_load: 'Conferindo a lista...',
+      wiki: 'Conhecer a wiki', scroll: 'Como funciona',
+      how: 'Como funciona', how_h: 'Você começa sem nada. Todo o resto é conquistado.',
+      loop: [
+        ['spawn', 'Acorde', 'Você nasce quase sem nada. Todo sobrevivente começa igual.', 'getting-started'],
+        ['gather-tools', 'Colete', 'Bata em árvores, pedras e minérios. Ferramenta melhor, coleta mais rápida.', 'resource-gathering'],
+        ['first-house', 'Construa', 'Fundação, paredes, porta e um Armário para manter a base de pé.', 'base-building'],
+        ['vehicles', 'Explore', 'Monte carros, saqueie zonas militares e dispute airdrops.', 'world-and-events'],
+      ],
+      join: 'Como participar da inauguração', join_h: 'Três passos. Menos de um minuto.',
+      steps: [
+        ['Entre no Discord', 'Use o botão abaixo. É grátis e leva poucos segundos.'],
+        ['Escolha a lista de espera', 'Nas perguntas de boas-vindas, marque a opção da lista de espera. Você ganha o cargo Waiting List e passa a contar nesta página.'],
+        ['Aguarde o chamado', 'Quando a barra encher, a data da inauguração é anunciada e todo mundo da lista é avisado.'],
+      ],
+      faq: 'Perguntas frequentes', faqs: [
+        ['Preciso pagar para jogar?', 'Não. O servidor é gratuito. Você só precisa do GTA San Andreas para PC e do Multi Theft Auto (MTA:SA), que também é grátis.'],
+        ['Quando o servidor abre?', 'Quando a lista de espera chegar a {n} sobreviventes, a data sai no Discord. Quanto mais gente entrar, mais cedo abre.'],
+        ['É parecido com Rust?', 'O ciclo é: coletar, craftar, construir a base, protegê-la e raidar os outros. Tudo no mapa de San Andreas, com mecânicas próprias.'],
+        ['Dá para jogar com amigos?', 'Sim. Grupos têm até 8 membros, com tag, emblema e cor próprios, e um ranking de grupos.'],
+        ['Roda em PC fraco?', 'O MTA roda em máquinas modestas. A interface do servidor foi feita para ser leve.'],
+      ],
+      news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e a contagem para a inauguração.',
+    },
+  };
+  const lt = (k, vars) => {
+    let s = LT[lang][k] ?? LT.en[k] ?? k;
+    if (vars && typeof s === 'string') for (const v in vars) s = s.replace('{' + v + '}', vars[v]);
+    return s;
+  };
+  const fmtDate = (d) => { const [y, m, dd] = d.split('-'); return lang === 'pt' ? `${dd}/${m}/${y}` : `${m}/${dd}/${y}`; };
+  let newsAll = false;
+
+  // lista de espera: barra com uma marca por vaga (até 60; acima disso vira barra contínua)
+  let wlTimer = null, wlLast = null;
   const WL_EVERY = 60000;
-  function waitlistBox() {
+  const wlGoal = () => (wlLast && wlLast.goal) || ((window.HAVOK || {}).waitlist || {}).goal || 30;
+  function waitlistCard() {
     const H = window.HAVOK || {}, cfg = H.waitlist || {};
-    if (!cfg.api) return '';
-    const goal = cfg.goal || 30;
-    setTimeout(() => { loadWaitlist(); wlTimer = setInterval(() => { if (!document.hidden) loadWaitlist(); }, WL_EVERY); });
-    return `<div class="wl" id="wl" data-state="loading" aria-live="polite">
-        <div class="wl-head"><b>${t('wl_title')}</b><span class="wl-num" id="wlNum">— / ${goal}</span></div>
-        <div class="wl-bar" role="progressbar" aria-label="${t('wl_title')}" aria-valuemin="0" aria-valuemax="${goal}"><i id="wlBar"></i></div>
-        <p class="wl-msg" id="wlMsg">${t('wl_load')}</p>
-        <a class="wl-btn" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')} ${t('wl_join')}</a>
-        <small class="wl-note">${t('wl_note')}</small>
+    const goal = wlGoal();
+    const cells = goal <= 60 ? Array.from({ length: goal }, () => '<i></i>').join('') : '<i class="fill"></i>';
+    if (cfg.api) setTimeout(() => { if (wlLast) paintWaitlist(wlLast); loadWaitlist(); wlTimer = setInterval(() => { if (!document.hidden) loadWaitlist(); }, WL_EVERY); });
+    return `<div class="wl" id="wl" data-state="${cfg.api ? 'loading' : 'error'}">
+        <div class="wl-top"><span class="wl-label"><i class="wl-live"></i>${lt('wl')}</span><span class="wl-of">${lt('wl_of', { n: goal })}</span></div>
+        <div class="wl-count" aria-live="polite"><b id="wlNum">--</b><span>/${goal}</span></div>
+        <div class="wl-cells${goal > 60 ? ' cont' : ''}" id="wlCells" role="progressbar" aria-label="${lt('wl')}" aria-valuemin="0" aria-valuemax="${goal}">${cells}</div>
+        <p class="wl-msg" id="wlMsg">${cfg.api ? lt('wl_load') : lt('wl_err')}</p>
+        <a class="wl-btn" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${lt('wl_join')}</span></a>
+        <small class="wl-note">${lt('wl_note')}</small>
       </div>`;
   }
-  async function loadWaitlist() {
+  function paintWaitlist(data) {
     const box = $('#wl');
     if (!box) return;
+    const num = $('#wlNum'), msg = $('#wlMsg'), cells = $('#wlCells');
+    if (!data) {
+      // sem leitura real: nada de número. Se já tinha um na tela, mantém e só avisa.
+      if (box.dataset.state !== 'ok') box.dataset.state = 'error';
+      msg.textContent = lt('wl_err');
+      return;
+    }
+    const goal = data.goal, n = data.count;
+    box.dataset.state = n >= goal ? 'full' : 'ok';
+    num.textContent = String(n).padStart(2, '0');
+    cells.setAttribute('aria-valuenow', n);
+    if (cells.classList.contains('cont')) cells.firstElementChild.style.transform = `scaleX(${Math.min(1, n / goal)})`;
+    else [...cells.children].forEach((c, i) => { c.classList.toggle('on', i < n); c.style.transitionDelay = (i * 25) + 'ms'; });
+    const left = goal - n;
+    msg.textContent = left <= 0 ? lt('wl_full') : left === 1 ? lt('wl_left1') : lt('wl_left', { n: left });
+  }
+  async function loadWaitlist() {
     const cfg = (window.HAVOK || {}).waitlist || {};
     let data = null;
     try {
@@ -565,86 +592,84 @@
       const r = await fetch(cfg.api, { signal: ctrl.signal, cache: 'no-cache' });
       clearTimeout(to);
       const j = r.ok ? await r.json() : null;
-      if (j && Number.isInteger(j.count) && j.count >= 0) data = j;
+      if (j && Number.isInteger(j.count) && j.count >= 0 && Number.isInteger(j.goal) && j.goal > 0) data = j;
     } catch (e) { data = null; }
-    if (!$('#wl')) return; // saiu da página enquanto carregava
-    const goal = (data && data.goal) || cfg.goal || 30;
-    const bar = $('#wlBar'), num = $('#wlNum'), msg = $('#wlMsg');
-    if (!data) {
-      // mantém o último número real na tela se já tinha um; senão fica sem número
-      if (box.dataset.state !== 'ok') { box.dataset.state = 'error'; num.textContent = `— / ${goal}`; bar.style.transform = 'scaleX(0)'; }
-      msg.textContent = t('wl_err');
-      return;
+    if (data) {
+      // a meta mudou no Worker: redesenha a barra com o número certo de marcas
+      const regoal = wlLast ? wlLast.goal !== data.goal : data.goal !== wlGoal();
+      wlLast = data;
+      if (regoal && $('#wl')) { route(); return; }
     }
-    box.dataset.state = 'ok';
-    num.textContent = `${data.count} / ${goal}`;
-    bar.style.transform = `scaleX(${Math.min(1, data.count / goal)})`;
-    bar.parentElement.setAttribute('aria-valuenow', data.count);
-    msg.textContent = data.count >= goal ? t('wl_full') : t('wl_goal', { n: goal });
+    paintWaitlist(data);
   }
 
-  // ---------------------------------------------------------------- home (landing)
-  const LANDING_MEDIA = [['spawn', 'spawn'], ['gather-tools', 'resource-gathering'], ['first-house', 'base-building'], ['vehicles', 'world-and-events'], ['build-wheel', 'base-building'], ['upgrade', 'base-building']];
-  const fmtDate = (d) => { const [y, m, dd] = d.split('-'); return lang === 'pt' ? `${dd}/${m}/${y}` : `${m}/${dd}/${y}`; };
-  let newsAll = false;
   function pageLanding() {
     const H = window.HAVOK || {};
     const so = Object.assign({ discord: H.discord }, H.socials || {});
-    const caption = (id) => (W.media.find((m) => m.id === id) || {}).caption || '';
-    const loop = (id) => `<video autoplay muted loop playsinline preload="metadata" poster="" aria-label="${esc(caption(id))}"><source src="media/${id}.webm" type="video/webm"><source src="media/${id}.mp4" type="video/mp4"></video>`;
+    const goal = wlGoal();
     const news = (window.HAVOK_NEWS || []);
     const shown = newsAll ? news : news.slice(0, 2);
+    const loop = (id) => `<video muted loop playsinline preload="none" aria-hidden="true"><source src="media/${id}.webm" type="video/webm"><source src="media/${id}.mp4" type="video/mp4"></video>`;
     setTimeout(() => {
-      // os vídeos da galeria só tocam quando aparecem na tela (economiza banda e CPU)
-      const vids = document.querySelectorAll('.l-gallery video');
+      // os vídeos só tocam quando aparecem na tela (economiza banda e CPU)
+      const vids = document.querySelectorAll('.l-step video');
       if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause())), { threshold: 0.25 });
-        vids.forEach((v) => { v.removeAttribute('autoplay'); v.pause(); io.observe(v); });
+        const io = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause())), { threshold: 0.3 });
+        vids.forEach((v) => io.observe(v));
       }
       const more = $('#newsMore');
       if (more) more.onclick = () => { newsAll = true; route(); };
+      // âncora sem mexer no hash (o hash é a rota)
+      const go = $('#toHow');
+      if (go) go.onclick = () => $('#how').scrollIntoView({ behavior: 'smooth' });
     });
     return `<section class="l-hero">
         <video class="l-hero-bg" autoplay muted loop playsinline preload="auto" poster="media/hero.webp" aria-hidden="true"><source src="media/hero.webm" type="video/webm"><source src="media/hero.mp4" type="video/mp4"></video>
         <div class="l-hero-in">
-          <img class="l-logo" src="logo-text.png" alt="HAVOK">
-          <h1 class="l-h1"><span>${t('l_h1a')}</span> <span>${t('l_h1b')}</span> <span class="hot">${t('l_h1c')}</span></h1>
-          <p class="l-sub">${t('l_sub')}</p>
-          ${waitlistBox()}
-          <div class="l-cta">
-            <a class="l-btn primary" href="play/">${svg('play')} ${t('l_play')}</a>
-            <a class="l-btn discord" href="${esc(so.discord || '#')}" target="_blank" rel="noopener">${svg('discord')} Discord</a>
-            <a class="l-btn" href="#/wiki">${svg('book')} ${t('l_wiki')}</a>
+          <div class="l-copy">
+            <img class="l-logo" src="logo-text.png" alt="HAVOK" width="560" height="140">
+            <p class="l-eyebrow">${lt('eyebrow')}</p>
+            <h1 class="l-h1"><span>${lt('h1a')}</span> <span class="hot">${lt('h1b')}</span></h1>
+            <p class="l-sub">${lt('sub', { n: goal })}</p>
+            <div class="l-links"><a href="#/wiki">${svg('book')} ${lt('wiki')}</a><button type="button" id="toHow">${svg('chevron')} ${lt('scroll')}</button></div>
           </div>
+          ${waitlistCard()}
         </div>
-        <div class="l-scroll" aria-hidden="true"></div>
       </section>
       <div class="l-body">
-        <div class="section-title">${t('l_feat')}</div>
-        <div class="l-feats">${T[lang].feats.map((f) => `<a class="l-feat" href="#/guides/${f[3]}"><span class="tile-ic">${svg(f[0])}</span><b>${esc(f[1])}</b><small>${esc(f[2])}</small></a>`).join('')}</div>
+        <section class="l-sec" id="how">
+          <p class="l-kicker">01 · ${lt('how')}</p>
+          <h2 class="l-h2">${lt('how_h')}</h2>
+          <div class="l-loop">${lt('loop').map(([id, title, desc, guide], i) => `<a class="l-step" href="#/guides/${guide}">
+              <div class="l-step-media">${loop(id)}<span class="l-step-n">${String(i + 1).padStart(2, '0')}</span></div>
+              <b>${esc(title)}</b><small>${esc(desc)}</small></a>`).join('')}</div>
+        </section>
 
-        <div class="l-new">
-          <div class="l-new-txt">
-            <h2>${t('l_new')}</h2>
-            <p>${t('l_new_sub')}</p>
-            <ol>${T[lang].l_steps.map((x) => `<li>${esc(x)}</li>`).join('')}</ol>
-            <a class="l-btn primary" href="#/guides/getting-started">${svg('rocket')} ${t('l_new_btn')}</a>
+        <section class="l-sec l-join">
+          <div>
+            <p class="l-kicker">02 · ${lt('join')}</p>
+            <h2 class="l-h2">${lt('join_h')}</h2>
+            <ol class="l-steps">${lt('steps').map(([title, desc]) => `<li><b>${esc(title)}</b><span>${esc(desc)}</span></li>`).join('')}</ol>
+            <a class="wl-btn inline" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${lt('wl_join')}</span></a>
           </div>
-          <div class="l-new-media">${loop('hud')}</div>
-        </div>
+        </section>
 
-        <div class="section-title">${t('l_media')}</div>
-        <div class="l-gallery">${LANDING_MEDIA.map(([id, g]) => `<a href="#/guides/${g}" class="l-shot">${loop(id)}<span>${esc(caption(id))}</span></a>`).join('')}</div>
+        <section class="l-sec">
+          <p class="l-kicker">03 · ${lt('faq')}</p>
+          <div class="faq l-faq">${lt('faqs').map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a.replace('{n}', goal))}</p></details>`).join('')}</div>
+        </section>
 
-        <div class="section-title">${t('l_news')}</div>
-        <div class="l-news">${shown.map((n) => `<article class="l-post">
-            <header><time datetime="${n.date}">${fmtDate(n.date)}</time><h3>${esc(n.title[lang] || n.title.en)}</h3></header>
-            <ul>${n.items.map((i) => `<li><span class="tag ${i.tag}">${esc(T[lang].tags[i.tag] || i.tag)}</span><span>${esc(i[lang] || i.en)}</span></li>`).join('')}</ul>
-          </article>`).join('')}
-          ${news.length > shown.length ? `<button class="l-more" id="newsMore">${t('l_all_news')}</button>` : ''}</div>
+        ${news.length ? `<section class="l-sec">
+          <p class="l-kicker">${lt('news')}</p>
+          <div class="l-news">${shown.map((n) => `<article class="l-post">
+              <header><time datetime="${n.date}">${fmtDate(n.date)}</time><h3>${esc(n.title[lang] || n.title.en)}</h3></header>
+              <ul>${n.items.map((i) => `<li><span class="tag ${i.tag}">${esc(T[lang].tags[i.tag] || i.tag)}</span><span>${esc(i[lang] || i.en)}</span></li>`).join('')}</ul>
+            </article>`).join('')}
+            ${news.length > shown.length ? `<button class="l-more" id="newsMore">${lt('all_news')}</button>` : ''}</div>
+        </section>` : ''}
 
         <div class="l-social">
-          <div><h2>${t('l_social')}</h2><p>${t('l_social_sub')}</p></div>
+          <div><h2>${lt('social')}</h2><p>${lt('social_sub')}</p></div>
           <div class="l-social-links">${[['discord', 'Discord'], ['youtube', 'YouTube'], ['tiktok', 'TikTok'], ['instagram', 'Instagram']].filter(([k]) => so[k]).map(([k, n]) => `<a class="l-soc ${k}" href="${esc(so[k])}" target="_blank" rel="noopener">${svg(k)}<span>${n}</span></a>`).join('')}</div>
         </div>
       </div>`;
@@ -702,13 +727,12 @@
     else if (parts[0] === 'faq') html = pageFaq();
     else if (parts[0] === 'media') html = pageMedia();
     else if (parts[0] === 'plano' || parts[0] === 'plan') html = pagePlan();
-    else if (parts[0] === 'badges') html = pageBadges();
     else if (parts[0] === 'store') html = pageStore();
     else html = pageHome();
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['badges', 'store'].includes(parts[0]) ? parts[0] : 'wiki')));
+    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : parts[0] === 'store' ? 'store' : 'wiki')));
     const it = parts[0] === 'items' && byId[parts[1]];
     document.title = landing ? 'HAVOK — Rust Survival' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);
