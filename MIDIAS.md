@@ -84,7 +84,7 @@ Marque ✅ ou anote o problema (print + o que aconteceu). Telas com ⭐ mudaram 
 - [ ] ⭐ `/modo` staff ⇄ jogador: troca sem reconectar, inventário e posição de cada conta certos
 - [ ] Morte: tela "MORTO", contagem, botão RESPAWN e CAMA; ⭐ VIP com várias camas
 
-**Inventário (TAB / E)**
+**Inventário (TAB)**
 - [ ] ⭐ Clicar item da barra rápida mostra a informação; fechar o inventário não deixa nada laranja
 - [ ] Arrastar entre inventário, barra rápida e corpo; dividir, comer, beber, dropar
 - [ ] Blueprints: receita sem material avisa o que falta; craftar funciona
