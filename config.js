@@ -9,9 +9,9 @@ window.HAVOK = {
   vip: {
     period: 'month',
     prices: {
-      survivor: { brl: 9.90, usd: 2.99 },
-      veteran: { brl: 19.90, usd: 4.99 },
-      legendary: { brl: 34.90, usd: 7.99 },
+      survivor: { brl: 15.00, usd: 2.99 },
+      veteran: { brl: 45.00, usd: 7.99 },
+      legendary: { brl: 90.00, usd: 15.99 },
     },
   },
   // endereço do servidor MTA para a página /play (ex.: '203.0.113.10:22003'). Vazio = página sem o botão.
