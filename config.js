@@ -1,7 +1,7 @@
 // Configuração do site HAVOK. Edite aqui sem mexer no resto.
 window.HAVOK = {
   // convite do Discord (botão do topo, da Store e do rodapé)
-  discord: 'https://discord.gg/caVytDM',
+  discord: 'https://discord.gg/w4hqcT8ufS',
   // lista de espera: URL do Worker (worker/README.md). Vazio = o contador não aparece.
   // ex.: api: 'https://havok-waitlist.SEU-USUARIO.workers.dev/waitlist'
   waitlist: { api: '', goal: 30 },
