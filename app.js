@@ -120,6 +120,7 @@
   // ---------------------------------------------------------------- icons (lucide-like paths)
   const P = {
     crosshair: '<circle cx="12" cy="12" r="9"/><path d="M22 12h-4M6 12H2M12 6V2M12 22v-4"/>',
+    car: '<path d="M5 17h14M6 17v2M18 17v2M3 13l2-6h14l2 6v4H3z"/><circle cx="7.5" cy="14" r="1"/><circle cx="16.5" cy="14" r="1"/>',
     wrench: '<path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8-1.3-1.3a4 4 0 0 0-5-5l2.3 2.3-2 2-2.3-2.3a4 4 0 0 0 5 5"/>',
     gem: '<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 21 8 9l4-6 4 6-4 12"/>',
     cog: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
@@ -198,6 +199,7 @@
       <div class="nav-group"><h5>${t('browse')}</h5>
         ${a('#/items', 'grid', t('all_items'))}
         ${CATS.map((c) => a('#/category/' + c.id, c.icon, c[lang])).join('')}
+        ${a('#/vehicles', 'car', lang === 'pt' ? 'Veículos' : 'Vehicles')}
         ${a('#/faq', 'help', 'FAQ')}
       </div>
       <div class="nav-group"><h5>${t('guides_h')}</h5>
@@ -236,6 +238,7 @@
       ${featuredVideo()}
       <div class="section-title">${t('categories')}</div>
       <div class="w-cats">${CATS.map((c) => `<a class="w-cat" href="#/category/${c.id}"><span class="w-cat-ic">${svg(c.icon)}</span><b>${esc(c[lang])}</b><small>${t('items_count', { n: count(c.id) })}</small></a>`).join('')}
+        <a class="w-cat" href="#/vehicles"><span class="w-cat-ic">${svg('car')}</span><b>${lang === 'pt' ? 'Veículos' : 'Vehicles'}</b><small>${(W.vehicles || []).length} ${lang === 'pt' ? 'veículos' : 'vehicles'}</small></a>
         <a class="w-cat" href="#/items"><span class="w-cat-ic">${svg('grid')}</span><b>${t('all_items')}</b><small>${t('items_count', { n: W.items.length })}</small></a></div>
       <div class="section-title">${t('guides')}</div>
       <div class="w-guides">${W.guides.map((g, i) => `<a class="w-guide" href="#/guides/${g.slug}"><span class="w-guide-n">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}
@@ -462,6 +465,44 @@
       <div class="box">${W.media.map((m) => `<div class="obtain">${svg(m.kind === 'video' ? 'video' : 'image')}<code>media/${m.id}.${m.kind === 'video' ? 'mp4' : 'webp'}</code><span class="muted">— ${esc(m.caption)}</span><a href="#/guides/${m.guide}" style="margin-left:auto" class="muted">${esc(m.guide)}</a></div>`).join('')}</div>`;
   }
 
+
+
+  // ---------------------------------------------------------------- veículos (stoneage_vehicles/config.lua via build)
+  const VCATS = { armored: ['Armored', 'Blindados'], offroad: ['Off-road', 'Off-road'], sport: ['Sport', 'Esportivos'], sedan: ['Cars', 'Carros'],
+    pickup: ['Pickups & vans', 'Picapes e vans'], bike: ['Motorcycles', 'Motos'], utility: ['Utility', 'Utilitários'], boat: ['Boats', 'Barcos'] };
+  const VT = {
+    en: { title: 'Vehicles', sub: 'Every vehicle on the server and what it needs to run.', all: 'All', map: 'On the map', mapv: 'up to {n}', trunk: 'Trunk', slots: '{n} slots', slot1: '1 slot',
+      fuel: 'Fuel', fuelv: 'up to {n}', spawn: 'Spawns', sp: { car: 'Roads and cities', boat: 'Coast and docks', armored: 'Special spots only' },
+      armor: 'Armored: takes half the bullet damage', needs: 'Needs to run', how: 'How to get one running',
+      howtxt: 'Abandoned vehicles are missing parts. Hold right click on one to see what it needs, install the parts, refuel with a Gas Can and press K to start the engine. Without tires a car does not move.',
+      none: 'Not on the map yet' },
+    pt: { title: 'Veículos', sub: 'Todos os veículos do servidor e o que cada um precisa para andar.', all: 'Todos', map: 'No mapa', mapv: 'até {n}', trunk: 'Porta-malas', slots: '{n} slots', slot1: '1 slot',
+      fuel: 'Gasolina', fuelv: 'até {n}', spawn: 'Nasce em', sp: { car: 'Estradas e cidades', boat: 'Litoral e cais', armored: 'Só em pontos especiais' },
+      armor: 'Blindado: leva metade do dano de bala', needs: 'Precisa para andar', how: 'Como colocar um para andar',
+      howtxt: 'Veículos abandonados estão sem peças. Segure o clique direito num deles para ver o que falta, instale as peças, abasteça com um Galão com Gasolina e aperte K para ligar o motor. Sem pneu o carro não sai do lugar.',
+      none: 'Ainda não nasce no mapa' },
+  };
+  let vCat = '';
+  function pageVehicles() {
+    const V = VT[lang], list = (W.vehicles || []).filter((v) => !vCat || v.cat === vCat);
+    const fmt = (str, n) => str.replace('{n}', n);
+    const part = (id, n) => (n > 0 && byId[id] ? `<a class="vh-part" href="#/items/${id}" title="${esc(name(byId[id]))}">${iconOf(byId[id], 'ic')}<b>×${n}</b></a>` : '');
+    setTimeout(() => document.querySelectorAll('.vh-filter button').forEach((b) => b.onclick = () => { vCat = b.dataset.c; route(); }));
+    const cats = Object.keys(VCATS).filter((c) => (W.vehicles || []).some((v) => v.cat === c));
+    return `${crumbs([['Wiki', '#/wiki'], [V.title]])}
+      <h1 class="page-title">${V.title}</h1><p class="page-sub">${V.sub}</p>
+      <div class="vh-how">${svg('wrench')}<div><b>${V.how}</b><p>${V.howtxt}</p>
+        <div class="vh-how-items">${['engine', 'car-battery', 'tire', 'gas-can'].filter((id) => byId[id]).map((id) => `<a href="#/items/${id}">${iconOf(byId[id])}<span>${esc(name(byId[id]))}</span></a>`).join('')}</div></div></div>
+      <div class="vh-filter">${[['', V.all], ...cats.map((c) => [c, VCATS[c][lang === 'pt' ? 1 : 0]])].map(([c, n]) => `<button type="button" class="chip ${vCat === c ? 'on' : ''}" data-c="${c}">${esc(n)}</button>`).join('')}</div>
+      <div class="vh-grid">${list.map((v) => `<article class="vh-card${v.armored ? ' armored' : ''}">
+          <div class="vh-img"><img src="vehicles/${v.id}.webp" alt="${esc(v.name)}" loading="lazy" width="204" height="125">${v.armored ? `<span class="vh-badge">${svg('shield')}</span>` : ''}</div>
+          <div class="vh-body"><b>${esc(v.name)}</b><small>${esc(VCATS[v.cat][lang === 'pt' ? 1 : 0])}</small>
+            ${v.armored ? `<p class="vh-armor">${svg('shield')} ${V.armor}</p>` : ''}
+            <div class="vh-needs"><span>${V.needs}</span><div>${part('engine', v.engine)}${part('car-battery', v.battery)}${part('tire', v.tires)}</div></div>
+            <dl><div><dt>${V.fuel}</dt><dd>${fmt(V.fuelv, v.fuel)}</dd></div><div><dt>${V.trunk}</dt><dd>${v.slots === 1 ? V.slot1 : fmt(V.slots, v.slots)}</dd></div>
+              <div><dt>${V.map}</dt><dd>${fmt(V.mapv, v.max)}</dd></div><div><dt>${V.spawn}</dt><dd>${V.sp[v.spawn] || v.spawn}</dd></div></dl></div>
+        </article>`).join('')}</div>`;
+  }
 
   // ---------------------------------------------------------------- badges (as mesmas do jogo: havok_badges)
   const BRAR = { common: ['Common', '#c9c2b6'], rare: ['Rare', '#4ea8ff'], epic: ['Epic', '#b07bff'], legendary: ['Legendary', '#ffae2e'], mythic: ['Mythic', '#ff3d52'] };
@@ -887,6 +928,7 @@
     else if (parts[0] === 'plano' || parts[0] === 'plan') html = pagePlan();
     else if (parts[0] === 'store') html = pageStore();
     else if (parts[0] === 'badges') html = pageBadges();
+    else if (parts[0] === 'vehicles') html = pageVehicles();
     else html = pageHome();
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
