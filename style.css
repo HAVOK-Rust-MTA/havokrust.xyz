@@ -672,6 +672,15 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
 .cd small { grid-column: 1 / -1; color: var(--dim); font-size: 12.5px; }
 .cd.pvp { border-color: var(--red); background: rgba(229, 84, 75, .1); }
 .cd.pvp .cd-label, .cd.pvp small { color: #ff8a80; }
+.cd[hidden] { display: none; }
+.cd-bar { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.cd-bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .9s linear; }
+.cd.pvp .cd-bar > span { background: var(--red); }
+.cd.pvp .cd-left b { animation: cd-pulse 2s ease-in-out infinite; }
+.cd.pending .cd-left b { font-size: 18px; color: #ff8a80; }
+.cd.stale { opacity: .7; }
+@keyframes cd-pulse { 50% { color: #ff8a80; } }
+@media (prefers-reduced-motion: reduce) { .cd.pvp .cd-left b { animation: none; } .cd-bar > span { transition: none; } }
 @media (max-width: 600px) { .cd { margin-bottom: 18px; } }
 
 /* ---------- badges ---------- */

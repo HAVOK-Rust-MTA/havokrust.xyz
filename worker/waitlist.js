@@ -2,13 +2,17 @@
 // Conta quantos membros do Discord têm o cargo "Waiting List" e devolve em JSON para o site.
 //
 //   GET /waitlist  ->  { count, goal, updatedAt, stale }
-//   cron (1 min)   ->  edita o painel da lista no canal do Discord (panel.js)
+//   cron (1 min)   ->  edita os painéis da lista no canal do Discord: status (panel.js) e inscrição (waitlist/join.js)
+//   POST /interactions -> recrutamento da staff, lista de espera e /wipe pelo Discord (banco D1)
+//   /api/wipe/*        -> calendário de wipe: status público (site) e sincronização assinada com o servidor MTA (wipe/)
 //
 // O token do bot fica só no Secret DISCORD_BOT_TOKEN; GUILD_ID, ROLE_ID, GOAL e ALLOWED_ORIGINS
 // ficam em [vars] no wrangler.toml. Nunca inventa número: se o Discord falhar e não houver
 // leitura recente guardada, responde erro.
 
-import { updatePanel, readFirst } from './panel.js';
+import { handleInteraction, recruitCron, serveBanner } from './recruit/interactions.js';
+import { refreshWaitlist, readFirstWaitlist } from './waitlist/join.js';
+import { handleWipeHttp, wipeCron } from './wipe/service.js';
 
 const API = 'https://discord.com/api/v10';
 const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
@@ -127,17 +131,27 @@ function configError(env) {
 export default {
   // a cada minuto: edita o painel da lista no canal do Discord (panel.js)
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(updatePanel(env).then((r) => { if (r === 'updated') console.log('panel: updated'); }).catch((e) => console.error('panel:', e.message)));
+    ctx.waitUntil(refreshWaitlist(env).then((r) => { if (r.status === 'updated') console.log('panel: updated'); }).catch((e) => console.error('panel:', e.message)));
+    // recrutamento: tenta de novo o que falhou no Discord e limpa rascunhos (não faz nada sem o D1 configurado)
+    ctx.waitUntil(recruitCron(env).catch((e) => console.error('recruit cron:', e.message)));
+    // wipe: painel e avisos (quem executa o wipe é o servidor MTA, nunca o cron)
+    ctx.waitUntil(wipeCron(env).catch((e) => console.error('wipe cron:', e.message)));
   },
 
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    // recrutamento da staff: o Discord entrega cliques, formulários e comandos aqui (assinados, Ed25519)
+    if (url.pathname === '/interactions') return handleInteraction(request, env, ctx);
+    if (url.pathname.startsWith('/api/wipe/')) return handleWipeHttp(request, env, ctx, url);
+    // banner do painel de recrutamento (o Discord baixa daqui)
+    if (url.pathname.startsWith('/recruit/') && request.method === 'GET') return serveBanner(url.pathname.slice('/recruit/'.length));
     const origin = allowedOrigin(request, env);
 
     // mural dos 15 primeiros (página de badges do site)
     if (url.pathname === '/waitlist/first' && request.method === 'GET') {
       try {
-        if (!firstMemo || Date.now() - firstMemo.at > 60_000) firstMemo = { list: await readFirst(env), at: Date.now() };
+        if (!firstMemo || Date.now() - firstMemo.at > 60_000) firstMemo = { list: await readFirstWaitlist(env), at: Date.now() };
         return json({ first: firstMemo.list }, 200, origin, 60);
       } catch (e) {
         console.error('first:', e.message);

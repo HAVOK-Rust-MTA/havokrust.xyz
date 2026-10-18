@@ -666,7 +666,7 @@
         ['Can I play with friends?', 'Yes. Groups have up to 8 members, with their own tag, emblem and color, plus a group ranking.'],
         ['Does it run on a weak PC?', 'MTA runs on modest hardware. The server interface was built to stay light.'],
       ],
-      cd_launch: 'Server launch in', cd_wipe: 'Next wipe in', cd_pvp: 'INSANE PvP: weapons in every barrel until the wipe', cd_every: 'Full wipe every {n} days',
+      cd_wipe: 'Next wipe in', cd_pvp: 'FINAL 24 HOURS · INSANE PvP: weapons and loot are easier to find until the wipe', cd_every: 'full wipe every {n} days', cd_at: 'Wipe: {d}', cd_pending: 'Wipe in progress', cd_failed: 'Wipe delayed', cd_stale: 'No connection to the server right now; trying again…',
       news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and the launch countdown.',
     },
     pt: {
@@ -698,7 +698,7 @@
         ['Dá para jogar com amigos?', 'Sim. Grupos têm até 8 membros, com tag, emblema e cor próprios, e um ranking de grupos.'],
         ['Roda em PC fraco?', 'O MTA roda em máquinas modestas. A interface do servidor foi feita para ser leve.'],
       ],
-      cd_launch: 'Inauguração em', cd_wipe: 'Próximo wipe em', cd_pvp: 'PvP INSANO: armas em todo barril até o wipe', cd_every: 'Wipe completo a cada {n} dias',
+      cd_wipe: 'Próximo wipe em', cd_pvp: 'ÚLTIMAS 24 HORAS · PvP INSANO: armas e loot mais fáceis até o wipe', cd_every: 'wipe completo a cada {n} dias', cd_at: 'Wipe: {d}', cd_pending: 'Wipe em andamento', cd_failed: 'Wipe adiado', cd_stale: 'Sem conexão com o servidor agora; tentando de novo…',
       news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e a contagem para a inauguração.',
     },
   };
@@ -769,35 +769,71 @@
     paintWaitlist(data);
   }
 
-  // contagem: inauguração (antes de wipe.start) ou próximo wipe (a cada wipe.everyDays). Mesma conta do havok_wipe.
-  let cdTimer = null;
-  function wipeTimes() {
-    const w = (window.HAVOK || {}).wipe || {};
-    const m = String(w.start || '').match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/);
-    if (!m) return null;
-    const start = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4] + 3, +m[5]); // Brasília = UTC-3
-    const period = (w.everyDays || 45) * 86400000, now = Date.now();
-    if (now < start) return { kind: 'launch', at: start, every: w.everyDays || 45 };
-    const at = start + (Math.floor((now - start) / period) + 1) * period;
-    return { kind: 'wipe', at, every: w.everyDays || 45, pvp: at - now <= (w.pvpHours || 24) * 3600000 };
+  // contagem do wipe: calendário OFICIAL do Worker (/api/wipe/status, o mesmo que o Discord e o servidor usam).
+  // O relógio do site é corrigido pela hora do Worker; o contador anda a cada segundo aqui mesmo e o site só pergunta
+  // de novo a cada minuto (ou quando a aba volta a ficar visível). Sem resposta por 5 min: avisa que está sem conexão.
+  const WIPE_REFRESH_MS = 60000, WIPE_STALE_MS = 5 * 60000, PVP_MS = 24 * 3600000;
+  let cdTimer = null, wipeData = null, wipeAt = 0, wipeOffset = 0, wipeLoading = null;
+  function loadWipe(force) {
+    const api = ((window.HAVOK || {}).wipe || {}).api;
+    if (!api) return Promise.resolve(null);
+    if (wipeLoading) return wipeLoading;
+    if (!force && wipeData && Date.now() - wipeAt < WIPE_REFRESH_MS) return Promise.resolve(wipeData);
+    const sent = Date.now();
+    wipeLoading = fetch(api, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+      .then((d) => {
+        const got = Date.now();
+        const server = Date.parse(d.serverTime);
+        if (Number.isFinite(server)) wipeOffset = server - (sent + got) / 2; // meio da ida e volta
+        wipeData = d; wipeAt = got;
+        return d;
+      })
+      .catch(() => wipeData)
+      .finally(() => { wipeLoading = null; });
+    return wipeLoading;
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && $('#cdBox')) loadWipe(true).then(paintWipe);
+  });
+
+  const p2 = (n) => String(n).padStart(2, '0');
+  function paintWipe() {
+    const box = $('#cdBox');
+    if (!box) { clearInterval(cdTimer); cdTimer = null; return; }
+    const d = wipeData;
+    if (!d || !d.scheduledWipeAt || d.status === 'NONE') { box.hidden = true; return; }
+    box.hidden = false;
+    const now = Date.now() + wipeOffset;
+    const at = Date.parse(d.scheduledWipeAt), start = Date.parse(d.startedAt);
+    const left = Math.max(0, at - now);
+    const pending = d.status === 'WIPE_PENDING' || d.status === 'FAILED' || left === 0;
+    const pvp = !pending && left <= PVP_MS;
+    box.className = `cd${pvp ? ' pvp' : ''}${pending ? ' pending' : ''}${Date.now() - wipeAt > WIPE_STALE_MS ? ' stale' : ''}`;
+    let s = Math.floor(left / 1000);
+    const dd = Math.floor(s / 86400); s %= 86400;
+    const h = Math.floor(s / 3600); s %= 3600;
+    $('#cdLeft').innerHTML = pending ? `<b>${lt(d.status === 'FAILED' ? 'cd_failed' : 'cd_pending')}</b>`
+      : `<b>${dd}</b><i>d</i><b>${p2(h)}</b><i>h</i><b>${p2(Math.floor(s / 60))}</b><i>m</i><b>${p2(s % 60)}</b><i>s</i>`;
+    const pct = Math.min(100, Math.max(0, ((now - start) / (at - start)) * 100));
+    $('#cdBar').style.width = `${pending ? 100 : pct.toFixed(2)}%`;
+    const when = new Date(at).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    $('#cdNote').textContent = Date.now() - wipeAt > WIPE_STALE_MS ? lt('cd_stale')
+      : pvp ? lt('cd_pvp') : `${lt('cd_at', { d: when })} · ${lt('cd_every', { n: Math.round((d.durationSeconds || 1296000) / 86400) })}`;
   }
   function countdownBox() {
-    const w = wipeTimes();
-    if (!w) return '';
-    const paint = () => {
-      const el = $('#cdLeft');
-      if (!el) { clearInterval(cdTimer); return; }
-      const cur = wipeTimes();
-      let s = Math.max(0, Math.floor((cur.at - Date.now()) / 1000));
-      const d = Math.floor(s / 86400); s %= 86400;
-      const h = Math.floor(s / 3600); s %= 3600;
-      const mi = Math.floor(s / 60), se = s % 60;
-      const p2 = (n) => String(n).padStart(2, '0');
-      el.innerHTML = `<b>${d}</b><i>d</i><b>${p2(h)}</b><i>h</i><b>${p2(mi)}</b><i>m</i><b>${p2(se)}</b><i>s</i>`;
-    };
-    setTimeout(() => { clearInterval(cdTimer); paint(); cdTimer = setInterval(paint, 1000); });
-    return `<div class="cd${w.pvp ? ' pvp' : ''}"><span class="cd-label">${lt(w.kind === 'launch' ? 'cd_launch' : 'cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
-      <small>${w.pvp ? lt('cd_pvp') : lt('cd_every', { n: w.every })}</small></div>`;
+    if (!((window.HAVOK || {}).wipe || {}).api) return '';
+    setTimeout(() => {
+      clearInterval(cdTimer);
+      let ticks = 0;
+      loadWipe(false).then(paintWipe);
+      cdTimer = setInterval(() => {
+        paintWipe();
+        if (++ticks % 60 === 0) loadWipe(false).then(paintWipe); // revalida a cada minuto, sem pedir a cada segundo
+      }, 1000);
+    });
+    return `<div class="cd" id="cdBox" hidden><span class="cd-label">${lt('cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
+      <span class="cd-bar"><span id="cdBar"></span></span><small id="cdNote"></small></div>`;
   }
 
   function pageLanding() {

@@ -11,7 +11,34 @@ ALLOWED_ORIGINS = "https://havokrust.xyz,https://www.havokrust.xyz,http://127.0.
 # painel no canal: ID da mensagem que o webhook enviou uma vez (o link do webhook vai no Secret WAITLIST_WEBHOOK)
 WAITLIST_MESSAGE_ID = "1561125074197553324"
 
+# //------------------- RECRUTAMENTO DA STAFF (recruit/) -------------------\\
+# Fica desligado (o Worker responde "não configurado") até preencher isto. Passo a passo no README.
+# DISCORD_PUBLIC_KEY: Developer Portal → General Information → Public Key (é pública; o token NÃO vai aqui)
+DISCORD_PUBLIC_KEY = "3afbbd792b329668485532b0b1f440e55130bb69b20660acfb4a3e8605e561cd"
+# canal PRIVADO onde chegam as candidaturas (botão direito no canal → Copiar ID)
+STAFF_REVIEW_CHANNEL_ID = "1561366545064534096"
+# cargos que podem aprovar/reprovar/abrir/fechar, separados por vírgula
+STAFF_ADMIN_ROLE_IDS = "1561366785062862998,1561367057717661799"   # suporter, admin full
+# opcional: IDs de pessoas que podem tudo isso mesmo sem o cargo, separados por vírgula
+STAFF_ADMIN_USER_IDS = ""
+# vagas de cada processo novo (o processo guarda o número dele; mudar aqui não altera um processo em andamento)
+STAFF_MAX_SLOTS = "2"
+# Application ID do app (Developer Portal → General Information): o Worker registra o /staff sozinho
+DISCORD_APPLICATION_ID = "1560692623289614487"
+# wipe: duração de cada ciclo em segundos (15 dias). O segredo do servidor MTA vai no Secret WIPE_SECRET.
+WIPE_CYCLE_SECONDS = "1296000"
+# endereço público deste Worker (o banner do painel é servido daqui: /recruit/banner-*.jpg)
+PUBLIC_URL = "https://havok-waitlist.havokrust.workers.dev"
+
 [triggers]
 crons = ["* * * * *"]
 
 # O token NÃO vai aqui. Rode: npx wrangler secret put DISCORD_BOT_TOKEN
+
+# Banco D1. Crie com: npx wrangler d1 create havok-recruit
+# e descomente o bloco abaixo colando o database_id que o comando mostrar.
+[[d1_databases]]
+binding = "DB"
+database_name = "havok-recruit"
+database_id = "50f9c110-f21a-4476-b2b6-4f5ac92c8308"
+migrations_dir = "migrations"

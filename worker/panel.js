@@ -16,7 +16,7 @@ const discordFetch = async (fetchImpl, url, init = {}) => {
   return res.status === 204 ? null : res.json();
 };
 
-async function roleMembers(env, fetchImpl) {
+export async function roleMembers(env, fetchImpl = fetch) {
   const out = [];
   let after = '0';
   for (let page = 0; page < 10; page++) {
@@ -45,11 +45,14 @@ export function idsFromEmbed(embed) {
   return m ? m[1].split('.').filter(Boolean) : [];
 }
 
-function bar(n, goal) {
-  const cells = 20;
-  const lit = Math.min(cells, Math.round((Math.min(n, goal) / goal) * cells));
-  const pct = Math.floor((Math.min(n, goal) / goal) * 100);
-  return `${'🟧'.repeat(lit)}${'⬛'.repeat(cells - lit)}  **${pct}%**`;
+// Progresso rumo à inauguração (GOAL = meta de lançamento, 125). A MESMA função desenha a barra nos dois painéis
+// (status e "entrar na lista"). Passar da meta não é limite: a lista continua aceitando; só mostra 100% e 0 vagas.
+// Quadrados proporcionais, com pelo menos 1 aceso se houver alguém, e a barra só enche quando a meta foi alcançada.
+export function progress(n, goal, cells = 20) {
+  const capped = Math.max(0, Math.min(n, goal));
+  const pct = Math.min(100, Math.round((capped / goal) * 100));
+  const lit = n >= goal ? cells : n <= 0 ? 0 : Math.min(cells - 1, Math.max(1, Math.round((capped / goal) * cells)));
+  return { pct, left: Math.max(0, goal - n), reached: n >= goal, bar: `${'🟧'.repeat(lit)}${'⬛'.repeat(cells - lit)}  **${pct}%**` };
 }
 
 // colunas dos prêmios: #01–05, #06–10, #11–15
@@ -57,7 +60,8 @@ const TIERS = [['🔴 Vanguard', 0, 5], ['🟠 Pioneer', 5, 10], ['🟣 Early Su
 const line = (m, i) => `\`#${String(i + 1).padStart(2, '0')}\` ${display(m)}`;
 
 export function buildEmbed(queue, goal) {
-  const n = queue.length, left = Math.max(0, goal - n);
+  const n = queue.length;
+  const { left, bar } = progress(n, goal);
   // guarda a ordem no link do título (limite do Discord para URL: deixa folga)
   let ids = queue.map((m) => m.user.id);
   while (ids.length && (SITE.length + 4 + ids.join('.').length) > 1900) ids = ids.slice(0, -1);
@@ -69,10 +73,10 @@ export function buildEmbed(queue, goal) {
   const rest = queue.slice(15, 15 + SHOW).map((m, i) => line(m, i + 15));
   if (n > 15 + SHOW) rest.push(`+ ${n - 15 - SHOW} more · mais`);
   const fields = [
-    { name: 'Survivors · Sobreviventes', value: `### ${String(n).padStart(2, '0')} / ${goal}`, inline: true },
-    { name: 'Spots left · Vagas', value: `### ${left}`, inline: true },
-    { name: 'Launch · Inauguração', value: `### ${goal} 🎯`, inline: true },
-    { name: 'Progress · Progresso', value: bar(n, goal), inline: false },
+    { name: '👥 Survivors · Sobreviventes', value: `**${String(n).padStart(2, '0')}** / ${goal}`, inline: true },
+    { name: '⏳ Spots left · Vagas', value: `**${left}**`, inline: true },
+    { name: '🎯 Launch · Inauguração', value: `**${goal}**`, inline: true },
+    { name: 'Progress · Progresso', value: bar, inline: false },
     ...tierFields,
   ];
   if (rest.length) fields.push({ name: 'Next in line · Próximos da fila', value: rest.join('\n'), inline: false });
@@ -81,23 +85,26 @@ export function buildEmbed(queue, goal) {
     url: `${SITE}?wl=${ids.join('.')}`,
     color: 0xff6a00,
     thumbnail: { url: `${SITE}apple-touch-icon.png` },
-    description: `🇺🇸 Join by picking **Waiting List** in the welcome questions. The launch date is set at **${goal}** survivors.\n`
-      + `🇧🇷 Entre escolhendo **Waiting List** nas perguntas de boas-vindas. A data sai com **${goal}** sobreviventes.`,
+    description: `🇺🇸 The server launches when we reach **${goal}** survivors. Join with the button below.\n`
+      + `🇧🇷 O servidor será inaugurado quando alcançarmos **${goal}** sobreviventes. Entre pelo botão abaixo.`,
     fields,
     footer: { text: '🇺🇸 Live · updates every minute  ·  🇧🇷 Ao vivo · atualiza a cada minuto' },
   };
 }
 
 // o que muda de verdade (sem horário), para só editar quando precisa
-const signature = (e) => JSON.stringify([e && e.url, e && e.description, ((e && e.fields) || []).map((f) => [f.name, f.value])]);
+export const signature = (e) => JSON.stringify([e && e.url, e && e.description, ((e && e.fields) || []).map((f) => [f.name, f.value])]);
 
-export async function updatePanel(env, fetchImpl = fetch) {
+// onCount(n, goal): chamado com a contagem desta rodada (o painel "entrar na lista" usa a MESMA contagem)
+export async function updatePanel(env, fetchImpl = fetch, { onCount } = {}) {
   if (!env.WAITLIST_WEBHOOK || !env.WAITLIST_MESSAGE_ID) return 'off';
   const goal = Math.max(1, parseInt(env.GOAL, 10) || 50);
   const msgUrl = `${env.WAITLIST_WEBHOOK.replace(/\/$/, '')}/messages/${env.WAITLIST_MESSAGE_ID}`;
   const [members, current] = await Promise.all([roleMembers(env, fetchImpl), discordFetch(fetchImpl, msgUrl)]);
   const prev = (current && current.embeds && current.embeds[0]) || null;
-  const embed = buildEmbed(orderQueue(idsFromEmbed(prev), members), goal);
+  const queue = orderQueue(idsFromEmbed(prev), members);
+  if (onCount) await onCount(queue.length, goal);
+  const embed = buildEmbed(queue, goal);
   if (signature(prev) === signature(embed)) return 'same';
   embed.timestamp = new Date().toISOString();
   await discordFetch(fetchImpl, msgUrl, { method: 'PATCH', body: JSON.stringify({ embeds: [embed] }) });
@@ -108,7 +115,12 @@ export async function updatePanel(env, fetchImpl = fetch) {
 export async function readFirst(env, fetchImpl = fetch, limit = 15) {
   if (!env.WAITLIST_WEBHOOK || !env.WAITLIST_MESSAGE_ID) return [];
   const msg = await discordFetch(fetchImpl, `${env.WAITLIST_WEBHOOK.replace(/\/$/, '')}/messages/${env.WAITLIST_MESSAGE_ID}`);
-  const fields = (msg && msg.embeds && msg.embeds[0] && msg.embeds[0].fields) || [];
+  return readFirstFromEmbed(msg && msg.embeds && msg.embeds[0], limit);
+}
+
+// os primeiros da fila a partir do embed de status (vale para o painel do webhook e o do bot)
+export function readFirstFromEmbed(embed, limit = 15) {
+  const fields = (embed && embed.fields) || [];
   const out = [];
   for (const f of fields) {
     for (const ln of String(f.value || '').split('\n')) {
