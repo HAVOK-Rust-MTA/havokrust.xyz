@@ -816,7 +816,7 @@
     $('#cdLeft').innerHTML = pending ? `<b>${lt(d.status === 'FAILED' ? 'cd_failed' : 'cd_pending')}</b>`
       : `<b>${dd}</b><i>d</i><b>${p2(h)}</b><i>h</i><b>${p2(Math.floor(s / 60))}</b><i>m</i><b>${p2(s % 60)}</b><i>s</i>`;
     const pct = Math.min(100, Math.max(0, ((now - start) / (at - start)) * 100));
-    $('#cdBar').style.width = `${pending ? 100 : pct.toFixed(2)}%`;
+    $('#cdBar').style.transform = `scaleX(${pending ? 1 : (pct / 100).toFixed(4)})`;
     const when = new Date(at).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
     $('#cdNote').textContent = Date.now() - wipeAt > WIPE_STALE_MS ? lt('cd_stale')
       : pvp ? lt('cd_pvp') : `${lt('cd_at', { d: when })} · ${lt('cd_every', { n: Math.round((d.durationSeconds || 1296000) / 86400) })}`;

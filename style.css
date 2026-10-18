@@ -674,7 +674,7 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
 .cd.pvp .cd-label, .cd.pvp small { color: #ff8a80; }
 .cd[hidden] { display: none; }
 .cd-bar { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .08); overflow: hidden; }
-.cd-bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .9s linear; }
+.cd-bar > span { display: block; height: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0); transition: transform .9s linear; }
 .cd.pvp .cd-bar > span { background: var(--red); }
 .cd.pvp .cd-left b { animation: cd-pulse 2s ease-in-out infinite; }
 .cd.pending .cd-left b { font-size: 18px; color: #ff8a80; }
