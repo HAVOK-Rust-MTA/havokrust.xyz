@@ -811,7 +811,7 @@
     const left = Math.max(0, at - now);
     const pending = d.status === 'WIPE_PENDING' || d.status === 'FAILED' || left === 0;
     const pvp = !pending && left <= PVP_MS;
-    box.className = `cd${pvp ? ' pvp' : ''}${pending ? ' pending' : ''}${Date.now() - wipeAt > WIPE_STALE_MS ? ' stale' : ''}`;
+    box.className = `cd${box.dataset.big ? ' cd-big' : ''}${pvp ? ' pvp' : ''}${pending ? ' pending' : ''}${Date.now() - wipeAt > WIPE_STALE_MS ? ' stale' : ''}`;
     let s = Math.floor(left / 1000);
     const dd = Math.floor(s / 86400); s %= 86400;
     const h = Math.floor(s / 3600); s %= 3600;
@@ -834,7 +834,7 @@
         if (++ticks % 60 === 0) loadWipe(false).then(paintWipe); // revalida a cada minuto, sem pedir a cada segundo
       }, 1000);
     });
-    return `<div class="cd" id="cdBox" hidden><span class="cd-label">${lt('cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
+    return `<div class="cd${more ? '' : ' cd-big'}" id="cdBox" ${more ? '' : 'data-big="1"'} hidden><span class="cd-label">${lt('cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
       <span class="cd-bar"><span id="cdBar"></span></span><small id="cdNote"></small>${more ? `<a class="cd-more" href="#/wipe">${lt('cd_more')} ${svg('chevron')}</a>` : ''}</div>`;
   }
 
@@ -872,10 +872,12 @@
 
   function pageWipe() {
     return `<div class="wp">
+        <div class="wp-hero">
         <p class="l-kicker">${lt('wp_kicker')}</p>
         <h1 class="wp-title">${lt('wp_title')}</h1>
         <p class="wp-sub">${lt('wp_sub')}</p>
         ${countdownBox(false)}
+        </div>
         ${rankingSection()}
       </div>`;
   }
