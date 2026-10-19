@@ -29,7 +29,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVER', footer_copy: '© 2026 HAVOK — Rust Survival. Not affiliated with Facepunch Studios.',
       bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench', bp_tip: 'Needs a blueprint: you must learn this recipe before you can craft it.', bench_tip: 'Needs a Workbench nearby to craft.', bp_explain: 'You must learn this blueprint before crafting. Put the item and Scrap in a Research Table to get the blueprint, or find one in airdrops and the patrol helicopter, then right click it → Learn. Learning is permanent.', bp_explain_loot: 'This blueprint cannot be researched. Find it in loot, then right click it → Learn. Learning is permanent.', bp_how: 'How blueprints work', legend_bp: 'needs a blueprint (learn the recipe first)', legend_bench: 'needs a Workbench',
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
-      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play',
+      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play', nav_wipe: 'Wipe',
      
       store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
       store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Monthly price; other periods on Discord',
@@ -63,7 +63,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVIDOR', footer_copy: '© 2026 HAVOK — Rust Survival. Sem afiliação com a Facepunch Studios.',
       bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada', bp_tip: 'Precisa de blueprint: você tem que aprender esta receita antes de craftar.', bench_tip: 'Precisa de uma Bancada perto para craftar.', bp_explain: 'Você precisa aprender esta blueprint antes de craftar. Coloque o item e Sucata na Mesa de Pesquisa para ganhar a blueprint, ou ache uma no airdrop e no helicóptero de patrulha. Depois clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_explain_loot: 'Esta blueprint não dá para pesquisar. Ache no loot e clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_how: 'Como funcionam as blueprints', legend_bp: 'precisa de blueprint (aprender a receita antes)', legend_bench: 'precisa de Bancada',
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
-      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar',
+      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar', nav_wipe: 'Wipe',
      
       store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
       store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Preço por mês; outros períodos no Discord',
@@ -666,6 +666,7 @@
         ['Can I play with friends?', 'Yes. Groups have up to 8 members, with their own tag, emblem and color, plus a group ranking.'],
         ['Does it run on a weak PC?', 'MTA runs on modest hardware. The server interface was built to stay light.'],
       ],
+      rk_kicker: 'This wipe', rk_title: 'Who rules the island', rk_groups: 'Groups', rk_players: 'Players', rk_kills: 'Kills', rk_deaths: 'Deaths', rk_members: 'Members', rk_kd: 'K/D', rk_updated: 'Updated {t} · resets every wipe', rk_none: 'Nobody has scored yet this wipe. The first kills show up here.', wp_kicker: 'Current wipe', wp_title: 'The race for the island', wp_sub: 'Groups compete for the top until the wipe resets everything. The ranking updates every 5 minutes.', cd_more: 'See the wipe ranking',
       cd_wipe: 'Next wipe in', cd_pvp: 'FINAL 24 HOURS · INSANE PvP: weapons and loot are easier to find until the wipe', cd_every: 'full wipe every {n} days', cd_at: 'Wipe: {d}', cd_pending: 'Wipe in progress', cd_failed: 'Wipe delayed', cd_stale: 'No connection to the server right now; trying again…',
       news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and the launch countdown.',
     },
@@ -698,6 +699,7 @@
         ['Dá para jogar com amigos?', 'Sim. Grupos têm até 8 membros, com tag, emblema e cor próprios, e um ranking de grupos.'],
         ['Roda em PC fraco?', 'O MTA roda em máquinas modestas. A interface do servidor foi feita para ser leve.'],
       ],
+      rk_kicker: 'Este wipe', rk_title: 'Quem manda na ilha', rk_groups: 'Grupos', rk_players: 'Jogadores', rk_kills: 'Kills', rk_deaths: 'Mortes', rk_members: 'Membros', rk_kd: 'K/D', rk_updated: 'Atualizado {t} · zera a cada wipe', rk_none: 'Ninguém pontuou ainda neste wipe. As primeiras kills aparecem aqui.', wp_kicker: 'Wipe atual', wp_title: 'A disputa pela ilha', wp_sub: 'Os grupos disputam o topo até o wipe zerar tudo. O ranking atualiza a cada 5 minutos.', cd_more: 'Ver o ranking do wipe',
       cd_wipe: 'Próximo wipe em', cd_pvp: 'ÚLTIMAS 24 HORAS · PvP INSANO: armas e loot mais fáceis até o wipe', cd_every: 'wipe completo a cada {n} dias', cd_at: 'Wipe: {d}', cd_pending: 'Wipe em andamento', cd_failed: 'Wipe adiado', cd_stale: 'Sem conexão com o servidor agora; tentando de novo…',
       news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e a contagem para a inauguração.',
     },
@@ -821,7 +823,7 @@
     $('#cdNote').textContent = Date.now() - wipeAt > WIPE_STALE_MS ? lt('cd_stale')
       : pvp ? lt('cd_pvp') : `${lt('cd_at', { d: when })} · ${lt('cd_every', { n: Math.round((d.durationSeconds || 1296000) / 86400) })}`;
   }
-  function countdownBox() {
+  function countdownBox(more) {
     if (!((window.HAVOK || {}).wipe || {}).api) return '';
     setTimeout(() => {
       clearInterval(cdTimer);
@@ -833,7 +835,49 @@
       }, 1000);
     });
     return `<div class="cd" id="cdBox" hidden><span class="cd-label">${lt('cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
-      <span class="cd-bar"><span id="cdBar"></span></span><small id="cdNote"></small></div>`;
+      <span class="cd-bar"><span id="cdBar"></span></span><small id="cdNote"></small>${more ? `<a class="cd-more" href="#/wipe">${lt('cd_more')} ${svg('chevron')}</a>` : ''}</div>`;
+  }
+
+  // ranking do wipe atual (página #/wipe): grupos em destaque à esquerda, jogadores à direita
+  function rankingSection() {
+    const api = ((window.HAVOK || {}).ranking || {}).api;
+    if (!api) return '';
+    setTimeout(() => {
+      fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+        if (!$('#rankSec')) return;
+        const groups = (d && d.groups) || [], players = (d && d.players) || [];
+        const n = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
+        const kd = (k, de) => (de ? (k / de).toFixed(2) : n(k));
+        const empty = `<li class="rk-empty">${lt('rk_none')}</li>`;
+        $('#rkGroups').innerHTML = groups.map((g) => `<li><span class="rk-pos">${String(g.rank).padStart(2, '0')}</span>
+          <span class="rk-name"><i class="rk-dot" style="background:${/^#[0-9a-fA-F]{6}$/.test(g.color || '') ? g.color : 'var(--accent)'}"></i>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</span>
+          <span class="rk-num">${n(g.members)}</span><span class="rk-num hot">${n(g.kills)}</span><span class="rk-num">${n(g.deaths)}</span></li>`).join('') || empty;
+        $('#rkPlayers').innerHTML = players.map((p) => `<li><span class="rk-pos">${String(p.rank).padStart(2, '0')}</span>
+          <span class="rk-name">${esc(p.nick)}</span><span class="rk-num hot">${n(p.kills)}</span><span class="rk-num">${n(p.deaths)}</span><span class="rk-num">${kd(p.kills, p.deaths)}</span></li>`).join('') || empty;
+        if (d && d.updatedAt) $('#rkUpdated').textContent = lt('rk_updated', { t: new Date(d.updatedAt).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { dateStyle: 'short', timeStyle: 'short' }) });
+      }).catch(() => {
+        if ($('#rkGroups')) $('#rkGroups').innerHTML = $('#rkPlayers').innerHTML = `<li class="rk-empty">${lt('cd_stale')}</li>`;
+      });
+    });
+    const head = (cols) => `<li class="rk-head"><span class="rk-pos">#</span>${cols.map((c, i) => `<span class="${i ? 'rk-num' : 'rk-name'}">${c}</span>`).join('')}</li>`;
+    const loading = '<li class="rk-empty">…</li>';
+    return `<section class="rk" id="rankSec">
+        <div class="rk-grid">
+          <div class="rk-col rk-main"><h3>${lt('rk_groups')}</h3><ol class="rk-list">${head(['', lt('rk_members'), lt('rk_kills'), lt('rk_deaths')])}</ol><ol class="rk-list" id="rkGroups">${loading}</ol></div>
+          <div class="rk-col"><h3>${lt('rk_players')}</h3><ol class="rk-list">${head(['', lt('rk_kills'), lt('rk_deaths'), lt('rk_kd')])}</ol><ol class="rk-list" id="rkPlayers">${loading}</ol></div>
+        </div>
+        <p class="rk-updated" id="rkUpdated"></p>
+      </section>`;
+  }
+
+  function pageWipe() {
+    return `<div class="wp">
+        <p class="l-kicker">${lt('wp_kicker')}</p>
+        <h1 class="wp-title">${lt('wp_title')}</h1>
+        <p class="wp-sub">${lt('wp_sub')}</p>
+        ${countdownBox(false)}
+        ${rankingSection()}
+      </div>`;
   }
 
   function pageLanding() {
@@ -864,7 +908,7 @@
             <p class="l-eyebrow">${lt('eyebrow')}</p>
             <h1 class="l-h1"><span>${lt('h1a')}</span> <span class="hot">${lt('h1b')}</span></h1>
             <p class="l-sub">${lt('sub', { n: goal })}</p>
-            ${countdownBox()}
+            ${countdownBox(true)}
             <div class="l-links"><a href="#/wiki">${svg('book')} ${lt('wiki')}</a><button type="button" id="toHow">${svg('chevron')} ${lt('scroll')}</button></div>
           </div>
           ${waitlistCard()}
@@ -951,7 +995,7 @@
     let html;
     const landing = !parts.length;
     document.body.classList.toggle('landing', landing);
-    document.body.classList.toggle('standalone', parts[0] === 'store' || parts[0] === 'badges');
+    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe'].includes(parts[0]));
     if (landing) html = pageLanding();
     else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
@@ -964,14 +1008,15 @@
     else if (parts[0] === 'plano' || parts[0] === 'plan') html = pagePlan();
     else if (parts[0] === 'store') html = pageStore();
     else if (parts[0] === 'badges') html = pageBadges();
+    else if (parts[0] === 'wipe') html = pageWipe();
     else if (parts[0] === 'vehicles') html = pageVehicles();
     else html = pageHome();
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['store', 'badges'].includes(parts[0]) ? parts[0] : 'wiki')));
+    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['store', 'badges', 'wipe'].includes(parts[0]) ? parts[0] : 'wiki')));
     const it = parts[0] === 'items' && byId[parts[1]];
-    document.title = landing ? 'HAVOK — Rust Survival' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
+    document.title = landing ? 'HAVOK — Rust Survival' : parts[0] === 'wipe' ? 'Wipe — HAVOK' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);
   }
 

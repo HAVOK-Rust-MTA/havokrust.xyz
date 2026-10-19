@@ -7,6 +7,8 @@ window.HAVOK = {
   waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 125 },
   // wipe: calendário oficial do Worker (o mesmo do Discord e do servidor). Sem wipe agendado, o contador não aparece.
   wipe: { api: 'https://havok-waitlist.havokrust.workers.dev/api/wipe/status' },
+  // ranking do wipe atual (o servidor do jogo manda a cada 5 min). Vazio = a seção não aparece.
+  ranking: { api: 'https://havok-waitlist.havokrust.workers.dev/api/ranking' },
   // preços do VIP (por mês) em reais e dólar. Tirar um preço = mostra "Consulte no Discord".
   vip: {
     period: 'month',

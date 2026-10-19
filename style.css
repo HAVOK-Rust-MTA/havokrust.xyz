@@ -757,3 +757,33 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
 .vh-body dt { font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
 .vh-body dd { margin: 0; font-size: 13.5px; font-weight: 600; }
 @media (max-width: 600px) { .vh-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .vh-body dl { grid-template-columns: 1fr; } .vh-part .ic { width: 24px; height: 24px; } }
+
+/* ranking do wipe (home): grupos | jogadores */
+.wp-title { margin: 6px 0 10px; font: 700 clamp(34px, 5vw, 56px)/1 var(--title); text-transform: uppercase; letter-spacing: .01em; color: var(--text); }
+.wp-sub { margin: 0 0 22px; max-width: 62ch; color: var(--muted); font-size: 15.5px; line-height: 1.6; }
+.wp .cd { margin-bottom: 28px; }
+.cd-more { grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-top: 2px; color: var(--accent2); font-size: 13px; font-weight: 600; text-decoration: none; }
+.cd-more svg { width: 14px; height: 14px; }
+.cd-more:hover { color: var(--accent); }
+.rk-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.rk-col { border: 1px solid var(--line2); border-radius: 6px; background: rgba(14, 13, 12, .6); padding: 14px 16px 10px; min-width: 0; }
+.rk-col h3 { margin: 0 0 8px; font: 600 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent2); }
+.rk-main { border-color: rgba(255, 106, 0, .45); padding: 18px 20px 12px; }
+.rk-main h3 { font-size: 13px; color: var(--accent); }
+.rk-list { list-style: none; margin: 0; padding: 0; }
+.rk-list li { display: grid; grid-template-columns: 28px minmax(0, 1fr) repeat(3, 58px); align-items: center; gap: 6px; padding: 7px 0; border-top: 1px solid rgba(255, 255, 255, .05); font-size: 14px; }
+.rk-main .rk-list li { grid-template-columns: 34px minmax(0, 1fr) repeat(3, 72px); padding: 9px 0; font-size: 15px; }
+.rk-main .rk-list li:not(.rk-head):nth-child(-n+3) { font-size: 17px; font-weight: 600; padding: 12px 0; }
+.rk-list li.rk-head { border-top: 0; padding: 0 0 4px; font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+.rk-main .rk-list li.rk-head { font-size: 11px; padding: 0 0 6px; }
+.rk-pos { font: 600 12px var(--mono); color: var(--dim); }
+.rk-list li:not(.rk-head):nth-child(-n+3) .rk-pos { color: var(--accent); }
+.rk-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.rk-name small { color: var(--muted); font-size: 12px; font-weight: 400; }
+.rk-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; }
+.rk-num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); }
+.rk-num.hot { color: var(--text); font-weight: 700; }
+.rk-list li.rk-empty { display: block; padding: 14px 0; color: var(--dim); font-size: 14px; font-weight: 400; }
+.rk-updated { margin: 10px 0 0; color: var(--dim); font-size: 12.5px; }
+@media (max-width: 860px) { .rk-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .rk-list li, .rk-main .rk-list li { grid-template-columns: 26px minmax(0, 1fr) repeat(3, 46px); font-size: 13.5px; } .rk-main .rk-list li:not(.rk-head):nth-child(-n+3) { font-size: 15px; } }
