@@ -7,7 +7,7 @@
 // Quem pode aprovar/abrir/fechar sai dos cargos do membro que o PRÓPRIO Discord assina na interação,
 // nunca do custom_id nem do canal.
 import { verifyRequest } from './verify.js';
-import { NO_MENTIONS, DiscordError, sendMessage, editMessage, deleteMessage, editOriginal } from './discord.js';
+import { NO_MENTIONS, DiscordError, sendMessage, editMessage, deleteMessage, editOriginal, sendDM, addRole, removeRole } from './discord.js';
 import * as db from './db.js';
 import { QUESTIONS, STEP1, STEP2, TEXT, DEFAULT_SLOTS, DRAFT_TTL_S, INTERACTION_KEEP_S } from './config.js';
 import { BANNERS } from './banners.js';
@@ -196,9 +196,48 @@ async function onDecision(env, i, admin, decision, rawId, ctx) {
     await db.setPanelDirty(env.DB, app.process_id, true);
     ctx.waitUntil(db.getProcess(env.DB, app.process_id).then((p) => syncPanel(env, p)).catch((e) => console.error('recruit panel:', e.message)));
   }
+  ctx.waitUntil(notifyApplicant(env, app, decision).catch((e) => console.error('recruit notify:', e.message)));
   ctx.waitUntil(loadEmojis(env)); // o clique tem 3 s para responder: usa os emojis já guardados
   const [first] = reviewMessages(await db.getApplication(env.DB, applicationId), emojiPicker(cachedEmojis()));
   return update({ embeds: first.embeds, components: first.components });
+}
+
+// cargos dados automaticamente a quem é aprovado (lista separada por vírgula)
+const approvedRoles = (env) => idList(env.STAFF_APPROVED_ROLE_IDS || env.STAFF_HELPER_ROLE_ID);
+
+// avisa o candidato por DM e, se aprovado, dá os cargos. Sempre responde no canal de análise
+// (em cima da candidatura) dizendo o que deu certo e o que não deu, para o admin não ficar no escuro.
+// Roda uma vez por decisão: o decide() do banco só deixa o primeiro clique passar. /staff avisar repete à mão.
+async function notifyApplicant(env, app, decision) {
+  const done = [], problems = [];
+  const roles = decision === 'approve' ? approvedRoles(env) : [];
+  const given = [];
+  for (const role of roles) {
+    try {
+      await addRole(env, app.user_id, role);
+      given.push(role);
+    } catch (e) {
+      problems.push(e.status === 403
+        ? `não consegui dar <@&${role}> (o cargo do bot precisa ficar ACIMA dele e ter "Gerenciar cargos")`
+        : e.status === 404 ? `não consegui dar <@&${role}> (a pessoa saiu do servidor?)` : `não consegui dar <@&${role}>`);
+    }
+  }
+  if (given.length) done.push(`cargos dados: ${given.map((r) => `<@&${r}>`).join(' ')}`);
+  const name = String(app.display_name || app.username).replace(/[*_`~|>\\]/g, '');
+  const content = decision === 'approve' ? TEXT.dmApproved(name, given.length > 0) : TEXT.dmRejected(name);
+  try {
+    await sendDM(env, app.user_id, { content });
+    done.push('DM entregue');
+  } catch (e) {
+    problems.push(e.status === 403 ? 'a DM NÃO chegou (a pessoa fecha mensagens diretas)' : 'a DM NÃO chegou (erro do Discord, tente `/staff avisar`)');
+  }
+  const verdict = decision === 'approve' ? 'APROVADO' : 'REPROVADO';
+  const lines = [`${problems.length ? '⚠️' : '✅'} Candidatura ${appNumber(app.id)} (<@${app.user_id}>) ${verdict}: ${done.join(' · ') || 'nada foi enviado'}.`];
+  if (problems.length) lines.push(`Falhou: ${problems.join('; ')}. Avise a pessoa manualmente ou use \`/staff avisar numero:${app.id}\`.`);
+  const ref = app.review_message_id && !String(app.review_message_id).startsWith('posting:')
+    ? { message_reference: { message_id: app.review_message_id, fail_if_not_exists: false } } : {};
+  await sendMessage(env, env.STAFF_REVIEW_CHANNEL_ID, { content: lines.join('\n'), ...ref });
+  return { ok: problems.length === 0, text: lines.join('\n') };
 }
 
 async function afterFilled(env, processId) {
@@ -308,6 +347,14 @@ async function runCommand(env, i, admin) {
     }
     case 'status':
       return statusText(current, current ? await db.processStats(env.DB, current.id) : null);
+    case 'avisar': {
+      const id = Number(option(sub, 'numero'));
+      const app = Number.isInteger(id) && await db.getApplication(env.DB, id);
+      if (!app || app.guild_id !== env.GUILD_ID) return 'Candidatura não encontrada.';
+      if (app.status !== 'approved' && app.status !== 'rejected') return `A candidatura ${appNumber(id)} ainda está pendente: aprove ou reprove primeiro.`;
+      const r = await notifyApplicant(env, app, app.status === 'approved' ? 'approve' : 'reject');
+      return r.text;
+    }
     case 'desfazer': {
       const id = Number(option(sub, 'numero'));
       const reason = String(option(sub, 'motivo') || '').replace(CONTROL, '').trim();
@@ -318,6 +365,12 @@ async function runCommand(env, i, admin) {
       if (!r.ok) return `A candidatura ${appNumber(id)} já está pendente.`;
       const fresh = await db.getApplication(env.DB, id);
       const notes = [];
+      // desfez uma aprovação: tira o cargo de helper que o bot deu (cargos dados à mão ficam)
+      if (app.status === 'approved') {
+        for (const role of approvedRoles(env)) {
+          await removeRole(env, app.user_id, role).catch(() => notes.push(`não consegui tirar <@&${role}>, tire manualmente`));
+        }
+      }
       if (fresh.review_message_id && !fresh.review_message_id.startsWith('posting:')) {
         const [first] = reviewMessages(fresh, emojiPicker(await loadEmojis(env)));
         await editMessage(env, fresh.review_channel_id, fresh.review_message_id, first).catch(() => notes.push('não consegui editar a mensagem de análise'));

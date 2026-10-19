@@ -295,3 +295,37 @@ test('sem ciclo: status público NONE e painel avisando que ainda não foi agend
   await syncPanel(env, { force: true });
   assert.match(panelEdits().pop().body.embeds[0].description, /ainda não foi agendado/);
 });
+
+// //------------------- DATA PELO JOGO E RANKING -------------------\\
+test('data definida dentro do jogo (assinada pelo servidor) vale igual ao /wipe definir e atualiza o painel', async () => {
+  await withPanel();
+  const at = nowS() + 15 * 86400;
+  const r = await server('POST', '/api/wipe/mta/event', { type: 'define', at, actor: 'kpital' });
+  assert.deepEqual([r.status, r.json.result, r.json.current.scheduledWipeAtUnix], [200, 'created', at]);
+  assert.match(panelEdits().pop().body.embeds[0].title, /WIPE STATUS/);
+  const again = await server('POST', '/api/wipe/mta/event', { type: 'define', at: at + 3600, actor: 'kpital' });
+  assert.equal(again.json.result, 'rescheduled');
+  assert.equal((await server('POST', '/api/wipe/mta/event', { type: 'define', at: nowS() + 10, actor: 'x' })).json.result, 'too_soon');
+  assert.equal(env.DB.row(`SELECT COUNT(*) n FROM wipe_events WHERE origin = 'admin:mta:kpital'`).n, 2);
+  // sem assinatura ninguém define data
+  const fake = await worker.fetch(new Request('https://w.example/api/wipe/mta/event', { method: 'POST', body: JSON.stringify({ type: 'define', at }) }), env, ctx);
+  assert.equal(fake.status, 401);
+});
+
+test('ranking: o servidor manda (assinado), o site lê; só nome/tag/números, limpos e no máximo 10', async () => {
+  const groups = Array.from({ length: 14 }, (_, i) => ({ name: `#ff0000Grupo<b>${i}</b>`, tag: 'TAGMUITOLONGA', color: '#ff6a00', members: 3, kills: 100 - i, deaths: 5, xp: 900, serial: 'SECRETO' }));
+  const players = [{ nick: 'kpital', kills: 42, deaths: 3, account: 'ECF1A777' }, { nick: '', kills: 1 }];
+  const r = await server('POST', '/api/wipe/mta/ranking', { groups, players });
+  assert.deepEqual([r.status, r.json.groups, r.json.players], [200, 10, 1]);
+  const res = await worker.fetch(new Request('https://w.example/api/ranking', { headers: { Origin: 'https://havokrust.xyz' } }), env, ctx);
+  const body = await res.json();
+  assert.equal(res.headers.get('Access-Control-Allow-Origin'), 'https://havokrust.xyz');
+  assert.equal(body.groups[0].name, 'Grupob0/b'); // sem cor do MTA (#ff0000) e sem < >
+  assert.ok(!/[<>#]/.test(JSON.stringify(body.groups.map((g) => g.name))));
+  assert.equal(body.groups[0].tag.length, 8);
+  assert.ok(!JSON.stringify(body).includes('SECRETO') && !JSON.stringify(body).includes('ECF1A777'));
+  assert.deepEqual(body.players, [{ rank: 1, nick: 'kpital', kills: 42, deaths: 3 }]);
+  // ninguém de fora publica ranking
+  const fake = await worker.fetch(new Request('https://w.example/api/wipe/mta/ranking', { method: 'POST', body: '{"groups":[]}' }), env, ctx);
+  assert.equal(fake.status, 401);
+});

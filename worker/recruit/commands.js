@@ -41,6 +41,10 @@ export const STAFF_COMMAND = {
         { type: STRING, name: 'motivo', description: 'Por que a decisão está sendo desfeita', min_length: 5, max_length: 300, required: true },
       ],
     },
+    {
+      type: SUB, name: 'avisar', description: 'Manda de novo a DM do resultado (e os cargos, se aprovado) para o candidato',
+      options: [{ type: INTEGER, name: 'numero', description: 'Número da candidatura (ex.: 3)', min_value: 1, required: true }],
+    },
     { type: SUB, name: 'sincronizar', description: 'Atualiza o painel e publica candidaturas que faltam no canal de análise' },
   ],
 };

@@ -21,6 +21,9 @@ STAFF_REVIEW_CHANNEL_ID = "1561366545064534096"
 STAFF_ADMIN_ROLE_IDS = "1561366785062862998,1561367057717661799"   # suporter, admin full
 # opcional: IDs de pessoas que podem tudo isso mesmo sem o cargo, separados por vírgula
 STAFF_ADMIN_USER_IDS = ""
+# cargos dados automaticamente a quem for APROVADO, separados por vírgula. Vazio = não dá cargo.
+# O cargo do bot precisa estar ACIMA de todos eles na lista de cargos do servidor.
+STAFF_APPROVED_ROLE_IDS = "1561366996342407228,1560456297629880471"
 # vagas de cada processo novo (o processo guarda o número dele; mudar aqui não altera um processo em andamento)
 STAFF_MAX_SLOTS = "2"
 # Application ID do app (Developer Portal → General Information): o Worker registra o /staff sozinho

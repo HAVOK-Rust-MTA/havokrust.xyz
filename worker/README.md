@@ -142,8 +142,16 @@ painel público  --[Candidatar-se]-->  mensagem privada --[Começar]--> formulá
 | `/staff fechar` | encerra as inscrições |
 | `/staff reabrir` | reabre o MESMO processo (aprovações continuam valendo; não reabre se as vagas já foram preenchidas) |
 | `/staff status` | aberto/fechado, candidaturas, aprovados e vagas restantes |
-| `/staff desfazer numero motivo` | volta uma candidatura avaliada para pendente (fica na auditoria). Se liberar vaga de um processo cheio, ele fica FECHADO até `/staff reabrir` |
+| `/staff desfazer numero motivo` | volta uma candidatura avaliada para pendente (fica na auditoria). Se liberar vaga de um processo cheio, ele fica FECHADO até `/staff reabrir`. Se era uma aprovação, o bot tira o cargo de Helper |
+| `/staff avisar numero` | manda de novo a DM do resultado (e os cargos, se aprovado) |
 | `/staff sincronizar` | atualiza o painel e publica candidaturas que faltam no canal de análise |
+
+**Aviso ao candidato:** quando alguém clica em Aprovar ou Recusar, o bot manda uma DM para o candidato.
+- **Aprovado:** recebe automaticamente os cargos de `STAFF_APPROVED_ROLE_IDS` (Helper e cargo base). O cargo com mais acesso é dado à mão.
+- **Recusado:** recebe uma mensagem padrão dizendo que pode tentar de novo no próximo processo.
+- **Confirmação:** o canal de análise sempre recebe uma resposta à candidatura com o resultado. Fica ✅ quando a DM foi entregue e os cargos foram dados, e ⚠️ quando algo falhou.
+- **Se falhou:** `/staff avisar numero` manda tudo de novo.
+- **Requisitos:** o bot precisa da permissão "Gerenciar cargos", e o cargo dele precisa ficar **acima** desses cargos na lista de cargos.
 
 ### Configurar (uma vez)
 
@@ -227,6 +235,11 @@ O Worker/D1 é o calendário; o servidor MTA (`havok_wipe`) faz o wipe de verdad
 | `/wipe painel [canal]` | publica (ou sincroniza) o painel; os avisos também saem nesse canal |
 | `/wipe definir data:"AAAA-MM-DD HH:MM" confirmar:true` | agenda o próximo wipe (Brasília). Sem ciclo: cria o primeiro |
 | `/wipe status` · `/wipe historico` · `/wipe sincronizar` | consulta / histórico / força o painel |
+| `/wipedefinir AAAA-MM-DD HH:MM` (no jogo, staff) | o mesmo que `/wipe definir`, de dentro do servidor MTA; Discord e site atualizam sozinhos |
+
+**Ranking do wipe no site:** o `havok_wipe` manda a cada 5 min (assinado, `POST /api/wipe/mta/ranking`) o top 10 de grupos
+(`havok_groups`) e o top 10 de jogadores por kills (sem contas de staff). O Worker guarda só nome, tag e números e o site lê
+`GET /api/ranking` (seção "Quem manda na ilha" na home, escondida enquanto não houver ninguém pontuando).
 
 Endpoints: `GET /api/wipe/status` (público, CORS de `ALLOWED_ORIGINS`), `GET /api/wipe/mta/sync` e `POST /api/wipe/mta/event`
 (só com `X-Havok-Timestamp` + `X-Havok-Signature` = HMAC-SHA256 de `"<ts>\n<MÉTODO>\n<caminho>\n<corpo>"` com `WIPE_SECRET`; 5 min de validade).

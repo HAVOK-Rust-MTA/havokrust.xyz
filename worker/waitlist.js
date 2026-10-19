@@ -143,7 +143,7 @@ export default {
 
     // recrutamento da staff: o Discord entrega cliques, formulários e comandos aqui (assinados, Ed25519)
     if (url.pathname === '/interactions') return handleInteraction(request, env, ctx);
-    if (url.pathname.startsWith('/api/wipe/')) return handleWipeHttp(request, env, ctx, url);
+    if (url.pathname.startsWith('/api/wipe/') || url.pathname === '/api/ranking') return handleWipeHttp(request, env, ctx, url);
     // banner do painel de recrutamento (o Discord baixa daqui)
     if (url.pathname.startsWith('/recruit/') && request.method === 'GET') return serveBanner(url.pathname.slice('/recruit/'.length));
     const origin = allowedOrigin(request, env);

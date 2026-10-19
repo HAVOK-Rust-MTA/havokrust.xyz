@@ -188,7 +188,7 @@ beforeEach(async () => {
   publicHex ??= hex(await crypto.subtle.exportKey('raw', keys.publicKey));
   env = {
     DB: new FakeD1(), DISCORD_BOT_TOKEN: 'b0t-t0k3n', DISCORD_PUBLIC_KEY: publicHex, GUILD_ID: GUILD,
-    STAFF_REVIEW_CHANNEL_ID: REVIEW, STAFF_ADMIN_ROLE_IDS: ADMIN_ROLE, PUBLIC_URL: 'https://havok-waitlist.example.workers.dev', ROLE_ID: '100000000000000099', ALLOWED_ORIGINS: '',
+    STAFF_REVIEW_CHANNEL_ID: REVIEW, STAFF_ADMIN_ROLE_IDS: ADMIN_ROLE, PUBLIC_URL: 'https://havok-waitlist.example.workers.dev', ROLE_ID: '100000000000000099', STAFF_APPROVED_ROLE_IDS: '100000000000000077,100000000000000078', ALLOWED_ORIGINS: '',
     GOAL: '125', WAITLIST_WEBHOOK: 'https://discord.com/api/webhooks/1/SECRET', WAITLIST_MESSAGE_ID: '400000000000000000',
   };
   calls = []; fail = []; nextMsg = 500000000000000000; pending = []; seq = 0; emojiList = null;
@@ -876,4 +876,75 @@ test('/waitinglist: só admin; refresh atualiza; recrutamento continua funcionan
   assert.match(lastFollowup(), /Inscritos agora: \*\*1\*\* de 125/);
   await openWithPanel();
   assert.match(reply(await apply(member(userId(9)))), /enviada com sucesso/);
+});
+
+// //------------------- AVISO AO CANDIDATO -------------------\\
+const HELPER = '100000000000000077', HELPER2 = '100000000000000078';
+const dms = () => calls.filter((c) => c.method === 'POST' && c.path === '/channels/1/messages').map((c) => c.body.content);
+
+test('aprovado: recebe o cargo de helper e uma DM; recusado: só a DM padrão', async () => {
+  await openWithPanel();
+  for (const n of [1, 2]) await apply(member(userId(n)));
+  await click(admin(), `recruit:approve:${appIdOf(userId(1))}`);
+  await click(admin(), `recruit:reject:${appIdOf(userId(2))}`);
+  await flush();
+  const roleCalls = calls.filter((c) => c.path.includes('/roles/'));
+  assert.deepEqual(roleCalls.map((c) => [c.method, c.path]), [HELPER, HELPER2].map((r) => ['PUT', `/guilds/${GUILD}/members/${userId(1)}/roles/${r}`]));
+  const opens = calls.filter((c) => c.method === 'POST' && c.path === '/users/@me/channels').map((c) => c.body.recipient_id);
+  assert.deepEqual(opens, [userId(1), userId(2)]);
+  const [ok, no] = dms();
+  assert.match(ok, /aprovada/);
+  assert.match(ok, /já recebeu seus cargos/);
+  assert.match(no, /não foi aprovada/);
+  // admins recebem a confirmação no canal de análise, em resposta à candidatura
+  const notes = calls.filter((c) => c.method === 'POST' && c.path === `/channels/${REVIEW}/messages` && /^✅/.test(c.body.content || ''));
+  assert.equal(notes.length, 2);
+  assert.match(notes[0].body.content, /APROVADO: cargos dados: <@&100000000000000077> <@&100000000000000078> · DM entregue/);
+  assert.match(notes[1].body.content, /REPROVADO: DM entregue/);
+  assert.ok(notes[0].body.message_reference.message_id);
+  assert.ok(!calls.some((c) => c.path === `/channels/${REVIEW}/messages` && /⚠️/.test(c.body.content || '')));
+});
+
+test('DM fechada e cargo sem permissão viram aviso no canal de análise', async () => {
+  await openWithPanel();
+  await apply(member(userId(1)));
+  fail.push({ method: 'POST', match: /^\/channels\/1\/messages$/, status: 403 });
+  fail.push({ method: 'PUT', match: /\/roles\//, status: 403 });
+  await click(admin(), `recruit:approve:${appIdOf(userId(1))}`);
+  await flush();
+  const warn = calls.find((c) => c.method === 'POST' && c.path === `/channels/${REVIEW}/messages` && /⚠️/.test(c.body.content || ''));
+  assert.ok(warn);
+  assert.match(warn.body.content, /DM/);
+  assert.match(warn.body.content, /não consegui dar <@&/);
+  assert.match(warn.body.content, /staff avisar numero:/);
+  assert.deepEqual(warn.body.allowed_mentions, { parse: [] });
+  // a aprovação em si continua valendo
+  assert.equal(env.DB.row('SELECT status FROM staff_applications').status, 'approved');
+});
+
+test('desfazer uma aprovação tira o cargo de helper', async () => {
+  await openWithPanel();
+  await apply(member(userId(1)));
+  const id = appIdOf(userId(1));
+  await click(admin(), `recruit:approve:${id}`);
+  await flush();
+  await command(admin(), 'desfazer', [{ type: 4, name: 'numero', value: id }, { type: 3, name: 'motivo', value: 'aprovado por engano' }]);
+  await flush();
+  for (const r of [HELPER, HELPER2]) assert.ok(calls.some((c) => c.method === 'DELETE' && c.path === `/guilds/${GUILD}/members/${userId(1)}/roles/${r}`));
+});
+
+test('/staff avisar repete a DM e os cargos de uma candidatura já avaliada', async () => {
+  await openWithPanel();
+  await apply(member(userId(1)));
+  const id = appIdOf(userId(1));
+  const lastFollowup = () => calls.filter((c) => c.path.startsWith(`/webhooks/${APP_ID}/`)).pop().body.content;
+  await command(admin(), 'avisar', [{ type: 4, name: 'numero', value: id }]);
+  await flush();
+  assert.match(lastFollowup(), /pendente/);
+  fail.push({ method: 'POST', match: /^\/channels\/1\/messages$/, status: 403, times: 1 });
+  await click(admin(), `recruit:approve:${id}`);
+  await flush();
+  await command(admin(), 'avisar', [{ type: 4, name: 'numero', value: id }]);
+  await flush();
+  assert.match(lastFollowup(), /^✅ .*DM entregue/);
 });

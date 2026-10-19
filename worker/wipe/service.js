@@ -2,7 +2,9 @@
 //
 //   GET  /api/wipe/status      público (site): só o que qualquer visitante pode ver
 //   GET  /api/wipe/mta/sync    servidor MTA, assinado (HMAC): o calendário oficial
-//   POST /api/wipe/mta/event   servidor MTA, assinado: pvp_on | wipe_started | wipe_done | wipe_failed
+//   POST /api/wipe/mta/event   servidor MTA, assinado: pvp_on | wipe_started | wipe_done | wipe_failed | define (data pelo jogo)
+//   POST /api/wipe/mta/ranking servidor MTA, assinado: top de grupos e jogadores do wipe atual (a cada 5 min)
+//   GET  /api/ranking          público (site): o último ranking recebido
 //
 // Assinatura do servidor: X-Havok-Timestamp (unix) + X-Havok-Signature = hex(HMAC-SHA256(WIPE_SECRET,
 // "<timestamp>\n<MÉTODO>\n<caminho>\n<corpo>")). Fora de 5 min = recusado. Nada de segredo na URL.
@@ -51,15 +53,41 @@ async function verifyServer(request, env, path, t = nowS()) {
   const sig = fromHex(request.headers.get('X-Havok-Signature') || '');
   if (!/^\d{9,12}$/.test(ts) || !sig || Math.abs(t - Number(ts)) > MAX_SKEW_S) return null;
   const body = request.method === 'GET' ? '' : await request.text();
-  if (body.length > 4096) return null;
+  if (body.length > 16384) return null;
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.WIPE_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
   const ok = await crypto.subtle.verify('HMAC', key, sig, new TextEncoder().encode(`${ts}\n${request.method}\n${path}\n${body}`)); // comparação em tempo constante
   return ok ? body : null;
 }
 
+// //------------------- RANKING DO WIPE -------------------\\
+const clean = (s, max = 32) => String(s ?? '').replace(/#[0-9a-fA-F]{6}/g, '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
+const int = (n) => Math.max(0, Math.min(1e9, Math.floor(Number(n) || 0)));
+const color = (c) => (/^#[0-9a-fA-F]{6}$/.test(String(c)) ? String(c) : null);
+
+// só o que é público num ranking de jogo: nome, tag, números. Nada de serial/conta.
+export function sanitizeRanking(raw) {
+  const groups = (Array.isArray(raw && raw.groups) ? raw.groups : []).slice(0, 10).map((g, i) => ({
+    rank: i + 1, name: clean(g.name), tag: clean(g.tag, 8), color: color(g.color), members: int(g.members), kills: int(g.kills), deaths: int(g.deaths), xp: int(g.xp),
+  })).filter((g) => g.name);
+  const players = (Array.isArray(raw && raw.players) ? raw.players : []).slice(0, 10).map((p, i) => ({
+    rank: i + 1, nick: clean(p.nick), kills: int(p.kills), deaths: int(p.deaths),
+  })).filter((p) => p.nick);
+  return { groups, players };
+}
+
 export async function handleWipeHttp(request, env, ctx, url) {
   const path = url.pathname;
   if (!env.DB) return json({ error: 'unavailable' }, 503);
+
+  if (path === '/api/ranking') {
+    const h = cors(request, env);
+    if (request.method === 'OPTIONS') return new Response(null, { status: h['Access-Control-Allow-Origin'] ? 204 : 403, headers: h });
+    if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, h);
+    const row = await env.DB.prepare(`SELECT value, updated_at FROM bot_settings WHERE key = 'ranking.snapshot'`).first();
+    const data = row ? JSON.parse(row.value) : { groups: [], players: [] };
+    const cycle = await currentCycle(env.DB);
+    return json({ ...data, updatedAt: row ? new Date(row.updated_at * 1000).toISOString() : null, cycleId: cycle ? cycle.id : null }, 200, { ...h, 'Cache-Control': 'public, max-age=60' });
+  }
 
   if (path === '/api/wipe/status') {
     const h = cors(request, env);
@@ -76,7 +104,7 @@ export async function handleWipeHttp(request, env, ctx, url) {
     }
   }
 
-  if (path === '/api/wipe/mta/sync' || path === '/api/wipe/mta/event') {
+  if (path === '/api/wipe/mta/sync' || path === '/api/wipe/mta/event' || path === '/api/wipe/mta/ranking') {
     const method = path.endsWith('/sync') ? 'GET' : 'POST';
     if (request.method !== method) return json({ error: 'method_not_allowed' }, 405);
     const body = await verifyServer(request, env, path);
@@ -90,6 +118,21 @@ export async function handleWipeHttp(request, env, ctx, url) {
       ev = JSON.parse(body);
     } catch {
       return json({ error: 'bad_json' }, 400);
+    }
+    if (path.endsWith('/ranking')) {
+      const data = sanitizeRanking(ev);
+      await env.DB.prepare(
+        `INSERT INTO bot_settings (key, value, updated_at) VALUES ('ranking.snapshot', ?, ?)
+         ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+      ).bind(JSON.stringify(data), nowS()).run();
+      return json({ ok: true, groups: data.groups.length, players: data.players.length });
+    }
+    // data do wipe definida dentro do jogo (staff, conferida pelo servidor): mesma regra do /wipe definir
+    if (ev.type === 'define') {
+      const r = await defineWipe(env.DB, { at: Number(ev.at), actor: `mta:${clean(ev.actor, 40) || '?'}` });
+      console.log(`wipe: data definida pelo jogo (${clean(ev.actor, 40)}) -> ${r.ok ? 'ok' : r.reason}`);
+      if (r.ok) ctx.waitUntil(syncPanel(env, { force: true }).catch((e) => console.error('wipe panel:', e.message)));
+      return json({ ok: r.ok, result: r.ok ? (r.created ? 'created' : 'rescheduled') : r.reason, current: cycleView(await currentCycle(env.DB)) }, r.ok ? 200 : 409);
     }
     const r = await applyServerEvent(env.DB, ev, { env });
     console.log(`wipe: evento do servidor ${ev.type} ciclo ${ev.cycleId} -> ${r.result}`);

@@ -69,3 +69,15 @@ export const deleteMessage = (env, channelId, messageId) =>
 // resposta adiada de uma interação: edita a mensagem "pensando..." (usa o token da interação, não o do bot)
 export const editOriginal = (env, interaction, message) =>
   discordRequest(env, 'PATCH', `/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`, { allowed_mentions: NO_MENTIONS, ...message }, { bot: false });
+
+// DM: abre (ou reaproveita) o canal privado com a pessoa e manda a mensagem. 403 = DM fechada.
+export async function sendDM(env, userId, message) {
+  const channel = await discordRequest(env, 'POST', '/users/@me/channels', { recipient_id: userId });
+  return sendMessage(env, channel.id, message);
+}
+
+export const addRole = (env, userId, roleId) =>
+  discordRequest(env, 'PUT', `/guilds/${env.GUILD_ID}/members/${userId}/roles/${roleId}`);
+
+export const removeRole = (env, userId, roleId) =>
+  discordRequest(env, 'DELETE', `/guilds/${env.GUILD_ID}/members/${userId}/roles/${roleId}`);

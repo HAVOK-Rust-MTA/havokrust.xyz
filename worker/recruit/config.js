@@ -49,6 +49,8 @@ export const TEXT = {
   notConfigured: 'O sistema de recrutamento ainda não foi configurado. Avise a administração.',
   repeated: 'Esta ação já foi processada.',
   error: 'Algo deu errado do nosso lado. Tente de novo em alguns instantes.',
+  dmApproved: (name, gotRole) => `**Parabéns, ${name}!** Sua candidatura para a equipe de moderação do ${BRAND} foi **aprovada**. ${gotRole ? 'Você já recebeu seus cargos de staff no Discord.' : 'Seus cargos de staff serão liberados pela administração.'}\n\nA administração vai falar com você em breve com os próximos passos. Bem-vindo à equipe!`,
+  dmRejected: (name) => `Olá, ${name}. Obrigado pelo interesse em fazer parte da equipe do ${BRAND}.\n\nDesta vez sua candidatura **não foi aprovada**. Você poderá se candidatar de novo quando abrirmos um próximo processo seletivo.`,
 };
 
 export const PANEL = {
