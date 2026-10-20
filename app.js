@@ -1027,7 +1027,7 @@
         expirou: 'The sign in took too long. Try again.', discord: 'Discord did not answer. Try again.', cancelado: 'Sign in cancelled.', config: 'Sign in is not available yet.' },
       down: 'Could not load your profile right now.', anon: 'Discord not linked', notfound: 'Player not found.', notfound_group: 'Group not found (groups reset every wipe).',
       in_rank: 'in the ranking', see_group: 'See group', edit: 'Edit profile', save: 'Save', cancel: 'Cancel', bio_l: 'About you', bio_ph: 'A short message for whoever opens your profile (240 characters)',
-      yt_ph: 'youtube.com/@yourchannel or @yourchannel', tt_ph: 'tiktok.com/@you or @you', saved: 'Profile saved.', bad_youtube: 'That YouTube link is not valid.', bad_tiktok: 'That TikTok link is not valid.',
+      yt_ph: 'youtube.com/@yourchannel or @yourchannel', tt_ph: 'tiktok.com/@you or @you', saved: 'Profile saved.', saving: 'Saving…', save_err: 'Could not save right now. Try again in a moment.', bad_youtube: 'That YouTube link is not valid.', bad_tiktok: 'That TikTok link is not valid.',
       kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', member: 'member', nomembers: 'No members yet.',
       rk_kicker: 'HAVOK · This wipe', rk_title: 'RANKING', rk_sub: 'Every group and every player of the current wipe. Click a group to see its members. Resets every wipe.',
       rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, kills_l: 'kills', hours_l: 'h played',
@@ -1041,7 +1041,7 @@
         expirou: 'O login demorou demais. Tente de novo.', discord: 'O Discord não respondeu. Tente de novo.', cancelado: 'Login cancelado.', config: 'O login ainda não está disponível.' },
       down: 'Não deu para carregar seu perfil agora.', anon: 'Discord não vinculado', notfound: 'Jogador não encontrado.', notfound_group: 'Grupo não encontrado (os grupos zeram a cada wipe).',
       in_rank: 'no ranking', see_group: 'Ver grupo', edit: 'Editar perfil', save: 'Salvar', cancel: 'Cancelar', bio_l: 'Sobre você', bio_ph: 'Uma mensagem curta para quem abrir o seu perfil (240 caracteres)',
-      yt_ph: 'youtube.com/@seucanal ou @seucanal', tt_ph: 'tiktok.com/@voce ou @voce', saved: 'Perfil salvo.', bad_youtube: 'Esse link do YouTube não vale.', bad_tiktok: 'Esse link do TikTok não vale.',
+      yt_ph: 'youtube.com/@seucanal ou @seucanal', tt_ph: 'tiktok.com/@voce ou @voce', saved: 'Perfil salvo.', saving: 'Salvando…', save_err: 'Não deu pra salvar agora. Tente de novo daqui a pouco.', bad_youtube: 'Esse link do YouTube não vale.', bad_tiktok: 'Esse link do TikTok não vale.',
       kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', member: 'membro', nomembers: 'Nenhum membro ainda.',
       rk_kicker: 'HAVOK · Este wipe', rk_title: 'RANKING', rk_sub: 'Todos os grupos e todos os jogadores do wipe atual. Clique num grupo para ver os membros. Zera a cada wipe.',
       rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, kills_l: 'kills', hours_l: 'h jogadas',
@@ -1150,11 +1150,12 @@
           e.preventDefault();
           const body = { bio: form.bio.value, youtube: form.youtube.value, tiktok: form.tiktok.value };
           const msg = $('#pfMsg');
-          msg.textContent = '…';
+          const show = (kind, text) => { msg.className = `pf-edit-msg ${kind}`; msg.innerHTML = `${svg(kind === 'bad' ? 'info' : 'award')}<span>${esc(text)}</span>`; };
+          show('wait', P.saving);
           let r = null;
           try { r = await fetch(`${api}/api/me/profile`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); } catch (err) { r = null; }
           const j = r ? await r.json().catch(() => ({})) : {};
-          if (r && r.ok) { msg.textContent = P.saved; route(); } else { msg.textContent = P[j.error] || P.down; }
+          if (r && r.ok) { show('ok', P.saved); setTimeout(route, 900); } else { show('bad', P[j.error] || P.save_err); }
         };
       } else {
         box.innerHTML = `<div class="pf-card"><header class="pf-head">${avatar(me.avatarUrl)}<div><h2>${esc(me.discordName)}</h2><p class="muted">Discord: ${esc(me.discordName)}</p></div>${action}</header>
