@@ -1146,11 +1146,10 @@
       if (!box) return;
       if (!g) { box.innerHTML = `<p class="muted">${P.notfound_group}</p>`; return; }
       document.title = `${g.name} — HAVOK`;
-      const c = gColor(g.color);
       const members = g.members.map((m) => `<a class="gp-member" href="#/jogador/${esc(m.pid)}">${avatar(m.avatarUrl, 'gp-avatar')}
           <div><b>${esc(m.nick)}</b><small>${ROLE[lang][m.role] || m.role} · Lv ${num(m.level)}</small></div>
           <span class="gp-k"><b>${num(m.kills)}</b><small>${P.kills}</small></span></a>`).join('');
-      box.innerHTML = `<div class="pf-card" style="border-top-color:${c}">
+      box.innerHTML = `<div class="pf-card">
           <header class="gp-head">${emblem(g, 'gp-emblem big')}<div><h2><span class="gp-rank">#${g.rank}</span> ${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</h2>
             ${g.description ? `<p class="gp-desc">${esc(g.description)}</p>` : ''}
             <p class="muted">${num(g.members.length)} ${g.members.length === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.deaths)} ${P.deaths.toLowerCase()} · ${num(g.xp)} ${P.xp}</p></div></header>
