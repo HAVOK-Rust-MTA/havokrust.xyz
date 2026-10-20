@@ -195,7 +195,18 @@
   function renderSide(route) {
     const cur = '#' + route;
     const a = (href, icon, label) => `<a href="${href}" class="${cur === href ? 'on' : ''}">${svg(icon)}<span>${esc(label)}</span></a>`;
+    // no celular o menu do topo some: as páginas principais ficam aqui em cima
     $('#sideNav').innerHTML = `
+      <div class="nav-group"><h5>HAVOK</h5>
+        ${a('#/', 'rocket', t('nav_home'))}
+        ${a('#/wipe', 'clock', t('nav_wipe'))}
+        ${a('#/ranking', 'award', t('nav_ranking'))}
+        ${a('#/perfil', 'user', acct && acct.loggedIn ? t('nav_profile') : (lang === 'pt' ? 'Conectar Discord' : 'Connect Discord'))}
+        ${a('#/badges', 'shield', t('nav_badges'))}
+        ${a('#/store', 'crown', t('nav_store'))}
+        <a href="play/">${svg('play')}<span>${esc(t('nav_play'))}</span></a>
+        <a href="${esc((window.HAVOK || {}).discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>Discord ↗</span></a>
+      </div>
       <div class="nav-group"><h5>${t('browse')}</h5>
         ${a('#/items', 'grid', t('all_items'))}
         ${CATS.map((c) => a('#/category/' + c.id, c.icon, c[lang])).join('')}
@@ -206,11 +217,8 @@
         ${a('#/guides', 'book', t('all_guides'))}
         ${W.guides.map((g) => a('#/guides/' + g.slug, g.icon, L(g).title)).join('')}
       </div>
-      <div class="nav-group"><h5>HAVOK</h5>
-        ${a('#/', 'rocket', t('nav_home'))}
+      <div class="nav-group"><h5>Wiki</h5>
         ${a('#/wiki', 'book', 'Wiki')}
-        ${a('#/store', 'crown', t('nav_store'))}
-        <a href="${esc((window.HAVOK || {}).discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>Discord ↗</span></a>
       </div>`;
   }
 

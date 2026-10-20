@@ -892,3 +892,5 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
 .spin { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--line2); border-top-color: var(--accent); animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spin { animation-duration: 2.4s; } }
+/* celular estreito: só o logo, para caber conta + Discord + idioma */
+@media (max-width: 480px) { .brand-txt { display: none; } }
