@@ -149,6 +149,7 @@
     video: '<path d="m22 8-6 4 6 4z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
     list: '<path d="M10 6h11M10 12h11M10 18h11M3 6h.01M3 12h.01M3 18h.01"/>',
     award: '<circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/>',
+    chevrons: '<path d="m6 17 6-5 6 5"/><path d="m6 11 6-5 6 5"/>', gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
     bug: '<path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7.1V6a3 3 0 1 1 6 0v1.1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6zM12 20v-9M6.5 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M22 13h-4M17.2 17c2.1.1 3.8 1.9 3.8 4"/>',
     sword: '<path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/>',
     skull: '<circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2M12.5 17l-.5-1-.5 1zM16 20a2 2 0 0 0 1.6-.9A8 8 0 1 0 6.4 19.1 2 2 0 0 0 8 20"/>',
@@ -518,10 +519,10 @@
     ['founder', 'Founder', 'mythic', 'team', 'Part of the team that built HAVOK.', 'Faz parte da equipe que construiu o HAVOK.'],
     ['vanguard', 'Vanguard', 'mythic', 'list', 'One of the first 5 on the waiting list.', 'Um dos 5 primeiros da lista de espera.'],
     ['pioneer', 'Pioneer', 'legendary', 'list', 'Spot 6 to 10 on the waiting list.', 'Posição 6 a 10 da lista de espera.'],
-    ['champion', 'Wipe Champion', 'legendary', 'auto', 'Be in the #1 group when the wipe ends. Stacks every wipe.', 'Estar no grupo nº 1 quando o wipe fecha. Acumula a cada wipe.'],
+    ['champion', 'Wipe Champion', 'legendary', 'auto', 'Be in the #1 group when the wipe ends. It is a title: it only lasts until the next wipe, then goes to the new #1.', 'Estar no grupo nº 1 quando o wipe fecha. É um título: só vale até o próximo wipe, aí passa para o novo nº 1.'],
     ['creator', 'Content Creator', 'legendary', 'ticket', 'Make videos or streams of HAVOK.', 'Gravar vídeos ou fazer lives do HAVOK.'],
     ['early', 'Early Survivor', 'epic', 'list', 'Spot 11 to 15 on the waiting list.', 'Posição 11 a 15 da lista de espera.'],
-    ['podium', 'Podium', 'epic', 'auto', 'Be in the #2 or #3 group when the wipe ends.', 'Estar no grupo nº 2 ou nº 3 quando o wipe fecha.'],
+    ['podium', 'Podium', 'epic', 'auto', 'Be in the #2 or #3 group when the wipe ends. Only lasts until the next wipe: get back on the podium to keep it.', 'Estar no grupo nº 2 ou nº 3 quando o wipe fecha. Só vale até o próximo wipe: volte ao pódio para manter.'],
     ['hunter', 'Hunter Slayer', 'epic', 'auto', 'Shoot down the patrol helicopter.', 'Derrubar o helicóptero de patrulha.'],
     ['firstblood', 'First Blood', 'rare', 'auto', 'Get the first kill after a wipe.', 'Fazer a primeira kill depois de um wipe.'],
     ['killer', 'Killer', 'rare', 'auto', 'Reach 100 kills in a single wipe.', 'Chegar a 100 kills num mesmo wipe.'],
@@ -1022,7 +1023,8 @@
       down: 'Could not load your profile right now.', anon: 'Discord not linked', notfound: 'Player not found.', notfound_group: 'Group not found (groups reset every wipe).',
       kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', member: 'member', nomembers: 'No members yet.',
       rk_kicker: 'HAVOK · This wipe', rk_title: 'RANKING', rk_sub: 'Every group and every player of the current wipe. Click a group to see its members. Resets every wipe.',
-      rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, xp: 'XP', nogroups: 'No groups yet this wipe.', noplayers: 'Nobody has played this wipe yet.' },
+      rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, kills_l: 'kills', hours_l: 'h played',
+      prize: (z) => `Prize: ${z.days}-day VIP for ${z.winners} drawn members (leader included)`, prize_note: 'The top 3 groups of the wipe win VIP by draw. The leader always wins.', xp: 'XP', nogroups: 'No groups yet this wipe.', noplayers: 'Nobody has played this wipe yet.' },
     pt: { kicker: 'HAVOK · Perfil', title: 'SEU PERFIL', sub: 'Seus números, grupo e badges num lugar só, com a sua foto do Discord no ranking.',
       login: 'Entrar com Discord', connect: 'Conectar Discord', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
       unlinked: 'Falta pouco: entre no servidor do HAVOK e a tela de vínculo abre sozinha. Um clique no Discord e a sua conta do jogo aparece aqui.',
@@ -1033,7 +1035,8 @@
       down: 'Não deu para carregar seu perfil agora.', anon: 'Discord não vinculado', notfound: 'Jogador não encontrado.', notfound_group: 'Grupo não encontrado (os grupos zeram a cada wipe).',
       kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', member: 'membro', nomembers: 'Nenhum membro ainda.',
       rk_kicker: 'HAVOK · Este wipe', rk_title: 'RANKING', rk_sub: 'Todos os grupos e todos os jogadores do wipe atual. Clique num grupo para ver os membros. Zera a cada wipe.',
-      rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, xp: 'XP', nogroups: 'Nenhum grupo neste wipe ainda.', noplayers: 'Ninguém jogou neste wipe ainda.' },
+      rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, kills_l: 'kills', hours_l: 'h jogadas',
+      prize: (z) => `Prêmio: VIP de ${z.days} dia${z.days > 1 ? 's' : ''} para ${z.winners} sorteados (o líder sempre ganha)`, prize_note: 'Os 3 primeiros grupos do wipe ganham VIP por sorteio. O líder sempre ganha.', xp: 'XP', nogroups: 'Nenhum grupo neste wipe ainda.', noplayers: 'Ninguém jogou neste wipe ainda.' },
   };
   const BADGE_EXTRA = { opening: ['Grand Opening', 'mythic'] }; // badges só do jogo (sem SVG no site): arte em PNG
   const badgeInfo = (id) => {
@@ -1149,20 +1152,34 @@
       const gr = await get(`${api}/api/groups`);
       const gBox = $('#rkpGroups');
       if (!gBox) return;
-      gBox.innerHTML = !gr ? `<p class="muted">${P.down}</p>` : gr.groups.map((g) => `<a class="rkp-group" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
-          <span class="rkp-pos">${String(g.rank).padStart(2, '0')}</span>${emblem(g)}
+      const MEDAL = ['gold', 'silver', 'bronze'];
+      const ico = (n) => `<span class="rkp-ic">${svg(n)}</span>`;
+      gBox.innerHTML = !gr ? `<p class="muted">${P.down}</p>` : gr.groups.map((g) => {
+        const medal = MEDAL[g.rank - 1];
+        return `<a class="rkp-group${medal ? ` podium ${medal}` : ''}" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
+          <span class="rkp-pos">${medal ? svg('award') : ''}${String(g.rank).padStart(2, '0')}</span>${emblem(g)}
           <div class="rkp-gtxt"><b>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</b>${g.description ? `<p>${esc(g.description)}</p>` : ''}
-            <small>${num(g.members)} ${g.members === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.xp)} ${P.xp}</small></div></a>`).join('') || `<p class="muted">${P.nogroups}</p>`;
+            <span class="rkp-stats">${ico('users')}${num(g.members)} <em>${g.members === 1 ? P.member : P.members}</em>${ico('skull')}${num(g.kills)} <em>${P.kills_l}</em>${ico('star')}${num(g.xp)} <em>XP</em></span>
+            ${medal && g.prize ? `<span class="rkp-prize">${svg('gift')}${esc(P.prize(g.prize))}</span>` : ''}</div></a>`;
+      }).join('') || `<p class="muted">${P.nogroups}</p>`;
+      if (gr && gr.groups.some((g) => g.prize)) gBox.insertAdjacentHTML('beforeend', `<p class="rkp-note">${svg('gift')}${P.prize_note}</p>`);
       const pl = await plP;
       const pBox = $('#rkpPlayers');
       if (!pBox) return;
-      const val = (p) => (rkBy === 'level' ? `Lv ${num(p.level)}` : rkBy === 'hours' ? `${num(Math.floor(p.playMinutes / 60))}h` : num(p.kills));
-      pBox.innerHTML = !pl ? `<p class="muted">${P.down}</p>` : pl.players.map((p) => `<a class="rkp-player" href="#/jogador/${esc(p.pid)}">
+      // o número da direita diz o que é: caveira = kills, divisas = level, relógio = horas
+      const val = (p) => (rkBy === 'level' ? `${svg('chevrons')}<b>${num(p.level)}</b><em>LEVEL</em>`
+        : rkBy === 'hours' ? `${svg('clock')}<b>${num(Math.floor(p.playMinutes / 60))}</b><em>${P.hours_l}</em>`
+          : `${svg('skull')}<b>${num(p.kills)}</b><em>${P.kills_l}</em>`);
+      pBox.innerHTML = !pl ? `<p class="muted">${P.down}</p>` : pl.players.map((p) => {
+        const medal = MEDAL[p.rank - 1];
+        return `<a class="rkp-player${medal ? ` podium ${medal}` : ''}" href="#/jogador/${esc(p.pid)}">
           <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
-          <div><b>${esc(p.nick)}</b><small>${p.group ? `<i style="color:${gColor(p.group.color)}">${esc(p.group.tag ? `[${p.group.tag}]` : p.group.name)}</i> · ` : ''}Lv ${num(p.level)} · K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</small></div>
-          <span class="rkp-val">${val(p)}</span></a>`).join('') || `<p class="muted">${P.noplayers}</p>`;
+          <div><b>${esc(p.nick)}</b><span class="rkp-stats">${p.group ? `<i style="color:${gColor(p.group.color)}">${esc(p.group.tag ? `[${p.group.tag}]` : p.group.name)}</i>` : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
+          <span class="rkp-val">${val(p)}</span></a>`;
+      }).join('') || `<p class="muted">${P.noplayers}</p>`;
     });
-    const sort = Object.entries(P.by).map(([k, n]) => `<button type="button" class="chip ${rkBy === k ? 'on' : ''}" data-by="${k}">${n}</button>`).join('');
+    const SORT_ICON = { kills: 'skull', level: 'chevrons', hours: 'clock' };
+    const sort = Object.entries(P.by).map(([k, n]) => `<button type="button" class="chip ${rkBy === k ? 'on' : ''}" data-by="${k}">${svg(SORT_ICON[k])}${n}</button>`).join('');
     return `<section class="bd-hero"><p class="l-kicker">${P.rk_kicker}</p><h1 class="page-title">${P.rk_title}</h1><p class="page-sub">${P.rk_sub}</p></section>
       <div class="rkp">
         <section class="rkp-col"><h3>${P.rk_groups}</h3><div id="rkpGroups">${spinner()}</div></section>

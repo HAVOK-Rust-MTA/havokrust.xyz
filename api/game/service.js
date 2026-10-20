@@ -76,10 +76,12 @@ async function sync(request, env) {
       used.add(`s:${slug}`);
       const members = (Array.isArray(g.members) ? g.members : []).slice(0, 32).map((m) => ({ account: account(m && m.acc), role: ROLES.has(m && m.role) ? m.role : 'Member' }))
         .filter((m) => m.account);
-      stmts.push(db.prepare(`INSERT INTO game_groups (name, slug, tag, color, emblem, description, rank, xp, kills, deaths, members, updated_at)
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      // prêmio da posição (top 3): quantos são sorteados, quantos dias e qual VIP
+      const pz = g.prize && typeof g.prize === 'object' ? { winners: Math.min(99, int(g.prize.winners)), days: Math.min(365, int(g.prize.days)), tier: Math.min(3, int(g.prize.tier)) } : null;
+      stmts.push(db.prepare(`INSERT INTO game_groups (name, slug, tag, color, emblem, description, rank, xp, kills, deaths, members, prize, updated_at)
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
         .bind(name, slug, clean(g.tag, 8) || null, color(g.color), /^\d{2}$/.test(String(g.emblem)) ? String(g.emblem) : null, clean(g.desc, 160) || null,
-          i + 1, int(g.xp), int(g.kills), int(g.deaths), JSON.stringify(members), t));
+          i + 1, int(g.xp), int(g.kills), int(g.deaths), JSON.stringify(members), pz && pz.winners && pz.days ? JSON.stringify(pz) : null, t));
       groups++;
     });
   }
@@ -152,8 +154,8 @@ export async function handleGameHttp(request, env, url, ctx) {
 async function publicRoute(db, path, url) {
   const h = { 'Cache-Control': 'public, max-age=60' };
   if (path === '/api/groups') {
-    const { results } = await db.prepare('SELECT slug, name, tag, color, emblem, description, rank, xp, kills, deaths, members FROM game_groups ORDER BY rank').all();
-    return json({ groups: results.map(({ members, ...g }) => ({ ...g, members: JSON.parse(members).length })) }, 200, h);
+    const { results } = await db.prepare('SELECT slug, name, tag, color, emblem, description, rank, xp, kills, deaths, members, prize FROM game_groups ORDER BY rank').all();
+    return json({ groups: results.map(({ members, prize, ...g }) => ({ ...g, members: JSON.parse(members).length, prize: prize ? JSON.parse(prize) : null })) }, 200, h);
   }
 
   if (path.startsWith('/api/group/')) {
@@ -168,7 +170,7 @@ async function publicRoute(db, path, url) {
     const order = { Leader: 1, Staff: 2, Sub: 3, Member: 4 };
     members.sort((a, b) => (order[a.role] - order[b.role]) || (b.level - a.level));
     return json({ slug: g.slug, name: g.name, tag: g.tag, color: g.color, emblem: g.emblem, description: g.description, rank: g.rank, xp: g.xp,
-      kills: g.kills, deaths: g.deaths, updatedAt: g.updated_at, members }, 200, h);
+      kills: g.kills, deaths: g.deaths, updatedAt: g.updated_at, prize: g.prize ? JSON.parse(g.prize) : null, members }, 200, h);
   }
 
   if (path === '/api/ranking/players') {

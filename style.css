@@ -900,3 +900,30 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
 
 /* menu do celular aberto: a página de trás não rola */
 @media (max-width: 860px) { body.menu-open { overflow: hidden; } }
+/* ranking: ícones nos números, top 3 com medalha e prêmio */
+.rkp { --gold: #f5b83d; --silver: #c9ced6; --bronze: #cd7f32; }
+.rkp-sort .chip { gap: 6px; }
+.rkp-sort .chip svg { font-size: 15px; }
+.rkp-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-top: 4px; color: var(--muted); font-size: 13px; }
+.rkp-stats em { font-style: normal; color: var(--dim); margin-right: 6px; }
+.rkp-stats i { font-style: normal; font-weight: 600; margin-right: 6px; }
+.rkp-ic { display: inline-grid; place-items: center; color: var(--dim); font-size: 14px; }
+.rkp-player .rkp-stats { margin-top: 2px; }
+.rkp-val { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 6px; text-align: right; }
+.rkp-val svg { grid-row: span 2; font-size: 20px; color: var(--accent); opacity: .85; }
+.rkp-val b { font: 600 22px/1 var(--title); color: var(--accent); }
+.rkp-val em { grid-column: 2; font-style: normal; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+/* pódio */
+.podium { --mc: var(--gold); position: relative; border-color: color-mix(in srgb, var(--mc) 45%, var(--line)); background: linear-gradient(90deg, color-mix(in srgb, var(--mc) 12%, var(--panel)), var(--panel) 70%); }
+.podium.silver { --mc: var(--silver); }
+.podium.bronze { --mc: var(--bronze); }
+.podium:hover { border-color: var(--mc); }
+.podium .rkp-pos { color: var(--mc); display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1; }
+.podium .rkp-pos svg { font-size: 18px; }
+.rkp-player.podium .rkp-pos { color: var(--mc); }
+.rkp-player.podium .gp-avatar { box-shadow: 0 0 0 2px var(--mc); }
+.rkp-prize { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+  color: var(--mc); background: color-mix(in srgb, var(--mc) 14%, transparent); border: 1px solid color-mix(in srgb, var(--mc) 40%, transparent); }
+.rkp-prize svg { font-size: 14px; }
+.rkp-note { display: flex; align-items: center; gap: 8px; margin: 6px 2px 0; color: var(--dim); font-size: 13px; }
+.rkp-note svg { color: var(--gold); font-size: 15px; flex: none; }

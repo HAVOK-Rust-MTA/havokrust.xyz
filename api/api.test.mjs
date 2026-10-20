@@ -8,7 +8,7 @@ import worker from './index.js';
 import { hmacHex } from './lib/util.js';
 import { sanitizeBadges, slugify } from './game/service.js';
 
-const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql']
+const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql']
   .map((f) => readFileSync(new URL(`../worker/migrations/${f}`, import.meta.url), 'utf8')).join('\n');
 class Stmt {
   constructor(db, sql, args = []) { this.db = db; this.sql = sql; this.args = args; }
@@ -273,6 +273,14 @@ test('ranking de jogadores: ordena, traz grupo com cor e foto só de quem vincul
   assert.equal(g.emblem, '07');
   assert.equal(g.description, 'Raid toda noite.script');
   assert.equal((await pub('/api/group/os-brabo')).json.emblem, '07');
+});
+
+test('prêmio do pódio: o jogo manda, o site lê (limpo); fora do top 3 não tem', async () => {
+  await syncGame([], [{ ...GROUP, prize: { winners: 6, days: 1, tier: 1, extra: 'x' } }, { ...GROUP, name: 'Outro', prize: null }]);
+  const gs = (await pub('/api/groups')).json.groups;
+  assert.deepEqual(gs[0].prize, { winners: 6, days: 1, tier: 1 });
+  assert.equal(gs[1].prize, null);
+  assert.deepEqual((await pub(`/api/group/${gs[0].slug}`)).json.prize, { winners: 6, days: 1, tier: 1 });
 });
 
 test('sync sem assinatura é recusado; perfil inexistente e slug inválido dão 404', async () => {
