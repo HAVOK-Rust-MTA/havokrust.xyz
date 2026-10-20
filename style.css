@@ -959,3 +959,4 @@ h2 .gtag { font-size: 14px; position: relative; top: -3px; }
 .pf-edit textarea:focus, .pf-edit input:focus { outline: none; border-color: var(--accent); }
 .pf-edit-btns { display: flex; gap: 8px; justify-content: flex-end; }
 .pf-edit-msg { margin: 0; min-height: 1em; color: var(--muted); font-size: 13px; }
+.rkp-badge { width: 20px; height: 18px; object-fit: contain; vertical-align: -3px; margin-left: 6px; }

@@ -192,6 +192,7 @@ async function publicRoute(db, path, url) {
       WHERE g.kills > 0 OR g.play_minutes > 0 ORDER BY ${col} DESC, g.level DESC, g.kills DESC LIMIT 50`).all();
     return json({ players: results.map((r, i) => ({
       rank: i + 1, ...publicPlayer(r), group: r.g_slug ? { name: r.group_name, slug: r.g_slug, tag: r.g_tag, color: r.g_color } : null,
+      badges: (() => { try { return Object.keys(JSON.parse(r.badges || '{}')); } catch { return []; } })(),
     })) }, 200, h);
   }
 

@@ -515,12 +515,17 @@
 
   // ---------------------------------------------------------------- badges (as mesmas do jogo: havok_badges)
   const BRAR = { common: ['Common', '#c9c2b6'], rare: ['Rare', '#4ea8ff'], epic: ['Epic', '#b07bff'], legendary: ['Legendary', '#ffae2e'], mythic: ['Mythic', '#ff3d52'] };
+  // arte que só existe em PNG (gerada junto com a do jogo); o resto é SVG
+  const BADGE_PNG = new Set(['youtuber', 'tiktoker', 'opening']);
+  const badgeImg = (id) => `badges/${id}.${BADGE_PNG.has(id) || /^newyear\d{4}$/.test(id) ? 'png' : 'svg'}`;
   const BADGE_LIST = [
     ['founder', 'Founder', 'mythic', 'team', 'Part of the team that built HAVOK.', 'Faz parte da equipe que construiu o HAVOK.'],
     ['vanguard', 'Vanguard', 'mythic', 'list', 'One of the first 5 on the waiting list.', 'Um dos 5 primeiros da lista de espera.'],
     ['pioneer', 'Pioneer', 'legendary', 'list', 'Spot 6 to 10 on the waiting list.', 'Posição 6 a 10 da lista de espera.'],
     ['champion', 'Wipe Champion', 'legendary', 'auto', 'Be in the #1 group when the wipe ends. It is a title: it only lasts until the next wipe, then goes to the new #1.', 'Estar no grupo nº 1 quando o wipe fecha. É um título: só vale até o próximo wipe, aí passa para o novo nº 1.'],
     ['creator', 'Content Creator', 'legendary', 'ticket', 'Make videos or streams of HAVOK.', 'Gravar vídeos ou fazer lives do HAVOK.'],
+    ['youtuber', 'YouTuber', 'legendary', 'ticket', 'HAVOK content creator on YouTube. Comes with the influencer VIP.', 'Criador de conteúdo do HAVOK no YouTube. Vem com o VIP de influenciador.'],
+    ['tiktoker', 'TikToker', 'legendary', 'ticket', 'HAVOK content creator on TikTok. Comes with the influencer VIP.', 'Criador de conteúdo do HAVOK no TikTok. Vem com o VIP de influenciador.'],
     ['early', 'Early Survivor', 'epic', 'list', 'Spot 11 to 15 on the waiting list.', 'Posição 11 a 15 da lista de espera.'],
     ['podium', 'Podium', 'epic', 'auto', 'Be in the #2 or #3 group when the wipe ends. Only lasts until the next wipe: get back on the podium to keep it.', 'Estar no grupo nº 2 ou nº 3 quando o wipe fecha. Só vale até o próximo wipe: volte ao pódio para manter.'],
     ['hunter', 'Hunter Slayer', 'epic', 'auto', 'Shoot down the patrol helicopter.', 'Derrubar o helicóptero de patrulha.'],
@@ -558,14 +563,14 @@
         const slots = Array.from({ length: 5 }, (_, i) => { const pos = t * 5 + i + 1, who = first.find((f) => f.pos === pos);
           return `<li class="${who ? '' : 'open'}"><span>#${String(pos).padStart(2, '0')}</span>${who ? `<b>${esc(who.name)}</b>` : `<i>${B.open}</i>`}</li>`; }).join('');
         const [, name, rar] = BADGE_LIST.find((b) => b[0] === id);
-        return `<div class="bd-tier" style="--rc:${BRAR[rar][1]}"><header><img src="badges/${id}.svg" alt=""><div><b>${name}</b><small>${range} · ${prize}</small></div></header><ol>${slots}</ol></div>`;
+        return `<div class="bd-tier" style="--rc:${BRAR[rar][1]}"><header><img src="${badgeImg(id)}" alt=""><div><b>${name}</b><small>${range} · ${prize}</small></div></header><ol>${slots}</ol></div>`;
       }).join('');
     });
     const list = BADGE_LIST.filter((b) => !bRar || b[2] === bRar);
     return `<section class="bd-hero"><p class="l-kicker">HAVOK · ${B.all === 'All' ? 'Collection' : 'Coleção'}</p><h1 class="page-title">${B.title}</h1><p class="page-sub">${B.sub}</p></section>
       <div class="bd-filter">${[['', B.all], ...Object.entries(BRAR).reverse().map(([k, v]) => [k, v[0]])].map(([k, n]) => `<button type="button" class="chip ${bRar === k ? 'on' : ''}" data-r="${k}" ${k ? `style="--rc:${BRAR[k][1]}"` : ''}>${n}</button>`).join('')}</div>
       <div class="bd-grid">${list.map(([id, name, rar, how, en, pt]) => `<article class="bd-card r-${rar}" style="--rc:${BRAR[rar][1]}">
-          <div class="bd-art"><img src="badges/${id}.svg" alt="${esc(name)}" loading="lazy"></div>
+          <div class="bd-art"><img src="${badgeImg(id)}" alt="${esc(name)}" loading="lazy"></div>
           <b>${esc(name)}</b><span class="bd-rar">${BRAR[rar][0]}</span>
           <p>${esc(lang === 'pt' ? pt : en)}</p><small class="bd-how how-${how}">${B.how[how]}</small></article>`).join('')}</div>
       <p class="bd-ingame">${svg('info')} ${B.ingame}</p>
@@ -1045,7 +1050,7 @@
   const BADGE_EXTRA = { opening: ['Grand Opening', 'mythic'] }; // badges só do jogo (sem SVG no site): arte em PNG
   const badgeInfo = (id) => {
     const b = BADGE_LIST.find((x) => x[0] === id);
-    if (b) return { name: b[1], rar: b[2], img: `badges/${id}.svg` };
+    if (b) return { name: b[1], rar: b[2], img: badgeImg(id) };
     const y = /^newyear(\d{4})$/.exec(id);
     if (y) return { name: `New Year ${y[1]}`, rar: 'legendary', img: `badges/${id}.png` };
     const e = BADGE_EXTRA[id];
@@ -1189,6 +1194,7 @@
       const gBox = $('#rkpGroups');
       if (!gBox) return;
       const MEDAL = ['gold', 'silver', 'bronze'];
+      const CREATOR_BADGES = ['youtuber', 'tiktoker', 'creator'];
       const ico = (n) => `<span class="rkp-ic">${svg(n)}</span>`;
       gBox.innerHTML = !gr ? `<p class="muted">${P.down}</p>` : gr.groups.map((g) => {
         const medal = MEDAL[g.rank - 1];
@@ -1210,7 +1216,7 @@
         const medal = MEDAL[p.rank - 1];
         return `<a class="rkp-player${medal ? ` podium ${medal}` : ''}" href="#/jogador/${esc(p.pid)}">
           <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
-          <div><b>${esc(p.nick)}</b><span class="rkp-stats">${p.group ? (p.group.tag ? tagPill(p.group) : `<i>${esc(p.group.name)}</i>`) : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
+          <div><b>${esc(p.nick)}${(p.badges || []).filter((id) => CREATOR_BADGES.includes(id)).map((id) => `<img class="rkp-badge" src="${badgeImg(id)}" alt="${esc(id)}" title="${esc((BADGE_LIST.find((x) => x[0] === id) || [])[1] || id)}">`).join('')}</b><span class="rkp-stats">${p.group ? (p.group.tag ? tagPill(p.group) : `<i>${esc(p.group.name)}</i>`) : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
           <span class="rkp-val">${val(p)}</span></a>`;
       }).join('') || `<p class="muted">${P.noplayers}</p>`;
     });
