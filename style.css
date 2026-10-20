@@ -939,7 +939,7 @@ h2 .gtag { font-size: 14px; position: relative; top: -3px; }
 .pf-link svg { font-size: 16px; }
 .pf-link.yt:hover { border-color: #ff3d3d; color: #fff; background: rgba(255, 61, 61, .14); }
 .pf-link.tt:hover { border-color: #25f4ee; color: #fff; background: rgba(37, 244, 238, .1); }
-.pf-bio { margin: 18px 0 0; padding: 14px 16px; border-left: 3px solid var(--line2); background: var(--card); border-radius: 0 4px 4px 0; white-space: pre-line; line-height: 1.55; overflow-wrap: anywhere; }
+.pf-bio { margin: 18px 0 0; padding: 14px 16px; border: 1px solid var(--line); background: var(--card); border-radius: 6px; white-space: pre-line; line-height: 1.55; overflow-wrap: anywhere; }
 .pf-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .pf-actions .chip { gap: 6px; }
 .pf-group { --gc: var(--accent); display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 6px; color: inherit; text-decoration: none;
