@@ -36,8 +36,8 @@ export function newCode() {
 }
 
 
-const siteUrl = (env) => String(env.SITE_URL || 'https://havokrust.xyz').replace(/\/+$/, '');
-const apiUrl = (env) => String(env.API_PUBLIC_URL || env.PUBLIC_URL || '').replace(/\/+$/, '');
+const siteUrl = (env) => String(env.SITE_URL || '').replace(/\/+$/, '');
+const apiUrl = (env) => String(env.API_PUBLIC_URL || '').replace(/\/+$/, '');
 const redirectUri = (env) => `${apiUrl(env)}/auth/discord/callback`;
 
 function cookieOf(request) {
@@ -104,6 +104,8 @@ async function mta(request, env, path) {
 
 // //------------------- DISCORD (navegador) -------------------\\
 async function startOAuth(env, linkCode) {
+  // tudo vem do wrangler.toml/secrets; faltando algo, não inventa endereço
+  if (!siteUrl(env)) return json({ error: 'not_configured' }, 503);
   if (!env.DISCORD_APPLICATION_ID || !env.DISCORD_CLIENT_SECRET || !apiUrl(env)) return redirect(`${siteUrl(env)}/#/perfil?erro=config`);
   const state = randomHex(16);
   await env.DB.prepare('INSERT INTO oauth_states (state, link_code, created_at) VALUES (?, ?, ?)').bind(state, linkCode, nowS()).run();
