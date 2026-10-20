@@ -34,6 +34,7 @@ export function siteCors(request, env, credentials = false) {
   if (!origin || !list.includes(origin)) return { Vary: 'Origin' };
   return {
     Vary: 'Origin', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Max-Age': '86400',
+    'Access-Control-Allow-Headers': 'Content-Type',
     ...(credentials ? { 'Access-Control-Allow-Credentials': 'true' } : {}),
   };
 }
@@ -45,3 +46,28 @@ export const account = (a) => (typeof a === 'string' && a.length >= 1 && a.lengt
 // foto do Discord de quem vinculou; sem vínculo = null (o site mostra o avatar cinza)
 export const avatarUrl = (id, hash) => (!id ? null : hash ? `https://cdn.discordapp.com/avatars/${id}/${hash}.png?size=256`
   : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(id) >> 22n) % 6}.png`);
+
+export const isAllowedOrigin = (request, env) => {
+  const origin = request.headers.get('Origin');
+  return !!origin && String(env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim()).includes(origin);
+};
+
+// o que o jogador escreve no perfil. Links só de YouTube e TikTok (aceita o link ou só o @)
+export function cleanBio(b) {
+  const s = String(b ?? '').replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  return s.slice(0, 240);
+}
+export function cleanYoutube(u) {
+  const s = String(u ?? '').trim();
+  if (!s) return '';
+  const h = s.match(/^@([A-Za-z0-9._-]{2,40})$/);
+  if (h) return `https://www.youtube.com/@${h[1]}`;
+  const m = s.match(/^(?:https?:\/\/)?(?:www\.|m\.)?youtube\.com\/(@[A-Za-z0-9._-]{2,40}|channel\/[A-Za-z0-9_-]{10,40}|c\/[A-Za-z0-9._-]{2,40})\/?$/);
+  return m ? `https://www.youtube.com/${m[1]}` : null;
+}
+export function cleanTiktok(u) {
+  const s = String(u ?? '').trim();
+  if (!s) return '';
+  const m = s.match(/^@([A-Za-z0-9._]{2,30})$/) || s.match(/^(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@([A-Za-z0-9._]{2,30})\/?$/);
+  return m ? `https://www.tiktok.com/@${m[1]}` : null;
+}

@@ -97,18 +97,28 @@ const publicPlayer = (r) => ({
   linked: !!r.discord_id, avatarUrl: avatarUrl(r.discord_id, r.avatar), lastSeen: r.last_seen,
 });
 // jogador + foto + grupo numa consulta só (o banco fica longe: cada ida e volta custa caro)
-const PLAYER_SQL = `SELECT g.*, p.discord_id, p.avatar, gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color, gg.rank AS g_rank
+const PLAYER_SQL = `SELECT g.*, p.discord_id, p.avatar, p.bio, p.youtube, p.tiktok,
+    gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color, gg.rank AS g_rank, gg.emblem AS g_emblem, gg.members AS g_members
   FROM game_players g LEFT JOIN players p ON p.account = g.account LEFT JOIN game_groups gg ON gg.name = g.group_name`;
 
 export async function playerByAccount(db, acc) {
   return acc ? db.prepare(`${PLAYER_SQL} WHERE g.account = ?`).bind(acc).first() : null;
 }
 
-// r vem do PLAYER_SQL (já traz o grupo)
+// r vem do PLAYER_SQL (já traz o grupo: emblema, posição e o cargo dele lá dentro)
 export function playerView(r) {
   let badges = {};
   try { badges = JSON.parse(r.badges || '{}'); } catch { badges = {}; }
-  return { ...publicPlayer(r), badges, group: r.g_slug ? { name: r.group_name, slug: r.g_slug, tag: r.g_tag, color: r.g_color, rank: r.g_rank } : null };
+  let group = null;
+  if (r.g_slug) {
+    let members = [];
+    try { members = JSON.parse(r.g_members || '[]'); } catch { members = []; }
+    const me = members.find((m) => m.account === r.account);
+    group = { name: r.group_name, slug: r.g_slug, tag: r.g_tag, color: r.g_color, rank: r.g_rank, emblem: r.g_emblem, members: members.length, role: me ? me.role : 'Member' };
+  }
+  // descrição e links: só de quem vinculou o Discord (foi ele que escreveu)
+  const social = r.discord_id ? { bio: r.bio || '', youtube: r.youtube || '', tiktok: r.tiktok || '' } : null;
+  return { ...publicPlayer(r), badges, group, social };
 }
 
 // páginas públicas guardadas 60 s na borda da Cloudflare: a segunda visita não vai ao banco

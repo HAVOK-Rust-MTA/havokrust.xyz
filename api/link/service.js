@@ -15,7 +15,7 @@
 //
 // Segurança: o código só nasce pelo servidor do jogo (assinado) para a conta logada lá, e só vira vínculo quando alguém
 // autoriza com o Discord. Ninguém vincula a conta de outro só sabendo o ID ou o serial dele.
-import { json, nowS, verifyServer, siteCors, clean, account, avatarUrl } from '../lib/util.js';
+import { json, nowS, verifyServer, siteCors, clean, account, avatarUrl, isAllowedOrigin, cleanBio, cleanYoutube, cleanTiktok } from '../lib/util.js';
 import { playerView } from '../game/service.js';
 
 const CODE_TTL_S = 15 * 60;
@@ -191,9 +191,9 @@ async function callback(request, env, url) {
 async function sessionUser(request, env) {
   const token = cookieOf(request);
   if (!token) return null;
-  return env.DB.prepare(`SELECT p.discord_id, p.account, p.nick AS p_nick, p.discord_name, p.avatar, p.linked_at,
+  return env.DB.prepare(`SELECT p.discord_id, p.account, p.nick AS p_nick, p.discord_name, p.avatar, p.linked_at, p.bio, p.youtube, p.tiktok,
       g.pid, g.nick, g.level, g.kills, g.deaths, g.play_minutes, g.group_name, g.badges, g.last_seen,
-      gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color, gg.rank AS g_rank
+      gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color, gg.rank AS g_rank, gg.emblem AS g_emblem, gg.members AS g_members
     FROM sessions s JOIN players p ON p.discord_id = s.discord_id
     LEFT JOIN game_players g ON g.account = p.account LEFT JOIN game_groups gg ON gg.name = g.group_name
     WHERE s.token_hash = ? AND s.expires_at >= ?`).bind(await sha256(token), nowS()).first();
@@ -201,7 +201,7 @@ async function sessionUser(request, env) {
 
 // //------------------- ROTEADOR -------------------\\
 export function isLinkPath(path) {
-  return path.startsWith('/api/link/') || path.startsWith('/v/') || path.startsWith('/auth/discord') || path === '/api/me' || path === '/api/logout';
+  return path.startsWith('/api/link/') || path.startsWith('/v/') || path.startsWith('/auth/discord') || path === '/api/me' || path === '/api/me/profile' || path === '/api/logout';
 }
 
 export async function handleLinkHttp(request, env, ctx, url) {
@@ -228,7 +228,32 @@ export async function handleLinkHttp(request, env, ctx, url) {
     return json({
       loggedIn: true, linked: !!p.account, discordName: p.discord_name, avatarUrl: avatarUrl(p.discord_id, p.avatar),
       nick: (g && g.nick) || p.p_nick, linkedAt: p.linked_at, profile: g ? playerView(g) : null,
+      social: { bio: p.bio || '', youtube: p.youtube || '', tiktok: p.tiktok || '' },
     }, 200, h);
+  }
+  // o próprio jogador edita a descrição e os links (só do site, com a sessão dele)
+  if (path === '/api/me/profile' && request.method === 'POST') {
+    if (!isAllowedOrigin(request, env)) return json({ error: 'forbidden' }, 403, h);
+    const p = await sessionUser(request, env);
+    if (!p) return json({ error: 'unauthorized' }, 401, h);
+    let data;
+    try {
+      const raw = await request.text();
+      if (raw.length > 4096) return json({ error: 'too_big' }, 413, h);
+      data = JSON.parse(raw);
+    } catch {
+      return json({ error: 'bad_json' }, 400, h);
+    }
+    const bio = cleanBio(data.bio), youtube = cleanYoutube(data.youtube), tiktok = cleanTiktok(data.tiktok);
+    if (youtube === null) return json({ error: 'bad_youtube' }, 400, h);
+    if (tiktok === null) return json({ error: 'bad_tiktok' }, 400, h);
+    await env.DB.prepare('UPDATE players SET bio = ?, youtube = ?, tiktok = ?, updated_at = ? WHERE discord_id = ?')
+      .bind(bio || null, youtube || null, tiktok || null, nowS(), p.discord_id).run();
+    // o perfil público fica 60 s no cache da borda: apaga o dele para aparecer na hora
+    if (p.pid && typeof caches !== 'undefined') {
+      ctx.waitUntil(caches.default.delete(new Request(`${apiUrl(env)}/api/player/${p.pid}`, { method: 'GET' })).catch(() => {}));
+    }
+    return json({ ok: true, social: { bio, youtube, tiktok } }, 200, h);
   }
   if (path === '/api/logout' && request.method === 'POST') {
     const token = cookieOf(request);

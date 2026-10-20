@@ -8,7 +8,7 @@ import worker from './index.js';
 import { hmacHex } from './lib/util.js';
 import { sanitizeBadges, slugify } from './game/service.js';
 
-const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql']
+const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql', '0008_profile_social.sql']
   .map((f) => readFileSync(new URL(`../worker/migrations/${f}`, import.meta.url), 'utf8')).join('\n');
 class Stmt {
   constructor(db, sql, args = []) { this.db = db; this.sql = sql; this.args = args; }
@@ -292,6 +292,36 @@ test('sync sem assinatura é recusado; perfil inexistente e slug inválido dão 
 test('grupos com nome parecido ganham slugs diferentes', async () => {
   await syncGame([], [{ ...GROUP, name: 'Os Brabo' }, { ...GROUP, name: 'os brabo!' }]);
   assert.deepEqual((await pub('/api/groups')).json.groups.map((g) => g.slug), ['os-brabo', 'os-brabo-2']);
+});
+
+const editProfile = (cookie, body, origin = SITE) => worker.fetch(new Request(`${API}/api/me/profile`, {
+  method: 'POST', headers: { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }), env, ctx);
+
+test('perfil: o jogador escreve descrição e links (YouTube/TikTok); aparece no perfil público; grupo com emblema e cargo', async () => {
+  await syncGame([{ account: 'SERIAL-A', nick: 'Lider', level: 40, group: 'Os Brábo' }], [GROUP]);
+  const c = await server('/api/link/mta/code', { account: 'SERIAL-A', nick: 'Lider' });
+  const { cookie } = await authorize(`/v/${c.json.code}`);
+  const r = await editProfile(cookie, { bio: 'Raid toda noite.\n\n\n\nChama no Discord', youtube: '@havokrust', tiktok: 'https://www.tiktok.com/@havok.br' });
+  assert.equal(r.status, 200);
+  const me = await (await get('/api/me', { Cookie: cookie, Origin: SITE })).json();
+  assert.deepEqual(me.social, { bio: 'Raid toda noite.\n\nChama no Discord', youtube: 'https://www.youtube.com/@havokrust', tiktok: 'https://www.tiktok.com/@havok.br' });
+  assert.deepEqual(me.profile.group, { name: 'Os Brábo', slug: 'os-brabo', tag: 'BRB', color: '#FF6A00', rank: 1, emblem: '07', members: 4, role: 'Leader' });
+  const pub1 = (await pub(`/api/player/${me.profile.pid}`)).json;
+  assert.equal(pub1.social.youtube, 'https://www.youtube.com/@havokrust');
+  assert.ok(!JSON.stringify(pub1).includes('SERIAL'));
+});
+
+test('perfil: link que não é YouTube/TikTok, sem sessão ou de outro site é recusado', async () => {
+  const c = await server('/api/link/mta/code', { account: 'SERIAL-A', nick: 'A' });
+  const { cookie } = await authorize(`/v/${c.json.code}`);
+  assert.equal((await editProfile(cookie, { youtube: 'https://evil.example/@x' })).status, 400);
+  assert.equal((await editProfile(cookie, { tiktok: 'javascript:alert(1)' })).status, 400);
+  assert.equal((await editProfile('havok_s=' + 'b'.repeat(64), { bio: 'x' })).status, 401);
+  assert.equal((await editProfile(cookie, { bio: 'x' }, 'https://malicioso.example')).status, 403);
+  // jogador sem Discord não tem descrição nem links no perfil público
+  await syncGame([{ account: 'SERIAL-Z', nick: 'Sem', level: 1, playMinutes: 5 }]);
+  const pl = (await pub('/api/ranking/players')).json.players.find((p) => p.nick === 'Sem');
+  assert.equal((await pub(`/api/player/${pl.pid}`)).json.social, null);
 });
 
 test('CORS do /api/me só libera a origem do site', async () => {

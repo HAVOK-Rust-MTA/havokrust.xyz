@@ -1021,6 +1021,8 @@
       err: { codigo: 'That link expired or was already used. Open the screen in game again.', ja_vinculada: 'That game account is already linked to another Discord.',
         expirou: 'The sign in took too long. Try again.', discord: 'Discord did not answer. Try again.', cancelado: 'Sign in cancelled.', config: 'Sign in is not available yet.' },
       down: 'Could not load your profile right now.', anon: 'Discord not linked', notfound: 'Player not found.', notfound_group: 'Group not found (groups reset every wipe).',
+      in_rank: 'in the ranking', see_group: 'See group', edit: 'Edit profile', save: 'Save', cancel: 'Cancel', bio_l: 'About you', bio_ph: 'A short message for whoever opens your profile (240 characters)',
+      yt_ph: 'youtube.com/@yourchannel or @yourchannel', tt_ph: 'tiktok.com/@you or @you', saved: 'Profile saved.', bad_youtube: 'That YouTube link is not valid.', bad_tiktok: 'That TikTok link is not valid.',
       kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', member: 'member', nomembers: 'No members yet.',
       rk_kicker: 'HAVOK · This wipe', rk_title: 'RANKING', rk_sub: 'Every group and every player of the current wipe. Click a group to see its members. Resets every wipe.',
       rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, kills_l: 'kills', hours_l: 'h played',
@@ -1033,6 +1035,8 @@
       err: { codigo: 'Esse link venceu ou já foi usado. Abra a tela no jogo de novo.', ja_vinculada: 'Essa conta do jogo já está vinculada a outro Discord.',
         expirou: 'O login demorou demais. Tente de novo.', discord: 'O Discord não respondeu. Tente de novo.', cancelado: 'Login cancelado.', config: 'O login ainda não está disponível.' },
       down: 'Não deu para carregar seu perfil agora.', anon: 'Discord não vinculado', notfound: 'Jogador não encontrado.', notfound_group: 'Grupo não encontrado (os grupos zeram a cada wipe).',
+      in_rank: 'no ranking', see_group: 'Ver grupo', edit: 'Editar perfil', save: 'Salvar', cancel: 'Cancelar', bio_l: 'Sobre você', bio_ph: 'Uma mensagem curta para quem abrir o seu perfil (240 caracteres)',
+      yt_ph: 'youtube.com/@seucanal ou @seucanal', tt_ph: 'tiktok.com/@voce ou @voce', saved: 'Perfil salvo.', bad_youtube: 'Esse link do YouTube não vale.', bad_tiktok: 'Esse link do TikTok não vale.',
       kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', member: 'membro', nomembers: 'Nenhum membro ainda.',
       rk_kicker: 'HAVOK · Este wipe', rk_title: 'RANKING', rk_sub: 'Todos os grupos e todos os jogadores do wipe atual. Clique num grupo para ver os membros. Zera a cada wipe.',
       rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, kills_l: 'kills', hours_l: 'h jogadas',
@@ -1057,7 +1061,9 @@
   const gColor = (c) => (/^#[0-9a-fA-F]{6}$/.test(c || '') ? c : '#ff6a00');
   // emblema do grupo (silhueta branca do jogo) pintado com a cor do grupo
   const emblem = (g, cls = 'gp-emblem') => `<span class="${cls}" style="--gc:${gColor(g.color)}">${/^\d{2}$/.test(g.emblem || '') ? `<i style="-webkit-mask-image:url(img/emblems/${g.emblem}.png);mask-image:url(img/emblems/${g.emblem}.png)"></i>` : `<b>${esc((g.tag || g.name || '?').slice(0, 3))}</b>`}</span>`;
-  const groupLink = (g) => (g ? `<a href="#/grupo/${esc(g.slug)}"><b>${esc(g.name)}</b>${g.tag ? ` [${esc(g.tag)}]` : ''}</a>` : '');
+  const groupLink = (g) => (g ? `<a href="#/grupo/${esc(g.slug)}"><b>${esc(g.name)}</b>${g.tag ? ` ${tagPill(g)}` : ''}</a>` : '');
+  // etiqueta da tag na cor do grupo (cor escura fica mais clara no texto para dar para ler)
+  const tagPill = (g) => (g && g.tag ? `<span class="gtag" style="--gc:${gColor(g.color)}">${esc(g.tag)}</span>` : '');
 
   // cartão do jogador (perfil próprio e perfil público): p = {nick, level, kills, deaths, playMinutes, badges, group, avatarUrl, linked}
   function playerCard(p, extra = {}) {
@@ -1066,11 +1072,20 @@
     const RORD = ['mythic', 'legendary', 'epic', 'rare', 'common'];
     const badges = Object.entries(p.badges || {}).map(([id, c]) => [badgeInfo(id), c]).filter(([b]) => b).sort((x, y) => RORD.indexOf(x[0].rar) - RORD.indexOf(y[0].rar))
       .map(([b, c]) => `<div class="pf-badge" style="--rc:${BRAR[b.rar][1]}" title="${esc(b.name)}"><img src="${b.img}" alt="${esc(b.name)}" loading="lazy"><b>${esc(b.name)}${c > 1 ? ` <small>x${c}</small>` : ''}</b><span>${BRAR[b.rar][0]}</span></div>`).join('');
-    const sub = [extra.discordName ? `Discord: ${esc(extra.discordName)}` : (p.linked ? '' : `<span class="pf-anon">${P.anon}</span>`),
-      p.group ? `${P.group}: ${groupLink(p.group)}` : ''].filter(Boolean).join(' · ');
+    const sub = [extra.discordName ? `Discord: ${esc(extra.discordName)}` : (p.linked ? '' : `<span class="pf-anon">${P.anon}</span>`)].filter(Boolean).join(' · ');
+    const so = p.social || {};
+    const links = [so.youtube ? `<a class="pf-link yt" href="${esc(so.youtube)}" target="_blank" rel="noopener nofollow">${svg('youtube')}YouTube</a>` : '',
+      so.tiktok ? `<a class="pf-link tt" href="${esc(so.tiktok)}" target="_blank" rel="noopener nofollow">${svg('tiktok')}TikTok</a>` : ''].join('');
+    const g = p.group;
+    const groupCard = g ? `<a class="pf-group" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">${emblem(g)}
+        <div><b>${esc(g.name)} ${tagPill(g)}</b><small>#${g.rank} ${P.in_rank} · ${ROLE[lang][g.role] || g.role} · ${num(g.members)} ${g.members === 1 ? P.member : P.members}</small></div>
+        <span class="pf-group-go">${P.see_group} ›</span></a>` : `<p class="pf-nogroup muted">${P.nogroup}</p>`;
     return `<div class="pf-card">
         <header class="pf-head">${avatar(p.avatarUrl)}
-          <div><h2>${esc(p.nick || extra.discordName || '?')}</h2><p class="muted">${sub}</p></div>${extra.action || ''}</header>
+          <div><h2>${esc(p.nick || extra.discordName || '?')}${g ? ` ${tagPill(g)}` : ''}</h2>${sub ? `<p class="muted">${sub}</p>` : ''}${links ? `<div class="pf-links">${links}</div>` : ''}</div>${extra.action || ''}</header>
+        ${so.bio ? `<p class="pf-bio">${esc(so.bio)}</p>` : ''}
+        ${extra.edit || ''}
+        <h3 class="pf-sec">${P.group}</h3>${groupCard}
         <div class="pf-stats">${stat('level', num(p.level))}${stat('kills', num(p.kills), true)}${stat('deaths', num(p.deaths))}${stat('kd', p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills))}${stat('hours', num(Math.floor((p.playMinutes || 0) / 60)))}</div>
         <h3 class="pf-sec">${P.badges}</h3><div class="pf-badges">${badges || `<p class="muted">${P.nobadges}</p>`}</div>
       </div>`;
@@ -1112,9 +1127,30 @@
         box.innerHTML = `<div class="pf-login"><a class="cta" href="${esc(me.loginUrl || `${api}/auth/discord`)}">${svg('discord')} ${P.login}</a><p class="muted">${P.how}</p></div>`;
         return;
       }
-      const action = `<button type="button" class="chip" id="pfOut">${P.logout}</button>`;
+      const action = `<div class="pf-actions"><button type="button" class="chip" id="pfEdit">${svg('scroll')}${P.edit}</button><button type="button" class="chip" id="pfOut">${P.logout}</button></div>`;
       if (me.linked && me.profile) {
-        box.innerHTML = playerCard({ ...me.profile, avatarUrl: me.avatarUrl, linked: true }, { discordName: me.discordName, action });
+        const so = me.social || {};
+        const edit = `<form class="pf-edit" id="pfForm" hidden>
+            <label>${P.bio_l}<textarea name="bio" maxlength="240" rows="3" placeholder="${esc(P.bio_ph)}">${esc(so.bio || '')}</textarea></label>
+            <label><span>${svg('youtube')} YouTube</span><input name="youtube" maxlength="120" value="${esc(so.youtube || '')}" placeholder="${esc(P.yt_ph)}"></label>
+            <label><span>${svg('tiktok')} TikTok</span><input name="tiktok" maxlength="120" value="${esc(so.tiktok || '')}" placeholder="${esc(P.tt_ph)}"></label>
+            <p class="pf-edit-msg" id="pfMsg" role="status"></p>
+            <div class="pf-edit-btns"><button type="button" class="chip" id="pfCancel">${P.cancel}</button><button type="submit" class="chip on">${P.save}</button></div>
+          </form>`;
+        box.innerHTML = playerCard({ ...me.profile, social: so, avatarUrl: me.avatarUrl, linked: true }, { discordName: me.discordName, action, edit });
+        const form = $('#pfForm');
+        $('#pfEdit').onclick = () => { form.hidden = !form.hidden; };
+        $('#pfCancel').onclick = () => { form.hidden = true; };
+        form.onsubmit = async (e) => {
+          e.preventDefault();
+          const body = { bio: form.bio.value, youtube: form.youtube.value, tiktok: form.tiktok.value };
+          const msg = $('#pfMsg');
+          msg.textContent = '…';
+          let r = null;
+          try { r = await fetch(`${api}/api/me/profile`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); } catch (err) { r = null; }
+          const j = r ? await r.json().catch(() => ({})) : {};
+          if (r && r.ok) { msg.textContent = P.saved; route(); } else { msg.textContent = P[j.error] || P.down; }
+        };
       } else {
         box.innerHTML = `<div class="pf-card"><header class="pf-head">${avatar(me.avatarUrl)}<div><h2>${esc(me.discordName)}</h2><p class="muted">Discord: ${esc(me.discordName)}</p></div>${action}</header>
           <p class="pf-note">${me.linked ? P.nodata : P.unlinked}</p></div>`;
@@ -1158,7 +1194,7 @@
         const medal = MEDAL[g.rank - 1];
         return `<a class="rkp-group${medal ? ` podium ${medal}` : ''}" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
           <span class="rkp-pos">${medal ? svg('award') : ''}${String(g.rank).padStart(2, '0')}</span>${emblem(g)}
-          <div class="rkp-gtxt"><b>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</b>${g.description ? `<p>${esc(g.description)}</p>` : ''}
+          <div class="rkp-gtxt"><b>${esc(g.name)} ${tagPill(g)}</b>${g.description ? `<p>${esc(g.description)}</p>` : ''}
             <span class="rkp-stats">${ico('users')}${num(g.members)} <em>${g.members === 1 ? P.member : P.members}</em>${ico('skull')}${num(g.kills)} <em>${P.kills_l}</em>${ico('star')}${num(g.xp)} <em>XP</em></span>
             ${medal && g.prize ? `<span class="rkp-prize">${svg('gift')}${esc(P.prize(g.prize))}</span>` : ''}</div></a>`;
       }).join('') || `<p class="muted">${P.nogroups}</p>`;
@@ -1174,7 +1210,7 @@
         const medal = MEDAL[p.rank - 1];
         return `<a class="rkp-player${medal ? ` podium ${medal}` : ''}" href="#/jogador/${esc(p.pid)}">
           <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
-          <div><b>${esc(p.nick)}</b><span class="rkp-stats">${p.group ? `<i style="color:${gColor(p.group.color)}">${esc(p.group.tag ? `[${p.group.tag}]` : p.group.name)}</i>` : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
+          <div><b>${esc(p.nick)}</b><span class="rkp-stats">${p.group ? (p.group.tag ? tagPill(p.group) : `<i>${esc(p.group.name)}</i>`) : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
           <span class="rkp-val">${val(p)}</span></a>`;
       }).join('') || `<p class="muted">${P.noplayers}</p>`;
     });
@@ -1201,7 +1237,7 @@
           <div><b>${esc(m.nick)}</b><small>${ROLE[lang][m.role] || m.role} · Lv ${num(m.level)}</small></div>
           <span class="gp-k"><b>${num(m.kills)}</b><small>${P.kills}</small></span></a>`).join('');
       box.innerHTML = `<div class="pf-card">
-          <header class="gp-head">${emblem(g, 'gp-emblem big')}<div><h2><span class="gp-rank">#${g.rank}</span> ${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</h2>
+          <header class="gp-head">${emblem(g, 'gp-emblem big')}<div><h2><span class="gp-rank">#${g.rank}</span> ${esc(g.name)} ${tagPill(g)}</h2>
             ${g.description ? `<p class="gp-desc">${esc(g.description)}</p>` : ''}
             <p class="muted">${num(g.members.length)} ${g.members.length === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.deaths)} ${P.deaths.toLowerCase()} · ${num(g.xp)} ${P.xp}</p></div></header>
           <div class="gp-list">${members || `<p class="muted">${P.nomembers}</p>`}</div></div>`;
