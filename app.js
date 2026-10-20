@@ -1293,6 +1293,45 @@
   }
 
   // ---------------------------------------------------------------- router
+  // ---------------------------------------------------------------- anti-cheat: gravação (link só no canal de staff)
+  function pageAc(id) {
+    const pt = lang === 'pt';
+    const api = pfApi();
+    if (!/^[0-9a-f]{32}$/.test(id || '')) return `<div class="pf-card ac-card"><p class="muted">${pt ? 'Gravação não encontrada.' : 'Recording not found.'}</p></div>`;
+    setTimeout(async () => {
+      const box = $('#acBox');
+      if (!box) return;
+      let c = null;
+      try { const r = await fetch(`${api}/api/ac/clip/${id}`); c = r.ok ? await r.json() : null; } catch (e) { c = null; }
+      if (!c) { box.innerHTML = `<p class="muted">${pt ? 'Gravação não encontrada ou já apagada (ficam 14 dias).' : 'Recording not found or already deleted (kept for 14 days).'}</p>`; return; }
+      const when = new Date(c.created_at * 1000).toLocaleString(pt ? 'pt-BR' : 'en-US');
+      const src = (n) => `${api}/api/ac/clip/${id}/${n}.jpg`;
+      box.innerHTML = `<div class="ac-head"><b>${esc(c.player)}</b><span class="ac-reason">${esc(c.reason)}</span><span class="muted">${esc(when)}</span></div>
+        ${c.detail ? `<p class="ac-detail">${esc(c.detail)}</p>` : ''}
+        <div class="ac-stage"><img id="acImg" alt="" src="${src(c.frames - 1)}"><span id="acTime" class="ac-time"></span></div>
+        <div class="ac-ctrl"><button id="acPlay" class="ac-play">${pt ? 'Pausar' : 'Pause'}</button>
+          <input id="acSeek" type="range" min="0" max="${c.frames - 1}" value="0" aria-label="${pt ? 'Quadro' : 'Frame'}">
+          <span class="ac-speed">${[1, 2, 4].map((v) => `<button data-sp="${v}" class="${v === 1 ? 'on' : ''}">${v}x</button>`).join('')}</span></div>
+        <p class="muted ac-note">${pt ? `${c.frames} quadros, 1 por segundo: o último é o momento do alerta. Isto é evidência para a staff analisar, não prova sozinha.` : `${c.frames} frames, 1 per second: the last one is the moment of the alert. This is evidence for staff review, not proof on its own.`}</p>`;
+      // pré-carrega todos os quadros e toca em loop
+      const imgs = [...Array(c.frames)].map((_, n) => { const im = new Image(); im.src = src(n); return im; });
+      let n = 0, speed = 1, playing = true, timer;
+      const show = () => { $('#acImg').src = imgs[n].src; $('#acSeek').value = n; $('#acTime').textContent = `${n - (c.frames - 1)}s`; };
+      const tick = () => { if (!$('#acImg')) return clearInterval(timer); n = (n + 1) % c.frames; show(); };
+      const restart = () => { clearInterval(timer); if (playing) timer = setInterval(tick, 1000 / speed); };
+      $('#acPlay').onclick = () => { playing = !playing; $('#acPlay').textContent = playing ? (pt ? 'Pausar' : 'Pause') : (pt ? 'Tocar' : 'Play'); restart(); };
+      $('#acSeek').oninput = (e) => { n = Number(e.target.value); show(); };
+      document.querySelectorAll('.ac-speed button').forEach((b) => b.onclick = () => {
+        speed = Number(b.dataset.sp);
+        document.querySelectorAll('.ac-speed button').forEach((x) => x.classList.toggle('on', x === b));
+        restart();
+      });
+      show();
+      restart();
+    }, 0);
+    return `<div class="pf-card ac-card"><h1 class="ac-title">${pt ? 'Gravação do anti-cheat' : 'Anti-cheat recording'}</h1><div id="acBox">${spinner()}</div></div>`;
+  }
+
   function route() {
     clearInterval(wlTimer);
     const full = (location.hash || '#/').slice(1) || '/';
@@ -1302,7 +1341,7 @@
     let html;
     const landing = !parts.length;
     document.body.classList.toggle('landing', landing);
-    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil', 'jogador', 'grupo', 'ranking'].includes(parts[0]));
+    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil', 'jogador', 'grupo', 'ranking', 'ac'].includes(parts[0]));
     if (landing) html = pageLanding();
     else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
@@ -1321,6 +1360,7 @@
     else if (parts[0] === 'jogador' && parts[1]) html = pageJogador(parts[1]);
     else if (parts[0] === 'grupo' && parts[1]) html = pageGrupo(parts[1]);
     else if (parts[0] === 'vehicles') html = pageVehicles();
+    else if (parts[0] === 'ac') html = pageAc(parts[1]);
     else html = pageHome();
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
