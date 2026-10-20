@@ -94,24 +94,44 @@ const publicPlayer = (r) => ({
   pid: r.pid, nick: r.nick, level: r.level, kills: r.kills, deaths: r.deaths, playMinutes: r.play_minutes,
   linked: !!r.discord_id, avatarUrl: avatarUrl(r.discord_id, r.avatar), lastSeen: r.last_seen,
 });
-const PLAYER_SQL = `SELECT g.*, p.discord_id, p.avatar FROM game_players g LEFT JOIN players p ON p.account = g.account`;
+// jogador + foto + grupo numa consulta só (o banco fica longe: cada ida e volta custa caro)
+const PLAYER_SQL = `SELECT g.*, p.discord_id, p.avatar, gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color, gg.rank AS g_rank
+  FROM game_players g LEFT JOIN players p ON p.account = g.account LEFT JOIN game_groups gg ON gg.name = g.group_name`;
 
 export async function playerByAccount(db, acc) {
   return acc ? db.prepare(`${PLAYER_SQL} WHERE g.account = ?`).bind(acc).first() : null;
 }
 
-export async function playerView(db, r) {
-  const grp = r.group_name ? await db.prepare('SELECT name, slug, tag, color, rank FROM game_groups WHERE name = ?').bind(r.group_name).first() : null;
+// r vem do PLAYER_SQL (já traz o grupo)
+export function playerView(r) {
   let badges = {};
   try { badges = JSON.parse(r.badges || '{}'); } catch { badges = {}; }
-  return { ...publicPlayer(r), badges, group: grp ? { name: grp.name, slug: grp.slug, tag: grp.tag, color: grp.color, rank: grp.rank } : null };
+  return { ...publicPlayer(r), badges, group: r.g_slug ? { name: r.group_name, slug: r.g_slug, tag: r.g_tag, color: r.g_color, rank: r.g_rank } : null };
+}
+
+// páginas públicas guardadas 60 s na borda da Cloudflare: a segunda visita não vai ao banco
+const EDGE_TTL = 60;
+async function cached(request, url, ctx, build) {
+  const cache = typeof caches !== 'undefined' ? caches.default : null;
+  const key = new Request(url.toString(), { method: 'GET' });
+  if (cache) {
+    const hit = await cache.match(key);
+    if (hit) return hit;
+  }
+  const res = await build();
+  if (cache && res.status === 200) {
+    const copy = new Response(res.clone().body, res);
+    copy.headers.set('Cache-Control', `public, max-age=${EDGE_TTL}`);
+    ctx && ctx.waitUntil ? ctx.waitUntil(cache.put(key, copy)) : await cache.put(key, copy);
+  }
+  return res;
 }
 
 export function isGamePath(path) {
   return path === '/api/game/mta/sync' || path === '/api/groups' || path.startsWith('/api/group/') || path.startsWith('/api/player/') || path === '/api/ranking/players';
 }
 
-export async function handleGameHttp(request, env, url) {
+export async function handleGameHttp(request, env, url, ctx) {
   const path = url.pathname;
   if (!env.DB) return json({ error: 'unavailable' }, 503);
   if (path === '/api/game/mta/sync') return sync(request, env);
@@ -120,7 +140,17 @@ export async function handleGameHttp(request, env, url) {
   if (request.method === 'OPTIONS') return new Response(null, { status: h['Access-Control-Allow-Origin'] ? 204 : 403, headers: h });
   if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, h);
   const db = env.DB;
+  // o corpo vem do cache; o CORS é de quem pediu
+  const withCors = (res) => {
+    const out = new Response(res.body, res);
+    for (const [k, v] of Object.entries(h)) out.headers.set(k, v);
+    return out;
+  };
+  return withCors(await cached(request, url, ctx, () => publicRoute(db, path, url)));
+}
 
+async function publicRoute(db, path, url) {
+  const h = { 'Cache-Control': 'public, max-age=60' };
   if (path === '/api/groups') {
     const { results } = await db.prepare('SELECT slug, name, tag, color, emblem, description, rank, xp, kills, deaths, members FROM game_groups ORDER BY rank').all();
     return json({ groups: results.map(({ members, ...g }) => ({ ...g, members: JSON.parse(members).length })) }, 200, h);
@@ -130,13 +160,11 @@ export async function handleGameHttp(request, env, url) {
     const slug = decodeURIComponent(path.slice('/api/group/'.length));
     const g = /^[a-z0-9-]{1,48}$/.test(slug) && await db.prepare('SELECT * FROM game_groups WHERE slug = ?').bind(slug).first();
     if (!g) return json({ error: 'not_found' }, 404, h);
-    const roles = JSON.parse(g.members);
-    const members = [];
-    for (const m of roles) {
-      const r = await db.prepare(`${PLAYER_SQL} WHERE g.account = ?`).bind(m.account).first();
-      // membro que ainda não apareceu no sync (nunca entrou depois do sistema existir) fica de fora até aparecer
-      if (r) members.push({ ...publicPlayer(r), role: m.role });
-    }
+    // todos os membros numa consulta (json_each na lista de contas do grupo); quem nunca apareceu no sync fica de fora
+    const { results } = await db.prepare(`SELECT g.*, p.discord_id, p.avatar, json_extract(j.value, '$.role') AS role
+      FROM game_groups gr, json_each(gr.members) j JOIN game_players g ON g.account = json_extract(j.value, '$.account')
+      LEFT JOIN players p ON p.account = g.account WHERE gr.slug = ?`).bind(slug).all();
+    const members = results.map((r) => ({ ...publicPlayer(r), role: r.role }));
     const order = { Leader: 1, Staff: 2, Sub: 3, Member: 4 };
     members.sort((a, b) => (order[a.role] - order[b.role]) || (b.level - a.level));
     return json({ slug: g.slug, name: g.name, tag: g.tag, color: g.color, emblem: g.emblem, description: g.description, rank: g.rank, xp: g.xp,
@@ -159,7 +187,7 @@ export async function handleGameHttp(request, env, url) {
     const pid = path.slice('/api/player/'.length);
     const r = PID_RE.test(pid) && await db.prepare(`${PLAYER_SQL} WHERE g.pid = ?`).bind(pid).first();
     if (!r) return json({ error: 'not_found' }, 404, h);
-    return json(await playerView(db, r), 200, h);
+    return json(playerView(r), 200, h);
   }
   return json({ error: 'not_found' }, 404, h);
 }

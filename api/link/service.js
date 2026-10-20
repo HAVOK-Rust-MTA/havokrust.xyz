@@ -16,7 +16,7 @@
 // Segurança: o código só nasce pelo servidor do jogo (assinado) para a conta logada lá, e só vira vínculo quando alguém
 // autoriza com o Discord. Ninguém vincula a conta de outro só sabendo o ID ou o serial dele.
 import { json, nowS, verifyServer, siteCors, clean, account, avatarUrl } from '../lib/util.js';
-import { playerByAccount, playerView } from '../game/service.js';
+import { playerView } from '../game/service.js';
 
 const CODE_TTL_S = 15 * 60;
 const STATE_TTL_S = 10 * 60;
@@ -187,12 +187,16 @@ async function callback(request, env, url) {
   return redirect(`${site}/#/perfil${result ? `?${result}` : ''}`, { 'Set-Cookie': setCookie(env, token, SESSION_TTL_S) });
 }
 
+// sessão + Discord + números do jogo + grupo numa consulta só
 async function sessionUser(request, env) {
   const token = cookieOf(request);
   if (!token) return null;
-  const s = await env.DB.prepare('SELECT discord_id, expires_at FROM sessions WHERE token_hash = ?').bind(await sha256(token)).first();
-  if (!s || s.expires_at < nowS()) return null;
-  return env.DB.prepare('SELECT discord_id, account, nick, discord_name, avatar, linked_at FROM players WHERE discord_id = ?').bind(s.discord_id).first();
+  return env.DB.prepare(`SELECT p.discord_id, p.account, p.nick AS p_nick, p.discord_name, p.avatar, p.linked_at,
+      g.pid, g.nick, g.level, g.kills, g.deaths, g.play_minutes, g.group_name, g.badges, g.last_seen,
+      gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color, gg.rank AS g_rank
+    FROM sessions s JOIN players p ON p.discord_id = s.discord_id
+    LEFT JOIN game_players g ON g.account = p.account LEFT JOIN game_groups gg ON gg.name = g.group_name
+    WHERE s.token_hash = ? AND s.expires_at >= ?`).bind(await sha256(token), nowS()).first();
 }
 
 // //------------------- ROTEADOR -------------------\\
@@ -220,10 +224,10 @@ export async function handleLinkHttp(request, env, ctx, url) {
     const p = await sessionUser(request, env);
     if (!p) return json({ loggedIn: false, loginUrl: `${apiUrl(env)}/auth/discord` }, 200, h);
     // números, grupo e badges vêm do jogo (game_players): o histórico de antes do vínculo vem junto
-    const g = p.account ? await playerByAccount(env.DB, p.account) : null;
+    const g = p.account && p.pid ? p : null;
     return json({
       loggedIn: true, linked: !!p.account, discordName: p.discord_name, avatarUrl: avatarUrl(p.discord_id, p.avatar),
-      nick: (g && g.nick) || p.nick, linkedAt: p.linked_at, profile: g ? await playerView(env.DB, g) : null,
+      nick: (g && g.nick) || p.p_nick, linkedAt: p.linked_at, profile: g ? playerView(g) : null,
     }, 200, h);
   }
   if (path === '/api/logout' && request.method === 'POST') {

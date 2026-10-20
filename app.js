@@ -560,7 +560,7 @@
           <b>${esc(name)}</b><span class="bd-rar">${BRAR[rar][0]}</span>
           <p>${esc(lang === 'pt' ? pt : en)}</p><small class="bd-how how-${how}">${B.how[how]}</small></article>`).join('')}</div>
       <p class="bd-ingame">${svg('info')} ${B.ingame}</p>
-      <section class="bd-wall-sec"><p class="l-kicker">${B.wall}</p><p class="page-sub">${B.wall_sub}</p><div class="bd-wall" id="bdWall"><p class="muted">…</p></div>
+      <section class="bd-wall-sec"><p class="l-kicker">${B.wall}</p><p class="page-sub">${B.wall_sub}</p><div class="bd-wall" id="bdWall">${spinner()}</div>
         <a class="wl-btn inline" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${B.join}</span></a></section>`;
   }
 
@@ -872,7 +872,7 @@
       });
     });
     const head = (cols) => `<li class="rk-head"><span class="rk-pos">#</span>${cols.map((c, i) => `<span class="${i ? 'rk-num' : 'rk-name'}">${c}</span>`).join('')}</li>`;
-    const loading = '<li class="rk-empty">…</li>';
+    const loading = `<li class="rk-empty">${lang === 'pt' ? 'Carregando…' : 'Loading…'}</li>`;
     return `<section class="rk" id="rankSec">
         <div class="rk-grid">
           <div class="rk-col rk-main"><h3>${lt('rk_groups')}</h3><ol class="rk-list">${head(['', lt('rk_members'), lt('rk_kills'), lt('rk_deaths')])}</ol><ol class="rk-list" id="rkGroups">${loading}</ol></div>
@@ -1036,6 +1036,8 @@
     const e = BADGE_EXTRA[id];
     return e ? { name: e[0], rar: e[1], img: `badges/${id}.png` } : null;
   };
+  // carregando: círculo girando + texto, até a API responder
+  const spinner = () => `<div class="loading" role="status"><span class="spin" aria-hidden="true"></span>${lang === 'pt' ? 'Carregando…' : 'Loading…'}</div>`;
   const ANON = 'img/avatar-anon.svg'; // jogador sem Discord vinculado: avatar cinza
   const pfApi = () => (((window.HAVOK || {}).account || {}).api || '').replace(/\/+$/, '');
   const num = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
@@ -1109,7 +1111,7 @@
       const out = $('#pfOut');
       if (out) out.onclick = async () => { try { await fetch(`${api}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ } location.hash = '#/perfil'; route(); refreshAccount(); };
     });
-    return `<section class="bd-hero"><p class="l-kicker">${P.kicker}</p><h1 class="page-title">${P.title}</h1><p class="page-sub">${P.sub}</p></section>${note}<div id="pfBox" class="pf"><p class="muted">…</p></div>`;
+    return `<section class="bd-hero"><p class="l-kicker">${P.kicker}</p><h1 class="page-title">${P.title}</h1><p class="page-sub">${P.sub}</p></section>${note}<div id="pfBox" class="pf">${spinner()}</div>`;
   }
 
   // perfil público (#/jogador/<pid>): com ou sem Discord
@@ -1123,7 +1125,7 @@
       box.innerHTML = p ? playerCard(p) : `<p class="muted">${P.notfound}</p>`;
       if (p) document.title = `${p.nick} — HAVOK`;
     });
-    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_player}</p></section><div id="pfBox" class="pf"><p class="muted">…</p></div>`;
+    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_player}</p></section><div id="pfBox" class="pf">${spinner()}</div>`;
   }
 
   // ranking completo do wipe (#/ranking): grupos com emblema/cor/descrição e jogadores com foto ou avatar cinza
@@ -1134,13 +1136,18 @@
     setTimeout(async () => {
       document.querySelectorAll('.rkp-sort button').forEach((b) => b.onclick = () => { rkBy = b.dataset.by; route(); });
       const get = async (u) => { try { const r = await fetch(u); return r.ok ? await r.json() : null; } catch (e) { return null; } };
-      const [gr, pl] = await Promise.all([get(`${api}/api/groups`), get(`${api}/api/ranking/players?by=${rkBy}`)]);
-      const gBox = $('#rkpGroups'), pBox = $('#rkpPlayers');
+      // cada lista aparece assim que a sua resposta chega (uma não espera a outra)
+      const plP = get(`${api}/api/ranking/players?by=${rkBy}`);
+      const gr = await get(`${api}/api/groups`);
+      const gBox = $('#rkpGroups');
       if (!gBox) return;
       gBox.innerHTML = !gr ? `<p class="muted">${P.down}</p>` : gr.groups.map((g) => `<a class="rkp-group" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
           <span class="rkp-pos">${String(g.rank).padStart(2, '0')}</span>${emblem(g)}
           <div class="rkp-gtxt"><b>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</b>${g.description ? `<p>${esc(g.description)}</p>` : ''}
             <small>${num(g.members)} ${g.members === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.xp)} ${P.xp}</small></div></a>`).join('') || `<p class="muted">${P.nogroups}</p>`;
+      const pl = await plP;
+      const pBox = $('#rkpPlayers');
+      if (!pBox) return;
       const val = (p) => (rkBy === 'level' ? `Lv ${num(p.level)}` : rkBy === 'hours' ? `${num(Math.floor(p.playMinutes / 60))}h` : num(p.kills));
       pBox.innerHTML = !pl ? `<p class="muted">${P.down}</p>` : pl.players.map((p) => `<a class="rkp-player" href="#/jogador/${esc(p.pid)}">
           <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
@@ -1150,8 +1157,8 @@
     const sort = Object.entries(P.by).map(([k, n]) => `<button type="button" class="chip ${rkBy === k ? 'on' : ''}" data-by="${k}">${n}</button>`).join('');
     return `<section class="bd-hero"><p class="l-kicker">${P.rk_kicker}</p><h1 class="page-title">${P.rk_title}</h1><p class="page-sub">${P.rk_sub}</p></section>
       <div class="rkp">
-        <section class="rkp-col"><h3>${P.rk_groups}</h3><div id="rkpGroups"><p class="muted">…</p></div></section>
-        <section class="rkp-col"><div class="rkp-colhead"><h3>${P.rk_players}</h3><div class="rkp-sort">${sort}</div></div><div id="rkpPlayers"><p class="muted">…</p></div></section>
+        <section class="rkp-col"><h3>${P.rk_groups}</h3><div id="rkpGroups">${spinner()}</div></section>
+        <section class="rkp-col"><div class="rkp-colhead"><h3>${P.rk_players}</h3><div class="rkp-sort">${sort}</div></div><div id="rkpPlayers">${spinner()}</div></section>
       </div>`;
   }
 
@@ -1174,7 +1181,7 @@
             <p class="muted">${num(g.members.length)} ${g.members.length === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.deaths)} ${P.deaths.toLowerCase()} · ${num(g.xp)} ${P.xp}</p></div></header>
           <div class="gp-list">${members || `<p class="muted">${P.nomembers}</p>`}</div></div>`;
     });
-    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_group}</p></section><div id="pfBox" class="pf"><p class="muted">…</p></div>`;
+    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_group}</p></section><div id="pfBox" class="pf">${spinner()}</div>`;
   }
 
   // ---------------------------------------------------------------- router

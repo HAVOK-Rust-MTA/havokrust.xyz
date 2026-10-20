@@ -16,7 +16,7 @@ export default {
     const url = new URL(request.url);
     try {
       if (isLinkPath(url.pathname)) return await handleLinkHttp(request, env, ctx, url);
-      if (isGamePath(url.pathname)) return await handleGameHttp(request, env, url);
+      if (isGamePath(url.pathname)) return await handleGameHttp(request, env, url, ctx);
     } catch (e) {
       console.error('api:', url.pathname, e.message);
       return json({ error: 'internal' }, 500);
