@@ -33,6 +33,14 @@ WIPE_CYCLE_SECONDS = "1296000"
 # endereço público deste Worker (o banner do painel é servido daqui: /recruit/banner-*.jpg)
 PUBLIC_URL = "https://havok-waitlist.havokrust.workers.dev"
 
+# //------------------- PERFIL / LOGIN COM DISCORD (link/) -------------------\\
+# O Worker responde em api.havokrust.xyz (domínio do site): sem isso o navegador bloqueia o cookie do login.
+# Secret: npx wrangler secret put DISCORD_CLIENT_SECRET   (Developer Portal -> OAuth2 -> Client Secret)
+# Redirect no Developer Portal (OAuth2 -> Redirects): https://api.havokrust.xyz/auth/discord/callback
+SITE_URL = "https://havokrust.xyz"
+API_PUBLIC_URL = "https://api.havokrust.xyz"
+COOKIE_DOMAIN = ".havokrust.xyz"
+
 [triggers]
 crons = ["* * * * *"]
 

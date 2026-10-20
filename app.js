@@ -29,7 +29,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVER', footer_copy: '© 2026 HAVOK — Rust Survival. Not affiliated with Facepunch Studios.',
       bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench', bp_tip: 'Needs a blueprint: you must learn this recipe before you can craft it.', bench_tip: 'Needs a Workbench nearby to craft.', bp_explain: 'You must learn this blueprint before crafting. Put the item and Scrap in a Research Table to get the blueprint, or find one in airdrops and the patrol helicopter, then right click it → Learn. Learning is permanent.', bp_explain_loot: 'This blueprint cannot be researched. Find it in loot, then right click it → Learn. Learning is permanent.', bp_how: 'How blueprints work', legend_bp: 'needs a blueprint (learn the recipe first)', legend_bench: 'needs a Workbench',
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
-      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play', nav_wipe: 'Wipe',
+      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play', nav_wipe: 'Wipe', nav_profile: 'Profile',
      
       store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
       store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Monthly price; other periods on Discord',
@@ -63,7 +63,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVIDOR', footer_copy: '© 2026 HAVOK — Rust Survival. Sem afiliação com a Facepunch Studios.',
       bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada', bp_tip: 'Precisa de blueprint: você tem que aprender esta receita antes de craftar.', bench_tip: 'Precisa de uma Bancada perto para craftar.', bp_explain: 'Você precisa aprender esta blueprint antes de craftar. Coloque o item e Sucata na Mesa de Pesquisa para ganhar a blueprint, ou ache uma no airdrop e no helicóptero de patrulha. Depois clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_explain_loot: 'Esta blueprint não dá para pesquisar. Ache no loot e clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_how: 'Como funcionam as blueprints', legend_bp: 'precisa de blueprint (aprender a receita antes)', legend_bench: 'precisa de Bancada',
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
-      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar', nav_wipe: 'Wipe',
+      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar', nav_wipe: 'Wipe', nav_profile: 'Perfil',
      
       store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
       store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Preço por mês; outros períodos no Discord',
@@ -989,15 +989,82 @@
     return `${crumbs([['Wiki', '#/wiki'], ['Plano']])}<div id="plan" class="prose plan"><p class="muted">Carregando...</p></div>`;
   }
 
+  // ---------------------------------------------------------------- perfil (#/perfil): login com Discord + vínculo com o jogo
+  const PF = {
+    en: { kicker: 'HAVOK · Profile', title: 'YOUR PROFILE', sub: 'Your stats, group and badges in one place, with your Discord picture on the ranking.',
+      login: 'Sign in with Discord', how: 'Then join the server: the link screen shows up by itself. Point your phone at the QR or click COPY LINK. No commands.',
+      unlinked: 'Almost there: join the HAVOK server and the link screen opens by itself. One click on Discord and your game account is here.',
+      linked_ok: 'Linked! Your game account is now on your profile.', logout: 'Sign out', nodata: 'Your stats show up here after your next minutes in game.',
+      level: 'Level', kills: 'Kills', deaths: 'Deaths', kd: 'K/D', hours: 'Hours played', group: 'Group', nogroup: 'No group', badges: 'Badges', nobadges: 'No badges yet.',
+      err: { codigo: 'That link expired or was already used. Open the screen in game again.', ja_vinculada: 'That game account is already linked to another Discord.',
+        expirou: 'The sign in took too long. Try again.', discord: 'Discord did not answer. Try again.', cancelado: 'Sign in cancelled.', config: 'Sign in is not available yet.' },
+      down: 'Could not load your profile right now.' },
+    pt: { kicker: 'HAVOK · Perfil', title: 'SEU PERFIL', sub: 'Seus números, grupo e badges num lugar só, com a sua foto do Discord no ranking.',
+      login: 'Entrar com Discord', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
+      unlinked: 'Falta pouco: entre no servidor do HAVOK e a tela de vínculo abre sozinha. Um clique no Discord e a sua conta do jogo aparece aqui.',
+      linked_ok: 'Vinculado! Sua conta do jogo já está no seu perfil.', logout: 'Sair', nodata: 'Seus números aparecem aqui depois dos próximos minutos no jogo.',
+      level: 'Level', kills: 'Kills', deaths: 'Mortes', kd: 'K/D', hours: 'Horas jogadas', group: 'Grupo', nogroup: 'Sem grupo', badges: 'Badges', nobadges: 'Nenhuma badge ainda.',
+      err: { codigo: 'Esse link venceu ou já foi usado. Abra a tela no jogo de novo.', ja_vinculada: 'Essa conta do jogo já está vinculada a outro Discord.',
+        expirou: 'O login demorou demais. Tente de novo.', discord: 'O Discord não respondeu. Tente de novo.', cancelado: 'Login cancelado.', config: 'O login ainda não está disponível.' },
+      down: 'Não deu para carregar seu perfil agora.' },
+  };
+  const BADGE_EXTRA = { opening: ['Grand Opening', 'mythic'] }; // badges só do jogo (sem SVG no site): arte em PNG
+  const badgeInfo = (id) => {
+    const b = BADGE_LIST.find((x) => x[0] === id);
+    if (b) return { name: b[1], rar: b[2], img: `badges/${id}.svg` };
+    const y = /^newyear(\d{4})$/.exec(id);
+    if (y) return { name: `New Year ${y[1]}`, rar: 'legendary', img: `badges/${id}.png` };
+    const e = BADGE_EXTRA[id];
+    return e ? { name: e[0], rar: e[1], img: `badges/${id}.png` } : null;
+  };
+  function pagePerfil(query) {
+    const P = PF[lang], A = (window.HAVOK || {}).account || {};
+    const api = (A.api || '').replace(/\/+$/, '');
+    const q = new URLSearchParams(query || '');
+    const note = q.get('vinculado') ? `<p class="pf-note ok">${P.linked_ok}</p>` : q.get('erro') ? `<p class="pf-note bad">${esc(P.err[q.get('erro')] || P.down)}</p>` : '';
+    setTimeout(async () => {
+      const box = $('#pfBox');
+      if (!box) return;
+      if (!api) { box.innerHTML = `<p class="muted">${P.err.config}</p>`; return; }
+      let me = null;
+      try { const r = await fetch(`${api}/api/me`, { credentials: 'include', cache: 'no-store' }); me = r.ok ? await r.json() : null; } catch (e) { me = null; }
+      if (!$('#pfBox')) return;
+      if (!me) { box.innerHTML = `<p class="muted">${P.down}</p>`; return; }
+      if (!me.loggedIn) {
+        box.innerHTML = `<div class="pf-login"><a class="cta" href="${esc(me.loginUrl || `${api}/auth/discord`)}">${svg('discord')} ${P.login}</a><p class="muted">${P.how}</p></div>`;
+        return;
+      }
+      const pr = me.profile || {};
+      const n = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
+      const stat = (k, v, hot) => `<div class="pf-stat${hot ? ' hot' : ''}"><b>${v}</b><span>${P[k]}</span></div>`;
+      const RORD = ['mythic', 'legendary', 'epic', 'rare', 'common'];
+      const badges = Object.entries(pr.badges || {}).map(([id, c]) => [badgeInfo(id), c]).filter(([b]) => b).sort((x, y) => RORD.indexOf(x[0].rar) - RORD.indexOf(y[0].rar))
+        .map(([b, c]) => `<div class="pf-badge" style="--rc:${BRAR[b.rar][1]}" title="${esc(b.name)}"><img src="${b.img}" alt="${esc(b.name)}" loading="lazy"><b>${esc(b.name)}${c > 1 ? ` <small>x${c}</small>` : ''}</b><span>${BRAR[b.rar][0]}</span></div>`).join('');
+      box.innerHTML = `<div class="pf-card">
+          <header class="pf-head"><img class="pf-avatar" src="${esc(me.avatarUrl)}" alt="" referrerpolicy="no-referrer">
+            <div><h2>${esc(me.nick || me.discordName)}</h2><p class="muted">Discord: ${esc(me.discordName)}${pr.group ? ` · ${P.group}: <b>${esc(pr.group)}</b>${pr.groupTag ? ` [${esc(pr.groupTag)}]` : ''}` : ''}</p></div>
+            <button type="button" class="chip" id="pfOut">${P.logout}</button></header>
+          ${me.linked ? (me.profile ? `<div class="pf-stats">${stat('level', n(pr.level))}${stat('kills', n(pr.kills), true)}${stat('deaths', n(pr.deaths))}${stat('kd', pr.deaths ? (pr.kills / pr.deaths).toFixed(2) : n(pr.kills))}${stat('hours', n(Math.floor((pr.playMinutes || 0) / 60)))}</div>
+            <h3 class="pf-sec">${P.badges}</h3><div class="pf-badges">${badges || `<p class="muted">${P.nobadges}</p>`}</div>` : `<p class="muted">${P.nodata}</p>`)
+            : `<p class="pf-note">${P.unlinked}</p>`}
+        </div>`;
+      const out = $('#pfOut');
+      if (out) out.onclick = async () => { try { await fetch(`${api}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ } location.hash = '#/perfil'; route(); };
+    });
+    return `<section class="bd-hero"><p class="l-kicker">${P.kicker}</p><h1 class="page-title">${P.title}</h1><p class="page-sub">${P.sub}</p></section>${note}<div id="pfBox" class="pf"><p class="muted">…</p></div>`;
+  }
+
   // ---------------------------------------------------------------- router
   function route() {
     clearInterval(wlTimer);
-    const h = (location.hash || '#/').slice(1) || '/';
+    const full = (location.hash || '#/').slice(1) || '/';
+    // #/perfil?vinculado=1 -> rota sem a query
+    const [h, query] = full.split('?');
     const parts = h.split('/').filter(Boolean);
     let html;
     const landing = !parts.length;
     document.body.classList.toggle('landing', landing);
-    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe'].includes(parts[0]));
+    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil'].includes(parts[0]));
     if (landing) html = pageLanding();
     else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
@@ -1011,14 +1078,15 @@
     else if (parts[0] === 'store') html = pageStore();
     else if (parts[0] === 'badges') html = pageBadges();
     else if (parts[0] === 'wipe') html = pageWipe();
+    else if (parts[0] === 'perfil' || parts[0] === 'profile') html = pagePerfil(query);
     else if (parts[0] === 'vehicles') html = pageVehicles();
     else html = pageHome();
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['store', 'badges', 'wipe'].includes(parts[0]) ? parts[0] : 'wiki')));
+    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['store', 'badges', 'wipe', 'perfil'].includes(parts[0]) ? parts[0] : 'wiki')));
     const it = parts[0] === 'items' && byId[parts[1]];
-    document.title = landing ? 'HAVOK — Rust Survival' : parts[0] === 'wipe' ? 'Wipe — HAVOK' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
+    document.title = landing ? 'HAVOK — Rust Survival' : parts[0] === 'wipe' ? 'Wipe — HAVOK' : parts[0] === 'perfil' ? (lang === 'pt' ? 'Perfil' : 'Profile') + ' — HAVOK' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);
   }
 

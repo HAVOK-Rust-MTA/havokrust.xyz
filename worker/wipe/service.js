@@ -47,7 +47,7 @@ export async function hmacHex(secret, message) {
 }
 
 // devolve o corpo se a assinatura do servidor MTA confere; senão null
-async function verifyServer(request, env, path, t = nowS()) {
+export async function verifyServer(request, env, path, t = nowS()) {
   if (!env.WIPE_SECRET || String(env.WIPE_SECRET).length < 32) return null;
   const ts = request.headers.get('X-Havok-Timestamp') || '';
   const sig = fromHex(request.headers.get('X-Havok-Signature') || '');

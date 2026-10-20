@@ -9,6 +9,9 @@ window.HAVOK = {
   wipe: { api: 'https://havok-waitlist.havokrust.workers.dev/api/wipe/status' },
   // ranking do wipe atual (o servidor do jogo manda a cada 5 min). Vazio = a seção não aparece.
   ranking: { api: 'https://havok-waitlist.havokrust.workers.dev/api/ranking' },
+  // perfil / login com Discord: o Worker no subdomínio do site (o cookie do login só funciona no mesmo domínio).
+  // Vazio = a página de perfil avisa que o login ainda não está disponível.
+  account: { api: 'https://api.havokrust.xyz' },
   // preços do VIP (por mês) em reais e dólar. Tirar um preço = mostra "Consulte no Discord".
   vip: {
     period: 'month',
