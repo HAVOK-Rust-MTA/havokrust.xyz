@@ -877,3 +877,13 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
 .rkp-player small i { font-style: normal; font-weight: 600; }
 .rkp-val { font: 600 20px var(--title); color: var(--accent); }
 @media (max-width: 900px) { .rkp { grid-template-columns: 1fr; } }
+/* conta no topo: Conectar Discord / foto + nome */
+.acct-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border-radius: 8px; border: 1px solid #5865f2; color: #c9cdfb; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.acct-btn:hover { background: rgba(88, 101, 242, .14); color: #fff; }
+.acct-btn svg { width: 18px; height: 18px; }
+.acct-btn.on { border-color: var(--line2); color: var(--text); padding: 0 12px 0 4px; }
+.acct-btn.on:hover, .acct-btn.cur { border-color: var(--accent); background: var(--accent-soft); }
+.acct-btn span { max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+.acct-av { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+@media (max-width: 900px) { .acct-btn span { display: none; } .acct-btn { padding: 0 10px; } .acct-btn.on { padding: 0 4px; } }
+.acct-btn[hidden] { display: none; }

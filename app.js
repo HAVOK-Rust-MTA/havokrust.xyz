@@ -1005,7 +1005,7 @@
   // ---------------------------------------------------------------- perfil (#/perfil): login com Discord + vínculo com o jogo
   const PF = {
     en: { kicker: 'HAVOK · Profile', title: 'YOUR PROFILE', sub: 'Your stats, group and badges in one place, with your Discord picture on the ranking.',
-      login: 'Sign in with Discord', how: 'Then join the server: the link screen shows up by itself. Point your phone at the QR or click COPY LINK. No commands.',
+      login: 'Sign in with Discord', connect: 'Connect Discord', how: 'Then join the server: the link screen shows up by itself. Point your phone at the QR or click COPY LINK. No commands.',
       unlinked: 'Almost there: join the HAVOK server and the link screen opens by itself. One click on Discord and your game account is here.',
       linked_ok: 'Linked! Your game account is now on your profile.', logout: 'Sign out', nodata: 'Your stats show up here after your next minutes in game.',
       level: 'Level', kills: 'Kills', deaths: 'Deaths', kd: 'K/D', hours: 'Hours played', group: 'Group', nogroup: 'No group', badges: 'Badges', nobadges: 'No badges yet.',
@@ -1016,7 +1016,7 @@
       rk_kicker: 'HAVOK · This wipe', rk_title: 'RANKING', rk_sub: 'Every group and every player of the current wipe. Click a group to see its members. Resets every wipe.',
       rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, xp: 'XP', nogroups: 'No groups yet this wipe.', noplayers: 'Nobody has played this wipe yet.' },
     pt: { kicker: 'HAVOK · Perfil', title: 'SEU PERFIL', sub: 'Seus números, grupo e badges num lugar só, com a sua foto do Discord no ranking.',
-      login: 'Entrar com Discord', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
+      login: 'Entrar com Discord', connect: 'Conectar Discord', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
       unlinked: 'Falta pouco: entre no servidor do HAVOK e a tela de vínculo abre sozinha. Um clique no Discord e a sua conta do jogo aparece aqui.',
       linked_ok: 'Vinculado! Sua conta do jogo já está no seu perfil.', logout: 'Sair', nodata: 'Seus números aparecem aqui depois dos próximos minutos no jogo.',
       level: 'Level', kills: 'Kills', deaths: 'Mortes', kd: 'K/D', hours: 'Horas jogadas', group: 'Grupo', nogroup: 'Sem grupo', badges: 'Badges', nobadges: 'Nenhuma badge ainda.',
@@ -1063,6 +1063,25 @@
       </div>`;
   }
 
+  // botão da conta no topo: "Conectar Discord" ou a foto + nome de quem já entrou
+  let acct = null;
+  async function refreshAccount() {
+    const btn = $('#acctBtn');
+    const api = pfApi();
+    if (!btn || !api) return;
+    try { const r = await fetch(`${api}/api/me`, { credentials: 'include', cache: 'no-store' }); acct = r.ok ? await r.json() : null; } catch (e) { acct = null; }
+    drawAccount();
+  }
+  function drawAccount() {
+    const btn = $('#acctBtn');
+    if (!btn || !acct) return;
+    btn.hidden = false;
+    btn.classList.toggle('on', !!acct.loggedIn);
+    btn.innerHTML = acct.loggedIn
+      ? `${avatar(acct.avatarUrl, 'acct-av')}<span>${esc(acct.nick || acct.discordName)}</span>`
+      : `${svg('discord')}<span>${PF[lang].connect}</span>`;
+  }
+
   function pagePerfil(query) {
     const P = PF[lang];
     const api = pfApi();
@@ -1088,7 +1107,7 @@
           <p class="pf-note">${me.linked ? P.nodata : P.unlinked}</p></div>`;
       }
       const out = $('#pfOut');
-      if (out) out.onclick = async () => { try { await fetch(`${api}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ } location.hash = '#/perfil'; route(); };
+      if (out) out.onclick = async () => { try { await fetch(`${api}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ } location.hash = '#/perfil'; route(); refreshAccount(); };
     });
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker}</p><h1 class="page-title">${P.title}</h1><p class="page-sub">${P.sub}</p></section>${note}<div id="pfBox" class="pf"><p class="muted">…</p></div>`;
   }
@@ -1192,6 +1211,7 @@
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
     document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['grupo', 'jogador'].includes(parts[0]) ? 'ranking' : ['store', 'badges', 'wipe', 'perfil', 'ranking'].includes(parts[0]) ? parts[0] : 'wiki')));
+    if ($('#acctBtn')) $('#acctBtn').classList.toggle('cur', parts[0] === 'perfil');
     const it = parts[0] === 'items' && byId[parts[1]];
     document.title = landing ? 'HAVOK — Rust Survival' : parts[0] === 'wipe' ? 'Wipe — HAVOK' : parts[0] === 'perfil' ? (lang === 'pt' ? 'Perfil' : 'Profile') + ' — HAVOK' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);
@@ -1210,6 +1230,7 @@
     try { localStorage.setItem('havok-lang', lang); } catch (e) { /* sem storage */ }
     applyLang();
     route();
+    drawAccount();
   }));
   $('#menuBtn').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
 
@@ -1256,6 +1277,7 @@
   $('#searchBtn').addEventListener('click', openSearch);
 
   window.addEventListener('hashchange', route);
+  refreshAccount();
   applyLang();
   route();
 })();
