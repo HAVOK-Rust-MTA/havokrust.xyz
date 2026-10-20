@@ -149,6 +149,7 @@
     video: '<path d="m22 8-6 4 6 4z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
     list: '<path d="M10 6h11M10 12h11M10 18h11M3 6h.01M3 12h.01M3 18h.01"/>',
     award: '<circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/>',
+    logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>',
     chevrons: '<path d="m6 17 6-5 6 5"/><path d="m6 11 6-5 6 5"/>', gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
     bug: '<path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7.1V6a3 3 0 1 1 6 0v1.1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6zM12 20v-9M6.5 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M22 13h-4M17.2 17c2.1.1 3.8 1.9 3.8 4"/>',
     sword: '<path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/>',
@@ -680,8 +681,8 @@
         ['Can I play with friends?', 'Yes. Groups have up to 8 members, with their own tag, emblem and color, plus a group ranking.'],
         ['Does it run on a weak PC?', 'MTA runs on modest hardware. The server interface was built to stay light.'],
       ],
-      rk_kicker: 'This wipe', rk_title: 'Who rules the island', rk_groups: 'Groups', rk_players: 'Players', rk_kills: 'Kills', rk_deaths: 'Deaths', rk_members: 'Members', rk_kd: 'K/D', rk_updated: 'Updated {t} · resets every wipe', rk_none: 'Nobody has scored yet this wipe. The first kills show up here.', wp_kicker: 'Current wipe', wp_title: 'The race for the island', wp_sub: 'Groups compete for the top until the wipe resets everything. The ranking updates every 5 minutes.', cd_more: 'See the wipe ranking',
-      cd_wipe: 'Next wipe in', cd_pvp: 'FINAL 24 HOURS · INSANE PvP: weapons and loot are easier to find until the wipe', cd_every: 'full wipe every {n} days', cd_at: 'Wipe: {d}', cd_pending: 'Wipe in progress', cd_failed: 'Wipe delayed', cd_stale: 'No connection to the server right now; trying again…',
+      rk_kicker: 'This wipe', rk_title: 'Who rules the island', rk_groups: 'Groups', rk_players: 'Players', rk_kills: 'Kills', rk_deaths: 'Deaths', rk_members: 'Members', rk_kd: 'K/D', rk_updated: 'Updated {t} · resets every wipe', rk_none: 'Nobody has scored yet this wipe. The first kills show up here.', wp_kicker: 'Current wipe', wp_title: 'The race for the island', wp_sub: 'At this time the server resets everything: bases, items and the ranking. Badges and paid VIP stay.', cd_more: 'See the wipe',
+      cd_wipe: 'Next wipe in', cd_pvp: 'FINAL 24 HOURS · INSANE PvP: weapons and loot are easier to find until the wipe', cd_every: 'full wipe every {n} days', cd_at: 'Next wipe: {d}', cd_pending: 'Wipe in progress', cd_failed: 'Wipe delayed', cd_stale: 'No connection to the server right now; trying again…',
       news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and the launch countdown.',
     },
     pt: {
@@ -713,8 +714,8 @@
         ['Dá para jogar com amigos?', 'Sim. Grupos têm até 8 membros, com tag, emblema e cor próprios, e um ranking de grupos.'],
         ['Roda em PC fraco?', 'O MTA roda em máquinas modestas. A interface do servidor foi feita para ser leve.'],
       ],
-      rk_kicker: 'Este wipe', rk_title: 'Quem manda na ilha', rk_groups: 'Grupos', rk_players: 'Jogadores', rk_kills: 'Kills', rk_deaths: 'Mortes', rk_members: 'Membros', rk_kd: 'K/D', rk_updated: 'Atualizado {t} · zera a cada wipe', rk_none: 'Ninguém pontuou ainda neste wipe. As primeiras kills aparecem aqui.', wp_kicker: 'Wipe atual', wp_title: 'A disputa pela ilha', wp_sub: 'Os grupos disputam o topo até o wipe zerar tudo. O ranking atualiza a cada 5 minutos.', cd_more: 'Ver o ranking do wipe',
-      cd_wipe: 'Próximo wipe em', cd_pvp: 'ÚLTIMAS 24 HORAS · PvP INSANO: armas e loot mais fáceis até o wipe', cd_every: 'wipe completo a cada {n} dias', cd_at: 'Wipe: {d}', cd_pending: 'Wipe em andamento', cd_failed: 'Wipe adiado', cd_stale: 'Sem conexão com o servidor agora; tentando de novo…',
+      rk_kicker: 'Este wipe', rk_title: 'Quem manda na ilha', rk_groups: 'Grupos', rk_players: 'Jogadores', rk_kills: 'Kills', rk_deaths: 'Mortes', rk_members: 'Membros', rk_kd: 'K/D', rk_updated: 'Atualizado {t} · zera a cada wipe', rk_none: 'Ninguém pontuou ainda neste wipe. As primeiras kills aparecem aqui.', wp_kicker: 'Wipe atual', wp_title: 'A disputa pela ilha', wp_sub: 'Nesse horário o servidor zera tudo: bases, itens e o ranking. Badges e VIP pago ficam.', cd_more: 'Ver o wipe',
+      cd_wipe: 'Próximo wipe em', cd_pvp: 'ÚLTIMAS 24 HORAS · PvP INSANO: armas e loot mais fáceis até o wipe', cd_every: 'wipe completo a cada {n} dias', cd_at: 'Próximo wipe: {d}', cd_pending: 'Wipe em andamento', cd_failed: 'Wipe adiado', cd_stale: 'Sem conexão com o servidor agora; tentando de novo…',
       news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e a contagem para a inauguração.',
     },
   };
@@ -833,6 +834,7 @@
       : `<b>${dd}</b><i>d</i><b>${p2(h)}</b><i>h</i><b>${p2(Math.floor(s / 60))}</b><i>m</i><b>${p2(s % 60)}</b><i>s</i>`;
     const pct = Math.min(100, Math.max(0, ((now - start) / (at - start)) * 100));
     $('#cdBar').style.transform = `scaleX(${pending ? 1 : (pct / 100).toFixed(4)})`;
+    if ($('#cdPct')) $('#cdPct').textContent = pending ? '100%' : `${Math.floor(pct)}%`;
     const when = new Date(at).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
     $('#cdNote').textContent = Date.now() - wipeAt > WIPE_STALE_MS ? lt('cd_stale')
       : pvp ? lt('cd_pvp') : `${lt('cd_at', { d: when })} · ${lt('cd_every', { n: Math.round((d.durationSeconds || 1296000) / 86400) })}`;
@@ -849,7 +851,7 @@
       }, 1000);
     });
     return `<div class="cd${more ? '' : ' cd-big'}" id="cdBox" ${more ? '' : 'data-big="1"'} hidden><span class="cd-label">${lt('cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
-      <span class="cd-bar"><span id="cdBar"></span></span><small id="cdNote"></small>${more ? `<a class="cd-more" href="#/wipe">${lt('cd_more')} ${svg('chevron')}</a>` : ''}</div>`;
+      <span class="cd-bar"><span id="cdBar"></span><em class="cd-pct" id="cdPct"></em></span><small id="cdNote"></small>${more ? `<a class="cd-more" href="#/wipe">${lt('cd_more')} ${svg('chevron')}</a>` : ''}</div>`;
   }
 
   // ranking do wipe atual (página #/wipe): grupos em destaque à esquerda, jogadores à direita
@@ -905,7 +907,6 @@
         <p class="wp-sub">${lt('wp_sub')}</p>
         ${countdownBox(false)}
         </div>
-        ${rankingSection()}
       </div>`;
   }
 
@@ -1019,7 +1020,7 @@
   // ---------------------------------------------------------------- perfil (#/perfil): login com Discord + vínculo com o jogo
   const PF = {
     en: { kicker: 'HAVOK · Profile', title: 'YOUR PROFILE', sub: 'Your stats, group and badges in one place, with your Discord picture on the ranking.',
-      login: 'Sign in with Discord', connect: 'Connect Discord', how: 'Then join the server: the link screen shows up by itself. Point your phone at the QR or click COPY LINK. No commands.',
+      login: 'Sign in with Discord', connect: 'Connect Discord', my_profile: 'My profile', how: 'Then join the server: the link screen shows up by itself. Point your phone at the QR or click COPY LINK. No commands.',
       unlinked: 'Almost there: join the HAVOK server and the link screen opens by itself. One click on Discord and your game account is here.',
       linked_ok: 'Linked! Your game account is now on your profile.', logout: 'Sign out', nodata: 'Your stats show up here after your next minutes in game.',
       level: 'Level', kills: 'Kills', deaths: 'Deaths', kd: 'K/D', hours: 'Hours played', group: 'Group', nogroup: 'No group', badges: 'Badges', nobadges: 'No badges yet.',
@@ -1030,10 +1031,10 @@
       yt_ph: 'youtube.com/@yourchannel or @yourchannel', tt_ph: 'tiktok.com/@you or @you', saved: 'Profile saved.', saving: 'Saving…', save_err: 'Could not save right now. Try again in a moment.', bad_youtube: 'That YouTube link is not valid.', bad_tiktok: 'That TikTok link is not valid.',
       kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', member: 'member', nomembers: 'No members yet.',
       rk_kicker: 'HAVOK · This wipe', rk_title: 'RANKING', rk_sub: 'Every group and every player of the current wipe. Click a group to see its members. Resets every wipe.',
-      rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, kills_l: 'kills', hours_l: 'h played',
+      rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, kills_l: 'kills', hours_l: 'played',
       prize: (z) => `Prize: ${z.days}-day VIP for ${z.winners} drawn members (leader included)`, prize_note: 'The top 3 groups of the wipe win VIP by draw. The leader always wins.', xp: 'XP', nogroups: 'No groups yet this wipe.', noplayers: 'Nobody has played this wipe yet.' },
     pt: { kicker: 'HAVOK · Perfil', title: 'SEU PERFIL', sub: 'Seus números, grupo e badges num lugar só, com a sua foto do Discord no ranking.',
-      login: 'Entrar com Discord', connect: 'Conectar Discord', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
+      login: 'Entrar com Discord', connect: 'Conectar Discord', my_profile: 'Meu perfil', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
       unlinked: 'Falta pouco: entre no servidor do HAVOK e a tela de vínculo abre sozinha. Um clique no Discord e a sua conta do jogo aparece aqui.',
       linked_ok: 'Vinculado! Sua conta do jogo já está no seu perfil.', logout: 'Sair', nodata: 'Seus números aparecem aqui depois dos próximos minutos no jogo.',
       level: 'Level', kills: 'Kills', deaths: 'Mortes', kd: 'K/D', hours: 'Horas jogadas', group: 'Grupo', nogroup: 'Sem grupo', badges: 'Badges', nobadges: 'Nenhuma badge ainda.',
@@ -1044,7 +1045,7 @@
       yt_ph: 'youtube.com/@seucanal ou @seucanal', tt_ph: 'tiktok.com/@voce ou @voce', saved: 'Perfil salvo.', saving: 'Salvando…', save_err: 'Não deu pra salvar agora. Tente de novo daqui a pouco.', bad_youtube: 'Esse link do YouTube não vale.', bad_tiktok: 'Esse link do TikTok não vale.',
       kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', member: 'membro', nomembers: 'Nenhum membro ainda.',
       rk_kicker: 'HAVOK · Este wipe', rk_title: 'RANKING', rk_sub: 'Todos os grupos e todos os jogadores do wipe atual. Clique num grupo para ver os membros. Zera a cada wipe.',
-      rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, kills_l: 'kills', hours_l: 'h jogadas',
+      rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, kills_l: 'kills', hours_l: 'jogadas',
       prize: (z) => `Prêmio: VIP de ${z.days} dia${z.days > 1 ? 's' : ''} para ${z.winners} sorteados (o líder sempre ganha)`, prize_note: 'Os 3 primeiros grupos do wipe ganham VIP por sorteio. O líder sempre ganha.', xp: 'XP', nogroups: 'Nenhum grupo neste wipe ainda.', noplayers: 'Ninguém jogou neste wipe ainda.' },
   };
   const BADGE_EXTRA = { opening: ['Grand Opening', 'mythic'] }; // badges só do jogo (sem SVG no site): arte em PNG
@@ -1111,9 +1112,33 @@
     btn.hidden = false;
     btn.classList.toggle('on', !!acct.loggedIn);
     btn.innerHTML = acct.loggedIn
-      ? `${avatar(acct.avatarUrl, 'acct-av')}<span>${esc(acct.nick || acct.discordName)}</span>`
+      ? `${avatar(acct.avatarUrl, 'acct-av')}<span>${esc(acct.nick || acct.discordName)}</span>${svg('chevron')}`
       : `${svg('discord')}<span>${PF[lang].connect}</span>`;
+    // logado: o clique abre o menu (Meu perfil / Sair) em vez de ir direto
+    btn.onclick = acct.loggedIn ? (e) => { e.preventDefault(); toggleAcctMenu(); } : null;
   }
+
+  function toggleAcctMenu(force) {
+    let menu = $('#acctMenu');
+    const open = force !== undefined ? force : !menu;
+    if (menu) menu.remove();
+    if (!open) return;
+    const P = PF[lang];
+    menu = document.createElement('div');
+    menu.id = 'acctMenu';
+    menu.className = 'acct-menu';
+    menu.innerHTML = `<a href="#/perfil">${svg('user')}${P.my_profile}</a><button type="button" class="out">${svg('logout')}${P.logout}</button>`;
+    $('#acctBtn').after(menu);
+    menu.querySelector('a').onclick = () => toggleAcctMenu(false);
+    menu.querySelector('.out').onclick = async () => {
+      toggleAcctMenu(false);
+      try { await fetch(`${pfApi()}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ }
+      acct = { loggedIn: false };
+      drawAccount();
+      route();
+    };
+  }
+  document.addEventListener('click', (e) => { if (!e.target.closest('#acctMenu, #acctBtn')) toggleAcctMenu(false); });
 
   function pagePerfil(query) {
     const P = PF[lang];
@@ -1132,7 +1157,7 @@
         box.innerHTML = `<div class="pf-login"><a class="cta" href="${esc(me.loginUrl || `${api}/auth/discord`)}">${svg('discord')} ${P.login}</a><p class="muted">${P.how}</p></div>`;
         return;
       }
-      const action = `<div class="pf-actions"><button type="button" class="chip" id="pfEdit">${svg('scroll')}${P.edit}</button><button type="button" class="chip" id="pfOut">${P.logout}</button></div>`;
+      const action = `<div class="pf-actions"><button type="button" class="chip" id="pfEdit">${svg('scroll')}${P.edit}</button><button type="button" class="chip danger" id="pfOut">${svg('logout')}${P.logout}</button></div>`;
       if (me.linked && me.profile) {
         const so = me.social || {};
         const edit = `<form class="pf-edit" id="pfForm" hidden>
@@ -1211,13 +1236,13 @@
       if (!pBox) return;
       // o número da direita diz o que é: caveira = kills, divisas = level, relógio = horas
       const val = (p) => (rkBy === 'level' ? `${svg('chevrons')}<b>${num(p.level)}</b><em>LEVEL</em>`
-        : rkBy === 'hours' ? `${svg('clock')}<b>${num(Math.floor(p.playMinutes / 60))}</b><em>${P.hours_l}</em>`
+        : rkBy === 'hours' ? `${svg('clock')}<b>${num(Math.floor(p.playMinutes / 60))}<small>h</small></b><em>${P.hours_l}</em>`
           : `${svg('skull')}<b>${num(p.kills)}</b><em>${P.kills_l}</em>`);
       pBox.innerHTML = !pl ? `<p class="muted">${P.down}</p>` : pl.players.map((p) => {
         const medal = MEDAL[p.rank - 1];
         return `<a class="rkp-player${medal ? ` podium ${medal}` : ''}" href="#/jogador/${esc(p.pid)}">
           <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
-          <div><b>${esc(p.nick)}${(p.badges || []).filter((id) => CREATOR_BADGES.includes(id)).map((id) => `<img class="rkp-badge" src="${badgeImg(id)}" alt="${esc(id)}" title="${esc((BADGE_LIST.find((x) => x[0] === id) || [])[1] || id)}">`).join('')}</b><span class="rkp-stats">${p.group ? (p.group.tag ? tagPill(p.group) : `<i>${esc(p.group.name)}</i>`) : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
+          <div><b>${esc(p.nick)}${p.group && p.group.tag ? ` ${tagPill(p.group)}` : ''}${(p.badges || []).filter((id) => CREATOR_BADGES.includes(id)).map((id) => `<img class="rkp-badge" src="${badgeImg(id)}" alt="${esc(id)}" title="${esc((BADGE_LIST.find((x) => x[0] === id) || [])[1] || id)}">`).join('')}</b><span class="rkp-stats">${p.group && !p.group.tag ? `<i>${esc(p.group.name)}</i>` : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
           <span class="rkp-val">${val(p)}</span></a>`;
       }).join('') || `<p class="muted">${P.noplayers}</p>`;
     });
