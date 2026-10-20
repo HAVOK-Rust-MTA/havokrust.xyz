@@ -4,6 +4,7 @@
 //   POST /api/link/mta/code     {account, nick}           -> {code, url, expiresIn} ou {linked, discordName}
 //   POST /api/link/mta/status   {codes: [...]}            -> {linked: {code: {account, discordName}}}
 //   POST /api/link/mta/lookup   {accounts: [...]}         -> {linked: {account: discordName}}
+//   POST /api/link/mta/avatars  {accounts: [...]}         -> {avatars: {account: url 64px}} (foto no painel de grupo do jogo)
 // (os números, grupo e badges de todo jogador chegam pelo /api/game/mta/sync, com ou sem vínculo: game/)
 // Jogador (navegador):
 //   GET  /v/<código>            link/QR da tela do jogo: vai direto para o "Autorizar" do Discord
@@ -99,6 +100,15 @@ async function mta(request, env, path) {
     return json({ linked: out });
   }
 
+  if (path === '/api/link/mta/avatars') {
+    const accounts = (Array.isArray(data.accounts) ? data.accounts : []).map(account).filter(Boolean).slice(0, 50);
+    const out = {};
+    for (const acc of accounts) {
+      const r = await db.prepare('SELECT discord_id, avatar FROM players WHERE account = ?').bind(acc).first();
+      if (r) out[acc] = avatarUrl(r.discord_id, r.avatar).replace('size=256', 'size=64');
+    }
+    return json({ avatars: out });
+  }
   return json({ error: 'not_found' }, 404);
 }
 

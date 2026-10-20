@@ -114,6 +114,13 @@ test('jogo pede código (assinado), jogador autoriza no Discord, conta fica vinc
   assert.equal(body.avatarUrl, `https://cdn.discordapp.com/avatars/200000000000000001/${'a'.repeat(32)}.png?size=256`);
 });
 
+test('jogo pega a foto (64px) só de quem vinculou', async () => {
+  const c = await server('/api/link/mta/code', { account: 'SERIAL-A', nick: 'A' });
+  await authorize(`/v/${c.json.code}`);
+  const r = await server('/api/link/mta/avatars', { accounts: ['SERIAL-A', 'SERIAL-B'] });
+  assert.deepEqual(r.json.avatars, { 'SERIAL-A': `https://cdn.discordapp.com/avatars/200000000000000001/${'a'.repeat(32)}.png?size=64` });
+});
+
 test('sem assinatura válida o jogo não cria código nem consulta', async () => {
   assert.equal((await server('/api/link/mta/code', { account: 'X', nick: 'x' }, 'outro-segredo-qualquer-com-32-caracteres')).status, 401);
   const res = await worker.fetch(new Request(`${API}/api/link/mta/code`, { method: 'POST', body: '{"account":"X"}' }), env, ctx);
