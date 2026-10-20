@@ -1,15 +1,15 @@
-// node --test worker/  — vínculo conta do jogo <-> Discord: D1 = SQLite real com as migrations, Discord simulado,
+// node --test api/  — vínculo, jogadores e grupos: D1 = SQLite real com as migrations, Discord simulado,
 // assinatura HMAC real. Nenhuma conta de verdade é tocada.
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
-import worker from './waitlist.js';
-import { hmacHex } from './wipe/service.js';
-import { sanitizeProfile } from './link/service.js';
+import worker from './index.js';
+import { hmacHex } from './lib/util.js';
+import { sanitizeBadges, slugify } from './game/service.js';
 
-const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql']
-  .map((f) => readFileSync(new URL(`./migrations/${f}`, import.meta.url), 'utf8')).join('\n');
+const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql']
+  .map((f) => readFileSync(new URL(`../worker/migrations/${f}`, import.meta.url), 'utf8')).join('\n');
 class Stmt {
   constructor(db, sql, args = []) { this.db = db; this.sql = sql; this.args = args; }
   bind(...args) { return new Stmt(this.db, this.sql, args); }
@@ -180,16 +180,80 @@ test('Discord falhou: volta para o site com erro, sem sessão', async () => {
   assert.equal(r2.headers.get('Set-Cookie'), null);
 });
 
-test('perfil que o jogo manda é limpo e só grava em conta vinculada', async () => {
-  const a = await server('/api/link/mta/code', { account: 'SERIAL-A', nick: 'A' });
-  const { cookie } = await authorize(`/v/${a.json.code}`);
-  const r = await server('/api/link/mta/profile', { players: [
-    { account: 'SERIAL-A', nick: '#FF6A00Jo<b>ao', level: 51.7, kills: -3, deaths: 10, group: 'Os Brabo', groupTag: 'BRB', badges: { founder: 1, newyear2026: 2, '../x': 1 } },
-    { account: 'NAO-VINCULADA', nick: 'Z', level: 1 },
-  ] });
-  assert.equal(r.json.updated, 1);
+const pub = async (path) => { const r = await get(path, { Origin: SITE }); return { status: r.status, json: await r.json(), headers: r.headers }; };
+const syncGame = (players, groups) => server('/api/game/mta/sync', groups === undefined ? { players } : { players, groups });
+const GROUP = { name: 'Os Bráбo', tag: 'BRB', color: '#FF6A00', xp: 900, kills: 30, deaths: 10, members: [
+  { acc: 'SERIAL-A', role: 'Leader' }, { acc: 'SERIAL-B', role: 'Member' }, { acc: 'SERIAL-C', role: 'Sub' }, { acc: 'SERIAL-SUMIDO', role: 'Member' }] };
+
+test('jogador sem Discord entra no banco e aparece no grupo com nick e avatar cinza; o serial não sai', async () => {
+  const r = await syncGame([
+    { account: 'SERIAL-A', nick: 'Lider', level: 40, kills: 20, deaths: 5, playMinutes: 600, group: 'Os Bráбo', badges: { founder: 1 } },
+    { account: 'SERIAL-B', nick: '#00FF00Novato', level: 3, kills: 0, deaths: 2, group: 'Os Bráбo' },
+    { account: 'SERIAL-C', nick: 'Sub', level: 12, group: 'Os Bráбo' },
+  ], [GROUP]);
+  assert.deepEqual(r.json, { players: 3, groups: 1 });
+
+  const list = await pub('/api/groups');
+  assert.equal(list.json.groups.length, 1);
+  const slug = list.json.groups[0].slug;
+  assert.equal(list.json.groups[0].members, 4);
+
+  const g = await pub(`/api/group/${slug}`);
+  assert.equal(g.status, 200);
+  // membro que nunca apareceu no sync fica de fora; ordem: líder, sub, membro
+  assert.deepEqual(g.json.members.map((m) => [m.nick, m.role, m.linked, m.avatarUrl]), [['Lider', 'Leader', false, null], ['Sub', 'Sub', false, null], ['Novato', 'Member', false, null]]);
+  assert.ok(!JSON.stringify(g.json).includes('SERIAL'), 'serial não pode sair na API pública');
+
+  const p = await pub(`/api/player/${g.json.members[0].pid}`);
+  assert.equal(p.json.nick, 'Lider');
+  assert.deepEqual(p.json.badges, { founder: 1 });
+  assert.equal(p.json.group.slug, slug);
+  assert.ok(!JSON.stringify(p.json).includes('SERIAL'));
+});
+
+test('vinculou depois: o histórico que já existia aparece com a foto do Discord, no perfil e no grupo', async () => {
+  await syncGame([{ account: 'SERIAL-A', nick: 'Lider', level: 40, kills: 20, deaths: 5, playMinutes: 600, group: 'Os Bráбo', badges: { founder: 1, newyear2026: 1 } }], [GROUP]);
+  const before = await pub('/api/groups');
+  const slug = before.json.groups[0].slug;
+  const pidBefore = (await pub(`/api/group/${slug}`)).json.members[0].pid;
+
+  const c = await server('/api/link/mta/code', { account: 'SERIAL-A', nick: 'Lider' });
+  const { cookie } = await authorize(`/v/${c.json.code}`);
   const me = await (await get('/api/me', { Cookie: cookie, Origin: SITE })).json();
-  assert.deepEqual(me.profile, { nick: 'Jobao', level: 51, kills: 0, deaths: 10, playMinutes: 0, group: 'Os Brabo', groupTag: 'BRB', badges: { founder: 1, newyear2026: 2 } });
+  assert.equal(me.profile.level, 40);
+  assert.equal(me.profile.pid, pidBefore, 'o pid não muda com o vínculo');
+  assert.deepEqual(me.profile.badges, { founder: 1, newyear2026: 1 });
+  assert.equal(me.profile.group.name, 'Os Bráбo');
+
+  const m = (await pub(`/api/group/${slug}`)).json.members[0];
+  assert.equal(m.linked, true);
+  assert.equal(m.avatarUrl, `https://cdn.discordapp.com/avatars/200000000000000001/${'a'.repeat(32)}.png?size=256`);
+});
+
+test('sync atualiza números sem trocar o pid; lista de grupos nova substitui a antiga', async () => {
+  await syncGame([{ account: 'SERIAL-A', nick: 'A', level: 1 }], [GROUP]);
+  const pid = (await pub(`/api/group/${(await pub('/api/groups')).json.groups[0].slug}`)).json.members[0].pid;
+  await syncGame([{ account: 'SERIAL-A', nick: 'A2', level: 9 }], []);
+  assert.deepEqual((await pub('/api/groups')).json.groups, []);
+  const p = await pub(`/api/player/${pid}`);
+  assert.equal(p.json.nick, 'A2');
+  assert.equal(p.json.level, 9);
+  assert.equal(p.json.group, null);
+  // sync só de jogadores (sem 'groups') não mexe nos grupos
+  await syncGame([{ account: 'SERIAL-A', nick: 'A2', level: 9 }], [GROUP]);
+  await syncGame([{ account: 'SERIAL-A', nick: 'A3', level: 10 }]);
+  assert.equal((await pub('/api/groups')).json.groups.length, 1);
+});
+
+test('sync sem assinatura é recusado; perfil inexistente e slug inválido dão 404', async () => {
+  assert.equal((await server('/api/game/mta/sync', { players: [] }, 'outro-segredo-qualquer-com-32-caracteres')).status, 401);
+  assert.equal((await pub('/api/player/abcdefghij')).status, 404);
+  assert.equal((await pub('/api/group/..%2Fx')).status, 404);
+});
+
+test('grupos com nome parecido ganham slugs diferentes', async () => {
+  await syncGame([], [{ ...GROUP, name: 'Os Brabo' }, { ...GROUP, name: 'os brabo!' }]);
+  assert.deepEqual((await pub('/api/groups')).json.groups.map((g) => g.slug), ['os-brabo', 'os-brabo-2']);
 });
 
 test('CORS do /api/me só libera a origem do site', async () => {
@@ -197,7 +261,9 @@ test('CORS do /api/me só libera a origem do site', async () => {
   assert.equal(r.headers.get('Access-Control-Allow-Origin'), null);
 });
 
-test('sanitizeProfile aguenta lixo', () => {
-  assert.deepEqual(sanitizeProfile(null).badges, {});
-  assert.equal(sanitizeProfile({ level: 'abc' }).level, 0);
+test('badges e slug aguentam lixo', () => {
+  assert.deepEqual(sanitizeBadges(null), {});
+  assert.deepEqual(sanitizeBadges({ '../x': 1, founder: 'abc' }), { founder: 1 });
+  assert.equal(slugify('!!!'), 'grupo');
+  assert.equal(slugify('Ação Ç'), 'acao-c');
 });

@@ -5,7 +5,6 @@
 //   cron (1 min)   ->  edita os painéis da lista no canal do Discord: status (panel.js) e inscrição (waitlist/join.js)
 //   POST /interactions -> recrutamento da staff, lista de espera e /wipe pelo Discord (banco D1)
 //   /api/wipe/*        -> calendário de wipe: status público (site) e sincronização assinada com o servidor MTA (wipe/)
-//   /api/link/*, /v/*, /auth/discord*, /api/me -> vínculo conta do jogo <-> Discord e login do site (link/)
 //
 // O token do bot fica só no Secret DISCORD_BOT_TOKEN; GUILD_ID, ROLE_ID, GOAL e ALLOWED_ORIGINS
 // ficam em [vars] no wrangler.toml. Nunca inventa número: se o Discord falhar e não houver
@@ -14,7 +13,6 @@
 import { handleInteraction, recruitCron, serveBanner } from './recruit/interactions.js';
 import { refreshWaitlist, readFirstWaitlist } from './waitlist/join.js';
 import { handleWipeHttp, wipeCron } from './wipe/service.js';
-import { handleLinkHttp, isLinkPath, linkCron } from './link/service.js';
 
 const API = 'https://discord.com/api/v10';
 const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
@@ -138,8 +136,6 @@ export default {
     ctx.waitUntil(recruitCron(env).catch((e) => console.error('recruit cron:', e.message)));
     // wipe: painel e avisos (quem executa o wipe é o servidor MTA, nunca o cron)
     ctx.waitUntil(wipeCron(env).catch((e) => console.error('wipe cron:', e.message)));
-    // vínculo/login: limpa códigos, states e sessões vencidos
-    ctx.waitUntil(linkCron(env).catch((e) => console.error('link cron:', e.message)));
   },
 
   async fetch(request, env, ctx) {
@@ -148,8 +144,6 @@ export default {
     // recrutamento da staff: o Discord entrega cliques, formulários e comandos aqui (assinados, Ed25519)
     if (url.pathname === '/interactions') return handleInteraction(request, env, ctx);
     if (url.pathname.startsWith('/api/wipe/') || url.pathname === '/api/ranking') return handleWipeHttp(request, env, ctx, url);
-    // vínculo conta do jogo <-> Discord e login do site (link/)
-    if (isLinkPath(url.pathname)) return handleLinkHttp(request, env, ctx, url);
     // banner do painel de recrutamento (o Discord baixa daqui)
     if (url.pathname.startsWith('/recruit/') && request.method === 'GET') return serveBanner(url.pathname.slice('/recruit/'.length));
     const origin = allowedOrigin(request, env);

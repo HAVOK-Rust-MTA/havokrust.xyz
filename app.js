@@ -849,11 +849,23 @@
         const n = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
         const kd = (k, de) => (de ? (k / de).toFixed(2) : n(k));
         const empty = `<li class="rk-empty">${lt('rk_none')}</li>`;
-        $('#rkGroups').innerHTML = groups.map((g) => `<li><span class="rk-pos">${String(g.rank).padStart(2, '0')}</span>
+        $('#rkGroups').innerHTML = groups.map((g) => `<li data-name="${esc(g.name)}"><span class="rk-pos">${String(g.rank).padStart(2, '0')}</span>
           <span class="rk-name"><i class="rk-dot" style="background:${/^#[0-9a-fA-F]{6}$/.test(g.color || '') ? g.color : 'var(--accent)'}"></i>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</span>
           <span class="rk-num">${n(g.members)}</span><span class="rk-num hot">${n(g.kills)}</span><span class="rk-num">${n(g.deaths)}</span></li>`).join('') || empty;
         $('#rkPlayers').innerHTML = players.map((p) => `<li><span class="rk-pos">${String(p.rank).padStart(2, '0')}</span>
           <span class="rk-name">${esc(p.nick)}</span><span class="rk-num hot">${n(p.kills)}</span><span class="rk-num">${n(p.deaths)}</span><span class="rk-num">${kd(p.kills, p.deaths)}</span></li>`).join('') || empty;
+        // grupo clicável: abre a página do grupo com os membros (API do perfil)
+        if (pfApi()) fetch(`${pfApi()}/api/groups`).then((r) => (r.ok ? r.json() : null)).then((x) => {
+          const by = Object.fromEntries(((x && x.groups) || []).map((g) => [g.name, g.slug]));
+          document.querySelectorAll('#rkGroups li[data-name]').forEach((li) => {
+            const sl = by[li.dataset.name];
+            if (!sl) return;
+            li.classList.add('rk-link');
+            li.tabIndex = 0;
+            li.onclick = () => { location.hash = `#/grupo/${sl}`; };
+            li.onkeydown = (e) => { if (e.key === 'Enter') li.onclick(); };
+          });
+        }).catch(() => {});
         if (d && d.updatedAt) $('#rkUpdated').textContent = lt('rk_updated', { t: new Date(d.updatedAt).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { dateStyle: 'short', timeStyle: 'short' }) });
       }).catch(() => {
         if ($('#rkGroups')) $('#rkGroups').innerHTML = $('#rkPlayers').innerHTML = `<li class="rk-empty">${lt('cd_stale')}</li>`;
@@ -998,7 +1010,8 @@
       level: 'Level', kills: 'Kills', deaths: 'Deaths', kd: 'K/D', hours: 'Hours played', group: 'Group', nogroup: 'No group', badges: 'Badges', nobadges: 'No badges yet.',
       err: { codigo: 'That link expired or was already used. Open the screen in game again.', ja_vinculada: 'That game account is already linked to another Discord.',
         expirou: 'The sign in took too long. Try again.', discord: 'Discord did not answer. Try again.', cancelado: 'Sign in cancelled.', config: 'Sign in is not available yet.' },
-      down: 'Could not load your profile right now.' },
+      down: 'Could not load your profile right now.', anon: 'Discord not linked', notfound: 'Player not found.', notfound_group: 'Group not found (groups reset every wipe).',
+      kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', nomembers: 'No members yet.' },
     pt: { kicker: 'HAVOK · Perfil', title: 'SEU PERFIL', sub: 'Seus números, grupo e badges num lugar só, com a sua foto do Discord no ranking.',
       login: 'Entrar com Discord', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
       unlinked: 'Falta pouco: entre no servidor do HAVOK e a tela de vínculo abre sozinha. Um clique no Discord e a sua conta do jogo aparece aqui.',
@@ -1006,7 +1019,8 @@
       level: 'Level', kills: 'Kills', deaths: 'Mortes', kd: 'K/D', hours: 'Horas jogadas', group: 'Grupo', nogroup: 'Sem grupo', badges: 'Badges', nobadges: 'Nenhuma badge ainda.',
       err: { codigo: 'Esse link venceu ou já foi usado. Abra a tela no jogo de novo.', ja_vinculada: 'Essa conta do jogo já está vinculada a outro Discord.',
         expirou: 'O login demorou demais. Tente de novo.', discord: 'O Discord não respondeu. Tente de novo.', cancelado: 'Login cancelado.', config: 'O login ainda não está disponível.' },
-      down: 'Não deu para carregar seu perfil agora.' },
+      down: 'Não deu para carregar seu perfil agora.', anon: 'Discord não vinculado', notfound: 'Jogador não encontrado.', notfound_group: 'Grupo não encontrado (os grupos zeram a cada wipe).',
+      kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', nomembers: 'Nenhum membro ainda.' },
   };
   const BADGE_EXTRA = { opening: ['Grand Opening', 'mythic'] }; // badges só do jogo (sem SVG no site): arte em PNG
   const badgeInfo = (id) => {
@@ -1017,9 +1031,33 @@
     const e = BADGE_EXTRA[id];
     return e ? { name: e[0], rar: e[1], img: `badges/${id}.png` } : null;
   };
+  const ANON = 'img/avatar-anon.svg'; // jogador sem Discord vinculado: avatar cinza
+  const pfApi = () => (((window.HAVOK || {}).account || {}).api || '').replace(/\/+$/, '');
+  const num = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
+  const avatar = (url, cls = 'pf-avatar') => `<img class="${cls}" src="${esc(url || ANON)}" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${ANON}'">`;
+  const ROLE = { en: { Leader: 'Leader', Staff: 'Officer', Sub: 'Co-leader', Member: 'Member' }, pt: { Leader: 'Líder', Staff: 'Oficial', Sub: 'Sub-líder', Member: 'Membro' } };
+  const groupLink = (g) => (g ? `<a href="#/grupo/${esc(g.slug)}"><b>${esc(g.name)}</b>${g.tag ? ` [${esc(g.tag)}]` : ''}</a>` : '');
+
+  // cartão do jogador (perfil próprio e perfil público): p = {nick, level, kills, deaths, playMinutes, badges, group, avatarUrl, linked}
+  function playerCard(p, extra = {}) {
+    const P = PF[lang];
+    const stat = (k, v, hot) => `<div class="pf-stat${hot ? ' hot' : ''}"><b>${v}</b><span>${P[k]}</span></div>`;
+    const RORD = ['mythic', 'legendary', 'epic', 'rare', 'common'];
+    const badges = Object.entries(p.badges || {}).map(([id, c]) => [badgeInfo(id), c]).filter(([b]) => b).sort((x, y) => RORD.indexOf(x[0].rar) - RORD.indexOf(y[0].rar))
+      .map(([b, c]) => `<div class="pf-badge" style="--rc:${BRAR[b.rar][1]}" title="${esc(b.name)}"><img src="${b.img}" alt="${esc(b.name)}" loading="lazy"><b>${esc(b.name)}${c > 1 ? ` <small>x${c}</small>` : ''}</b><span>${BRAR[b.rar][0]}</span></div>`).join('');
+    const sub = [extra.discordName ? `Discord: ${esc(extra.discordName)}` : (p.linked ? '' : `<span class="pf-anon">${P.anon}</span>`),
+      p.group ? `${P.group}: ${groupLink(p.group)}` : ''].filter(Boolean).join(' · ');
+    return `<div class="pf-card">
+        <header class="pf-head">${avatar(p.avatarUrl)}
+          <div><h2>${esc(p.nick || extra.discordName || '?')}</h2><p class="muted">${sub}</p></div>${extra.action || ''}</header>
+        <div class="pf-stats">${stat('level', num(p.level))}${stat('kills', num(p.kills), true)}${stat('deaths', num(p.deaths))}${stat('kd', p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills))}${stat('hours', num(Math.floor((p.playMinutes || 0) / 60)))}</div>
+        <h3 class="pf-sec">${P.badges}</h3><div class="pf-badges">${badges || `<p class="muted">${P.nobadges}</p>`}</div>
+      </div>`;
+  }
+
   function pagePerfil(query) {
-    const P = PF[lang], A = (window.HAVOK || {}).account || {};
-    const api = (A.api || '').replace(/\/+$/, '');
+    const P = PF[lang];
+    const api = pfApi();
     const q = new URLSearchParams(query || '');
     const note = q.get('vinculado') ? `<p class="pf-note ok">${P.linked_ok}</p>` : q.get('erro') ? `<p class="pf-note bad">${esc(P.err[q.get('erro')] || P.down)}</p>` : '';
     setTimeout(async () => {
@@ -1034,24 +1072,53 @@
         box.innerHTML = `<div class="pf-login"><a class="cta" href="${esc(me.loginUrl || `${api}/auth/discord`)}">${svg('discord')} ${P.login}</a><p class="muted">${P.how}</p></div>`;
         return;
       }
-      const pr = me.profile || {};
-      const n = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
-      const stat = (k, v, hot) => `<div class="pf-stat${hot ? ' hot' : ''}"><b>${v}</b><span>${P[k]}</span></div>`;
-      const RORD = ['mythic', 'legendary', 'epic', 'rare', 'common'];
-      const badges = Object.entries(pr.badges || {}).map(([id, c]) => [badgeInfo(id), c]).filter(([b]) => b).sort((x, y) => RORD.indexOf(x[0].rar) - RORD.indexOf(y[0].rar))
-        .map(([b, c]) => `<div class="pf-badge" style="--rc:${BRAR[b.rar][1]}" title="${esc(b.name)}"><img src="${b.img}" alt="${esc(b.name)}" loading="lazy"><b>${esc(b.name)}${c > 1 ? ` <small>x${c}</small>` : ''}</b><span>${BRAR[b.rar][0]}</span></div>`).join('');
-      box.innerHTML = `<div class="pf-card">
-          <header class="pf-head"><img class="pf-avatar" src="${esc(me.avatarUrl)}" alt="" referrerpolicy="no-referrer">
-            <div><h2>${esc(me.nick || me.discordName)}</h2><p class="muted">Discord: ${esc(me.discordName)}${pr.group ? ` · ${P.group}: <b>${esc(pr.group)}</b>${pr.groupTag ? ` [${esc(pr.groupTag)}]` : ''}` : ''}</p></div>
-            <button type="button" class="chip" id="pfOut">${P.logout}</button></header>
-          ${me.linked ? (me.profile ? `<div class="pf-stats">${stat('level', n(pr.level))}${stat('kills', n(pr.kills), true)}${stat('deaths', n(pr.deaths))}${stat('kd', pr.deaths ? (pr.kills / pr.deaths).toFixed(2) : n(pr.kills))}${stat('hours', n(Math.floor((pr.playMinutes || 0) / 60)))}</div>
-            <h3 class="pf-sec">${P.badges}</h3><div class="pf-badges">${badges || `<p class="muted">${P.nobadges}</p>`}</div>` : `<p class="muted">${P.nodata}</p>`)
-            : `<p class="pf-note">${P.unlinked}</p>`}
-        </div>`;
+      const action = `<button type="button" class="chip" id="pfOut">${P.logout}</button>`;
+      if (me.linked && me.profile) {
+        box.innerHTML = playerCard({ ...me.profile, avatarUrl: me.avatarUrl, linked: true }, { discordName: me.discordName, action });
+      } else {
+        box.innerHTML = `<div class="pf-card"><header class="pf-head">${avatar(me.avatarUrl)}<div><h2>${esc(me.discordName)}</h2><p class="muted">Discord: ${esc(me.discordName)}</p></div>${action}</header>
+          <p class="pf-note">${me.linked ? P.nodata : P.unlinked}</p></div>`;
+      }
       const out = $('#pfOut');
       if (out) out.onclick = async () => { try { await fetch(`${api}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ } location.hash = '#/perfil'; route(); };
     });
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker}</p><h1 class="page-title">${P.title}</h1><p class="page-sub">${P.sub}</p></section>${note}<div id="pfBox" class="pf"><p class="muted">…</p></div>`;
+  }
+
+  // perfil público (#/jogador/<pid>): com ou sem Discord
+  function pageJogador(pid) {
+    const P = PF[lang];
+    setTimeout(async () => {
+      let p = null;
+      try { const r = await fetch(`${pfApi()}/api/player/${encodeURIComponent(pid)}`); p = r.ok ? await r.json() : null; } catch (e) { p = null; }
+      const box = $('#pfBox');
+      if (!box) return;
+      box.innerHTML = p ? playerCard(p) : `<p class="muted">${P.notfound}</p>`;
+      if (p) document.title = `${p.nick} — HAVOK`;
+    });
+    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_player}</p></section><div id="pfBox" class="pf"><p class="muted">…</p></div>`;
+  }
+
+  // grupo (#/grupo/<slug>): todos os membros; quem não vinculou o Discord aparece com o nick e o avatar cinza
+  function pageGrupo(slug) {
+    const P = PF[lang];
+    setTimeout(async () => {
+      let g = null;
+      try { const r = await fetch(`${pfApi()}/api/group/${encodeURIComponent(slug)}`); g = r.ok ? await r.json() : null; } catch (e) { g = null; }
+      const box = $('#pfBox');
+      if (!box) return;
+      if (!g) { box.innerHTML = `<p class="muted">${P.notfound_group}</p>`; return; }
+      document.title = `${g.name} — HAVOK`;
+      const c = /^#[0-9a-fA-F]{6}$/.test(g.color || '') ? g.color : 'var(--accent)';
+      const members = g.members.map((m) => `<a class="gp-member" href="#/jogador/${esc(m.pid)}">${avatar(m.avatarUrl, 'gp-avatar')}
+          <div><b>${esc(m.nick)}</b><small>${ROLE[lang][m.role] || m.role} · Lv ${num(m.level)}</small></div>
+          <span class="gp-k"><b>${num(m.kills)}</b><small>${P.kills}</small></span></a>`).join('');
+      box.innerHTML = `<div class="pf-card" style="border-top-color:${c}">
+          <header class="gp-head"><span class="gp-rank">#${g.rank}</span><div><h2>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</h2>
+            <p class="muted">${num(g.members.length)} ${P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.deaths)} ${P.deaths.toLowerCase()}</p></div></header>
+          <div class="gp-list">${members || `<p class="muted">${P.nomembers}</p>`}</div></div>`;
+    });
+    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_group}</p></section><div id="pfBox" class="pf"><p class="muted">…</p></div>`;
   }
 
   // ---------------------------------------------------------------- router
@@ -1064,7 +1131,7 @@
     let html;
     const landing = !parts.length;
     document.body.classList.toggle('landing', landing);
-    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil'].includes(parts[0]));
+    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil', 'jogador', 'grupo'].includes(parts[0]));
     if (landing) html = pageLanding();
     else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
@@ -1079,12 +1146,14 @@
     else if (parts[0] === 'badges') html = pageBadges();
     else if (parts[0] === 'wipe') html = pageWipe();
     else if (parts[0] === 'perfil' || parts[0] === 'profile') html = pagePerfil(query);
+    else if (parts[0] === 'jogador' && parts[1]) html = pageJogador(parts[1]);
+    else if (parts[0] === 'grupo' && parts[1]) html = pageGrupo(parts[1]);
     else if (parts[0] === 'vehicles') html = pageVehicles();
     else html = pageHome();
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['store', 'badges', 'wipe', 'perfil'].includes(parts[0]) ? parts[0] : 'wiki')));
+    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['grupo', 'jogador'].includes(parts[0]) ? 'wipe' : ['store', 'badges', 'wipe', 'perfil'].includes(parts[0]) ? parts[0] : 'wiki')));
     const it = parts[0] === 'items' && byId[parts[1]];
     document.title = landing ? 'HAVOK — Rust Survival' : parts[0] === 'wipe' ? 'Wipe — HAVOK' : parts[0] === 'perfil' ? (lang === 'pt' ? 'Perfil' : 'Profile') + ' — HAVOK' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);

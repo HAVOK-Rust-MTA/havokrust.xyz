@@ -4,7 +4,7 @@
 //   POST /api/link/mta/code     {account, nick}           -> {code, url, expiresIn} ou {linked, discordName}
 //   POST /api/link/mta/status   {codes: [...]}            -> {linked: {code: {account, discordName}}}
 //   POST /api/link/mta/lookup   {accounts: [...]}         -> {linked: {account: discordName}}
-//   POST /api/link/mta/profile  {players: [{account, ...}]} perfil público (level, kills, grupo, badges) dos vinculados
+// (os números, grupo e badges de todo jogador chegam pelo /api/game/mta/sync, com ou sem vínculo: game/)
 // Jogador (navegador):
 //   GET  /v/<código>            link/QR da tela do jogo: vai direto para o "Autorizar" do Discord
 //   GET  /auth/discord          "Entrar com Discord" do site (sem código)
@@ -14,8 +14,8 @@
 //
 // Segurança: o código só nasce pelo servidor do jogo (assinado) para a conta logada lá, e só vira vínculo quando alguém
 // autoriza com o Discord. Ninguém vincula a conta de outro só sabendo o ID ou o serial dele.
-import { verifyServer } from '../wipe/service.js';
-import { nowS } from '../wipe/cycle.js';
+import { json, nowS, verifyServer, siteCors, clean, account, avatarUrl } from '../lib/util.js';
+import { playerByAccount, playerView } from '../game/service.js';
 
 const CODE_TTL_S = 15 * 60;
 const STATE_TTL_S = 10 * 60;
@@ -26,10 +26,6 @@ const COOKIE = 'havok_s';
 const DISCORD = 'https://discord.com/api/v10';
 
 // //------------------- UTIL -------------------\\
-const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
-  status,
-  headers: { 'Content-Type': 'application/json; charset=utf-8', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store', ...headers },
-});
 const redirect = (to, headers = {}) => new Response(null, { status: 302, headers: { Location: to, 'Cache-Control': 'no-store', ...headers } });
 
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -39,24 +35,10 @@ export function newCode() {
   return [...crypto.getRandomValues(new Uint8Array(8))].map((b) => CODE_ALPHABET[b & 31]).join('');
 }
 
-const clean = (s, max = 32) => String(s ?? '').replace(/#[0-9a-fA-F]{6}/g, '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
-const int = (n) => Math.max(0, Math.min(1e9, Math.floor(Number(n) || 0)));
-const account = (a) => (typeof a === 'string' && a.length >= 1 && a.length <= 64 && !/[\u0000-\u001f]/.test(a) ? a : null);
 
 const siteUrl = (env) => String(env.SITE_URL || 'https://havokrust.xyz').replace(/\/+$/, '');
 const apiUrl = (env) => String(env.API_PUBLIC_URL || env.PUBLIC_URL || '').replace(/\/+$/, '');
 const redirectUri = (env) => `${apiUrl(env)}/auth/discord/callback`;
-const avatarUrl = (id, hash) => (hash ? `https://cdn.discordapp.com/avatars/${id}/${hash}.png?size=256` : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(id) >> 22n) % 6}.png`);
-
-function siteCors(request, env) {
-  const origin = request.headers.get('Origin');
-  const list = String(env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
-  if (!origin || !list.includes(origin)) return { Vary: 'Origin' };
-  return {
-    Vary: 'Origin', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Max-Age': '86400',
-  };
-}
 
 function cookieOf(request) {
   const m = (request.headers.get('Cookie') || '').match(new RegExp(`(?:^|;\\s*)${COOKIE}=([0-9a-f]{64})`));
@@ -66,18 +48,6 @@ const setCookie = (env, token, maxAge) => [
   `${COOKIE}=${token}`, 'Path=/', 'HttpOnly', 'Secure', 'SameSite=Lax', `Max-Age=${maxAge}`,
   env.COOKIE_DOMAIN ? `Domain=${env.COOKIE_DOMAIN}` : null,
 ].filter(Boolean).join('; ');
-
-// perfil público que o jogo manda: só números, nome de grupo e badges
-export function sanitizeProfile(p) {
-  const badges = {};
-  if (p && typeof p.badges === 'object' && p.badges) {
-    for (const [id, n] of Object.entries(p.badges).slice(0, 64)) if (/^[a-z0-9]{1,24}$/.test(id)) badges[id] = Math.max(1, Math.min(999, int(n)));
-  }
-  return {
-    nick: clean(p && p.nick), level: int(p && p.level), kills: int(p && p.kills), deaths: int(p && p.deaths),
-    playMinutes: int(p && p.playMinutes), group: clean(p && p.group) || null, groupTag: clean(p && p.groupTag, 8) || null, badges,
-  };
-}
 
 // //------------------- JOGO (assinado) -------------------\\
 async function mta(request, env, path) {
@@ -129,18 +99,6 @@ async function mta(request, env, path) {
     return json({ linked: out });
   }
 
-  if (path === '/api/link/mta/profile') {
-    const list = (Array.isArray(data.players) ? data.players : []).slice(0, 100);
-    let updated = 0;
-    for (const p of list) {
-      const acc = account(p && p.account);
-      if (!acc) continue;
-      const prof = sanitizeProfile(p);
-      const r = await db.prepare('UPDATE players SET profile = ?, nick = ?, updated_at = ? WHERE account = ?').bind(JSON.stringify(prof), prof.nick || null, t, acc).run();
-      updated += r.meta.changes;
-    }
-    return json({ updated });
-  }
   return json({ error: 'not_found' }, 404);
 }
 
@@ -222,7 +180,7 @@ async function sessionUser(request, env) {
   if (!token) return null;
   const s = await env.DB.prepare('SELECT discord_id, expires_at FROM sessions WHERE token_hash = ?').bind(await sha256(token)).first();
   if (!s || s.expires_at < nowS()) return null;
-  return env.DB.prepare('SELECT discord_id, account, nick, discord_name, avatar, profile, linked_at FROM players WHERE discord_id = ?').bind(s.discord_id).first();
+  return env.DB.prepare('SELECT discord_id, account, nick, discord_name, avatar, linked_at FROM players WHERE discord_id = ?').bind(s.discord_id).first();
 }
 
 // //------------------- ROTEADOR -------------------\\
@@ -244,14 +202,16 @@ export async function handleLinkHttp(request, env, ctx, url) {
   if (path === '/auth/discord' && request.method === 'GET') return startOAuth(env, null);
   if (path === '/auth/discord/callback' && request.method === 'GET') return callback(request, env, url);
 
-  const h = siteCors(request, env);
+  const h = siteCors(request, env, true);
   if (request.method === 'OPTIONS') return new Response(null, { status: h['Access-Control-Allow-Origin'] ? 204 : 403, headers: h });
   if (path === '/api/me' && request.method === 'GET') {
     const p = await sessionUser(request, env);
     if (!p) return json({ loggedIn: false, loginUrl: `${apiUrl(env)}/auth/discord` }, 200, h);
+    // números, grupo e badges vêm do jogo (game_players): o histórico de antes do vínculo vem junto
+    const g = p.account ? await playerByAccount(env.DB, p.account) : null;
     return json({
       loggedIn: true, linked: !!p.account, discordName: p.discord_name, avatarUrl: avatarUrl(p.discord_id, p.avatar),
-      nick: p.nick, linkedAt: p.linked_at, profile: p.profile ? JSON.parse(p.profile) : null,
+      nick: (g && g.nick) || p.nick, linkedAt: p.linked_at, profile: g ? await playerView(env.DB, g) : null,
     }, 200, h);
   }
   if (path === '/api/logout' && request.method === 'POST') {

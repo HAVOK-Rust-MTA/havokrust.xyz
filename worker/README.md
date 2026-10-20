@@ -264,32 +264,7 @@ Depois: reiniciar o servidor MTA (o `havok_wipe` passa a buscar o calendário), 
 - Um wipe feito tem a cópia do banco em `havok_wipe/backups/wipe-N-<hora>.db` (com o servidor desligado, copie de volta para
   `stoneage_sql/database.db`).
 
-## Perfil e login com Discord (`link/`)
 
-O jogador **não digita nada**: entrou no jogo sem vínculo, aparece a tela com QR e o botão COPIAR LINK.
-O link (`/v/<código>`) cai direto no "Autorizar" do Discord; autorizou, a tela do jogo fecha sozinha e o perfil aparece em `havokrust.xyz/#/perfil`.
+## Perfil, login com Discord, grupos
 
-```
-jogo --(assinado, HMAC do wipe)--> POST /api/link/mta/code   -> código de 15 min para a conta logada
-celular/navegador --> GET /v/<código> --> Discord (scope identify) --> /auth/discord/callback
-                                                                      liga conta <-> Discord, abre sessão (cookie), volta para o site
-jogo --(assinado)--> POST /api/link/mta/status a cada 4 s enquanto a tela está aberta
-jogo --(assinado)--> POST /api/link/mta/profile a cada 5 min: level, kills, mortes, horas, grupo, badges dos vinculados
-site --> GET /api/me (cookie)
-```
-
-Ninguém vincula a conta de outro: o código só nasce pelo servidor para quem está logado no jogo, e só vira vínculo
-com o login do Discord de quem abriu. Conta do jogo já vinculada não troca de dono; um Discord tem uma conta só.
-
-Para ligar (uma vez):
-
-1. **Domínio da API**: Cloudflare → Workers → `havok-waitlist` → Settings → Domains & Routes → *Add Custom Domain* → `api.havokrust.xyz`
-   (o domínio `havokrust.xyz` precisa estar na Cloudflare).
-2. **Developer Portal** → o app do HAVOK → **OAuth2**:
-   - *Redirects*: adicione `https://api.havokrust.xyz/auth/discord/callback`
-   - copie o **Client Secret** e rode `npx wrangler secret put DISCORD_CLIENT_SECRET`
-3. Banco: `npx wrangler d1 migrations apply havok-recruit --remote` (cria as tabelas de `0004_link.sql`)
-4. `npx wrangler deploy`
-5. Site: `account.api` no `config.js` já aponta para `https://api.havokrust.xyz`.
-
-No jogo o resource é o `havok_link` (precisa do `havok_wipe` com WIPE_API/WIPE_SECRET ligados e do grupo de ACL `HavokWeb`).
+Ficam em outro Worker, o `havok-api` (pasta `../api`), no mesmo banco D1. Veja `../api/README.md`.

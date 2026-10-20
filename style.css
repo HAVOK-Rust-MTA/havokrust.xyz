@@ -827,3 +827,24 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
   .pf-avatar { width: 64px; height: 64px; }
   .pf-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.pf-anon { color: var(--dim); }
+.pf-head a, .gp-head a { color: inherit; }
+.pf-head a:hover b { color: var(--accent); }
+/* grupo (#/grupo/<slug>) */
+.gp-head { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.gp-head h2 { margin: 0; font: 600 30px var(--title); text-transform: uppercase; overflow-wrap: anywhere; }
+.gp-head h2 small { color: var(--muted); font-size: 20px; }
+.gp-head p { margin: 4px 0 0; }
+.gp-rank { font: 600 34px var(--title); color: var(--accent); min-width: 64px; text-align: center; }
+.gp-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.gp-member { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; color: inherit; text-decoration: none; }
+.gp-member:hover { background: var(--card-hover); border-color: var(--line2); }
+.gp-member > div { flex: 1; min-width: 0; }
+.gp-member b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gp-member small { color: var(--muted); font-size: 13px; }
+.gp-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none; background: var(--panel); }
+.gp-k { text-align: right; }
+.gp-k b { color: var(--accent); font: 600 20px var(--title); }
+.rk-link { cursor: pointer; }
+.rk-link:hover .rk-name, .rk-link:focus-visible .rk-name { color: var(--accent); }
+@media (max-width: 640px) { .gp-list { grid-template-columns: 1fr; } .gp-head h2 { font-size: 24px; } .gp-rank { font-size: 26px; min-width: 44px; } }

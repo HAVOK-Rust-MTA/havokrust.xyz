@@ -1,0 +1,25 @@
+name = "havok-api"
+main = "index.js"
+compatibility_date = "2026-10-01"
+
+# responde no domínio do site (o cookie do login só funciona assim). O domínio havokrust.xyz precisa estar na Cloudflare.
+routes = [{ pattern = "api.havokrust.xyz", custom_domain = true }]
+
+[vars]
+SITE_URL = "https://havokrust.xyz"
+API_PUBLIC_URL = "https://api.havokrust.xyz"
+COOKIE_DOMAIN = ".havokrust.xyz"
+ALLOWED_ORIGINS = "https://havokrust.xyz,https://www.havokrust.xyz,http://127.0.0.1:8080,http://localhost:8080"
+# Application ID do app do Discord (o mesmo do bot)
+DISCORD_APPLICATION_ID = "1560692623289614487"
+# Secrets (npx wrangler secret put ...): DISCORD_CLIENT_SECRET e WIPE_SECRET (o MESMO valor do bot e do servidor MTA)
+
+[triggers]
+crons = ["*/30 * * * *"]
+
+# o MESMO banco do bot (havok-recruit). As migrations ficam na pasta do bot.
+[[d1_databases]]
+binding = "DB"
+database_name = "havok-recruit"
+database_id = "50f9c110-f21a-4476-b2b6-4f5ac92c8308"
+migrations_dir = "../worker/migrations"
