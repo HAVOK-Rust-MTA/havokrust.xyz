@@ -952,8 +952,11 @@ h2 .gtag { font-size: 14px; position: relative; top: -3px; }
 .pf-group-go { color: var(--muted); font-size: 13px; white-space: nowrap; }
 .pf-group:hover .pf-group-go { color: var(--accent); }
 .pf-nogroup { margin: 0; }
-.pf-edit { display: grid; gap: 12px; margin-top: 18px; padding: 16px; border: 1px solid var(--line2); border-radius: 6px; background: var(--card); }
-.pf-edit[hidden] { display: none; }
+.pf-edit { display: grid; gap: 12px; margin-top: 0; padding: 0 16px; border: 1px solid transparent; border-radius: 6px; background: var(--card);
+  max-height: 0; opacity: 0; overflow: hidden; transform: translateY(-8px); visibility: hidden;
+  transition: max-height .4s cubic-bezier(.2, .8, .2, 1), opacity .25s ease, transform .35s cubic-bezier(.2, .8, .2, 1), padding .35s ease, margin .35s ease, border-color .35s ease, visibility 0s .4s; }
+.pf-edit.open { max-height: 640px; opacity: 1; transform: none; visibility: visible; margin-top: 18px; padding: 16px; border-color: var(--line2);
+  transition: max-height .45s cubic-bezier(.2, .8, .2, 1), opacity .3s ease .05s, transform .4s cubic-bezier(.2, .8, .2, 1), padding .35s ease, margin .35s ease, border-color .35s ease, visibility 0s; }
 .pf-edit label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .pf-edit label > span { display: inline-flex; align-items: center; gap: 6px; }
 .pf-edit textarea, .pf-edit input { font: 15px var(--font); color: var(--text); background: var(--bg2); border: 1px solid var(--line2); border-radius: 6px; padding: 10px 12px; resize: vertical; }
@@ -985,3 +988,35 @@ h2 .gtag { font-size: 14px; position: relative; top: -3px; }
 .acct-menu a:hover { background: var(--card-hover); }
 .acct-menu .out { color: #ff7a70; }
 .acct-menu .out:hover { background: color-mix(in srgb, var(--red) 18%, transparent); }
+
+/* ------- movimento: tudo que reage ao mouse muda devagar ------- */
+.chip, .pf-link, .acct-btn, .cta, .discord-btn { transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease; }
+.chip:active, .pf-link:active, .acct-btn:active, .cta:active { transform: scale(.96); }
+.chip.on { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }
+/* cartões: a borda acende devagar, com brilho na cor do grupo (ou laranja), e o cartão sobe um pouco */
+.pf-group, .rkp-group, .rkp-player, .gp-member, .pf-stat, .pf-badge, .bd-card {
+  --glow: var(--gc, var(--accent));
+  transition: border-color .35s ease, box-shadow .35s ease, transform .3s cubic-bezier(.2, .8, .2, 1), background-color .3s ease; }
+.pf-group:hover, .rkp-group:hover, .rkp-player:hover, .gp-member:hover, .bd-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--glow) 75%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--glow) 35%, transparent), 0 10px 28px -10px color-mix(in srgb, var(--glow) 55%, transparent); }
+.podium { --glow: var(--mc); }
+.pf-stat:hover { border-color: var(--line2); box-shadow: 0 8px 22px -12px rgba(0, 0, 0, .8); }
+.pf-badge { --glow: var(--rc); }
+.pf-badge:hover { transform: translateY(-2px); box-shadow: 0 10px 26px -12px color-mix(in srgb, var(--rc) 70%, transparent); }
+.pf-group .gp-emblem, .rkp-group .gp-emblem { transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+.pf-group:hover .gp-emblem, .rkp-group:hover .gp-emblem { transform: scale(1.06); }
+.pf-group-go { transition: color .25s ease, transform .25s ease; }
+.pf-group:hover .pf-group-go { transform: translateX(3px); }
+/* menu da conta: abre e fecha com fade + zoom saindo do botão */
+.acct-menu { transform-origin: top right; animation: menu-in .18s cubic-bezier(.2, .8, .2, 1); }
+.acct-menu.closing { animation: menu-out .16s ease forwards; }
+@keyframes menu-in { from { opacity: 0; transform: translateY(-6px) scale(.96); } }
+@keyframes menu-out { to { opacity: 0; transform: translateY(-6px) scale(.96); } }
+.acct-btn.on svg { transition: transform .2s ease; }
+.acct-wrap:has(.acct-menu:not(.closing)) .acct-btn.on svg { transform: rotate(-90deg); }
+@media (prefers-reduced-motion: reduce) {
+  .pf-edit, .pf-edit.open, .acct-menu, .acct-menu.closing { transition: none; animation: none; }
+  .pf-group:hover, .rkp-group:hover, .rkp-player:hover, .gp-member:hover, .bd-card:hover, .pf-badge:hover { transform: none; }
+}

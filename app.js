@@ -1120,8 +1120,15 @@
 
   function toggleAcctMenu(force) {
     let menu = $('#acctMenu');
-    const open = force !== undefined ? force : !menu;
-    if (menu) menu.remove();
+    const open = force !== undefined ? force : !(menu && !menu.classList.contains('closing'));
+    if (menu) {
+      if (!open) {
+        menu.classList.add('closing');
+        setTimeout(() => menu.remove(), 160);
+        return;
+      }
+      menu.remove();
+    }
     if (!open) return;
     const P = PF[lang];
     menu = document.createElement('div');
@@ -1160,7 +1167,7 @@
       const action = `<div class="pf-actions"><button type="button" class="chip" id="pfEdit">${svg('scroll')}${P.edit}</button><button type="button" class="chip danger" id="pfOut">${svg('logout')}${P.logout}</button></div>`;
       if (me.linked && me.profile) {
         const so = me.social || {};
-        const edit = `<form class="pf-edit" id="pfForm" hidden>
+        const edit = `<form class="pf-edit" id="pfForm" aria-hidden="true">
             <label>${P.bio_l}<textarea name="bio" maxlength="240" rows="3" placeholder="${esc(P.bio_ph)}">${esc(so.bio || '')}</textarea></label>
             <label><span>${svg('youtube')} YouTube</span><input name="youtube" maxlength="120" value="${esc(so.youtube || '')}" placeholder="${esc(P.yt_ph)}"></label>
             <label><span>${svg('tiktok')} TikTok</span><input name="tiktok" maxlength="120" value="${esc(so.tiktok || '')}" placeholder="${esc(P.tt_ph)}"></label>
@@ -1169,8 +1176,15 @@
           </form>`;
         box.innerHTML = playerCard({ ...me.profile, social: so, avatarUrl: me.avatarUrl, linked: true }, { discordName: me.discordName, action, edit });
         const form = $('#pfForm');
-        $('#pfEdit').onclick = () => { form.hidden = !form.hidden; };
-        $('#pfCancel').onclick = () => { form.hidden = true; };
+        // abre/fecha com animação (a classe .open faz a transição no CSS)
+        const setOpen = (on) => {
+          form.classList.toggle('open', on);
+          form.setAttribute('aria-hidden', on ? 'false' : 'true');
+          $('#pfEdit').classList.toggle('on', on);
+          if (on) setTimeout(() => form.bio.focus(), 250);
+        };
+        $('#pfEdit').onclick = () => setOpen(!form.classList.contains('open'));
+        $('#pfCancel').onclick = () => setOpen(false);
         form.onsubmit = async (e) => {
           e.preventDefault();
           const body = { bio: form.bio.value, youtube: form.youtube.value, tiktok: form.tiktok.value };
