@@ -952,11 +952,13 @@ h2 .gtag { font-size: 14px; position: relative; top: -3px; }
 .pf-group-go { color: var(--muted); font-size: 13px; white-space: nowrap; }
 .pf-group:hover .pf-group-go { color: var(--accent); }
 .pf-nogroup { margin: 0; }
-.pf-edit { display: grid; gap: 12px; margin-top: 0; padding: 0 16px; border: 1px solid transparent; border-radius: 6px; background: var(--card);
-  max-height: 0; opacity: 0; overflow: hidden; transform: translateY(-8px); visibility: hidden;
-  transition: max-height .4s cubic-bezier(.2, .8, .2, 1), opacity .25s ease, transform .35s cubic-bezier(.2, .8, .2, 1), padding .35s ease, margin .35s ease, border-color .35s ease, visibility 0s .4s; }
-.pf-edit.open { max-height: 640px; opacity: 1; transform: none; visibility: visible; margin-top: 18px; padding: 16px; border-color: var(--line2);
-  transition: max-height .45s cubic-bezier(.2, .8, .2, 1), opacity .3s ease .05s, transform .4s cubic-bezier(.2, .8, .2, 1), padding .35s ease, margin .35s ease, border-color .35s ease, visibility 0s; }
+.pf-edit { display: grid; gap: 12px; margin-top: 18px; padding: 16px; border: 1px solid var(--line2); border-radius: 6px; background: var(--card); }
+/* abre/fecha: a grade vai de 0fr a 1fr (sem animar altura/margem), com fade e deslize */
+.pf-edit-wrap { display: grid; grid-template-rows: 0fr; opacity: 0; transform: translateY(-8px); visibility: hidden;
+  transition: grid-template-rows .4s cubic-bezier(.2, .8, .2, 1), opacity .25s ease, transform .35s cubic-bezier(.2, .8, .2, 1), visibility 0s .4s; }
+.pf-edit-wrap.open { grid-template-rows: 1fr; opacity: 1; transform: none; visibility: visible;
+  transition: grid-template-rows .45s cubic-bezier(.2, .8, .2, 1), opacity .3s ease .05s, transform .4s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+.pf-edit-clip { min-height: 0; overflow: hidden; }
 .pf-edit label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .pf-edit label > span { display: inline-flex; align-items: center; gap: 6px; }
 .pf-edit textarea, .pf-edit input { font: 15px var(--font); color: var(--text); background: var(--bg2); border: 1px solid var(--line2); border-radius: 6px; padding: 10px 12px; resize: vertical; }
@@ -1017,6 +1019,6 @@ h2 .gtag { font-size: 14px; position: relative; top: -3px; }
 .acct-btn.on svg { transition: transform .2s ease; }
 .acct-wrap:has(.acct-menu:not(.closing)) .acct-btn.on svg { transform: rotate(-90deg); }
 @media (prefers-reduced-motion: reduce) {
-  .pf-edit, .pf-edit.open, .acct-menu, .acct-menu.closing { transition: none; animation: none; }
+  .pf-edit-wrap, .pf-edit-wrap.open, .acct-menu, .acct-menu.closing { transition: none; animation: none; }
   .pf-group:hover, .rkp-group:hover, .rkp-player:hover, .gp-member:hover, .bd-card:hover, .pf-badge:hover { transform: none; }
 }

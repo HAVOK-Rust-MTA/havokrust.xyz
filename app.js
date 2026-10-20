@@ -1167,23 +1167,24 @@
       const action = `<div class="pf-actions"><button type="button" class="chip" id="pfEdit">${svg('scroll')}${P.edit}</button><button type="button" class="chip danger" id="pfOut">${svg('logout')}${P.logout}</button></div>`;
       if (me.linked && me.profile) {
         const so = me.social || {};
-        const edit = `<form class="pf-edit" id="pfForm" aria-hidden="true">
+        const edit = `<div class="pf-edit-wrap" id="pfWrap" aria-hidden="true"><div class="pf-edit-clip"><form class="pf-edit" id="pfForm">
             <label>${P.bio_l}<textarea name="bio" maxlength="240" rows="3" placeholder="${esc(P.bio_ph)}">${esc(so.bio || '')}</textarea></label>
             <label><span>${svg('youtube')} YouTube</span><input name="youtube" maxlength="120" value="${esc(so.youtube || '')}" placeholder="${esc(P.yt_ph)}"></label>
             <label><span>${svg('tiktok')} TikTok</span><input name="tiktok" maxlength="120" value="${esc(so.tiktok || '')}" placeholder="${esc(P.tt_ph)}"></label>
             <p class="pf-edit-msg" id="pfMsg" role="status"></p>
             <div class="pf-edit-btns"><button type="button" class="chip" id="pfCancel">${P.cancel}</button><button type="submit" class="chip on">${P.save}</button></div>
-          </form>`;
+          </form></div></div>`;
         box.innerHTML = playerCard({ ...me.profile, social: so, avatarUrl: me.avatarUrl, linked: true }, { discordName: me.discordName, action, edit });
         const form = $('#pfForm');
         // abre/fecha com animação (a classe .open faz a transição no CSS)
+        const wrap = $('#pfWrap');
         const setOpen = (on) => {
-          form.classList.toggle('open', on);
-          form.setAttribute('aria-hidden', on ? 'false' : 'true');
+          wrap.classList.toggle('open', on);
+          wrap.setAttribute('aria-hidden', on ? 'false' : 'true');
           $('#pfEdit').classList.toggle('on', on);
           if (on) setTimeout(() => form.bio.focus(), 250);
         };
-        $('#pfEdit').onclick = () => setOpen(!form.classList.contains('open'));
+        $('#pfEdit').onclick = () => setOpen(!wrap.classList.contains('open'));
         $('#pfCancel').onclick = () => setOpen(false);
         form.onsubmit = async (e) => {
           e.preventDefault();
