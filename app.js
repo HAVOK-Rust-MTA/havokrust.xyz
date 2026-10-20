@@ -1225,6 +1225,7 @@
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
+    document.body.classList.remove('menu-open');
     document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['grupo', 'jogador'].includes(parts[0]) ? 'ranking' : ['store', 'badges', 'wipe', 'perfil', 'ranking'].includes(parts[0]) ? parts[0] : 'wiki')));
     if ($('#acctBtn')) $('#acctBtn').classList.toggle('cur', parts[0] === 'perfil');
     const it = parts[0] === 'items' && byId[parts[1]];
@@ -1247,7 +1248,7 @@
     route();
     drawAccount();
   }));
-  $('#menuBtn').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
+  $('#menuBtn').addEventListener('click', () => document.body.classList.toggle('menu-open', $('#sidebar').classList.toggle('open')));
 
   // ---------------------------------------------------------------- global search
   const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1282,7 +1283,7 @@
   document.addEventListener('click', (e) => { if (!e.target.closest('.search')) sRes.classList.remove('open'); });
   // no celular a busca mora no menu lateral: abre o menu e já foca o campo
   function openSearch() {
-    if (window.matchMedia('(max-width: 860px)').matches) $('#sidebar').classList.add('open');
+    if (window.matchMedia('(max-width: 860px)').matches) { $('#sidebar').classList.add('open'); document.body.classList.add('menu-open'); }
     else if (document.body.classList.contains('landing')) { location.hash = '#/wiki'; setTimeout(() => sIn.focus(), 60); return; }
     sIn.focus(); sIn.select();
   }

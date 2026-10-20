@@ -270,7 +270,10 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   .topnav { display: none; }
   .brand { margin-right: auto; }
   .sidebar {
-    position: fixed; top: var(--header); left: 0; bottom: 0; z-index: 40; height: auto; width: 290px;
+    position: fixed; top: var(--header); left: 0; bottom: auto; z-index: 40; width: 290px;
+    /* altura da tela (não da página), com rolagem própria que não "vaza" para a página de trás */
+    height: calc(100vh - var(--header)); height: calc(100dvh - var(--header));
+    overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
     background: var(--bg); transform: translateX(-100%); transition: transform .2s;
   }
   .sidebar.open { transform: none; box-shadow: 20px 0 50px rgba(0, 0, 0, .6); }
@@ -894,3 +897,6 @@ body.standalone .main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 72
 @media (prefers-reduced-motion: reduce) { .spin { animation-duration: 2.4s; } }
 /* celular estreito: só o logo, para caber conta + Discord + idioma */
 @media (max-width: 480px) { .brand-txt { display: none; } }
+
+/* menu do celular aberto: a página de trás não rola */
+@media (max-width: 860px) { body.menu-open { overflow: hidden; } }
