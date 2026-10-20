@@ -8,7 +8,7 @@ import worker from './index.js';
 import { hmacHex } from './lib/util.js';
 import { sanitizeBadges, slugify } from './game/service.js';
 
-const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql']
+const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql']
   .map((f) => readFileSync(new URL(`../worker/migrations/${f}`, import.meta.url), 'utf8')).join('\n');
 class Stmt {
   constructor(db, sql, args = []) { this.db = db; this.sql = sql; this.args = args; }
@@ -182,14 +182,14 @@ test('Discord falhou: volta para o site com erro, sem sessão', async () => {
 
 const pub = async (path) => { const r = await get(path, { Origin: SITE }); return { status: r.status, json: await r.json(), headers: r.headers }; };
 const syncGame = (players, groups) => server('/api/game/mta/sync', groups === undefined ? { players } : { players, groups });
-const GROUP = { name: 'Os Bráбo', tag: 'BRB', color: '#FF6A00', xp: 900, kills: 30, deaths: 10, members: [
+const GROUP = { name: 'Os Brábo', tag: 'BRB', color: '#FF6A00', emblem: '07', desc: 'Raid toda noite.\n<script>', xp: 900, kills: 30, deaths: 10, members: [
   { acc: 'SERIAL-A', role: 'Leader' }, { acc: 'SERIAL-B', role: 'Member' }, { acc: 'SERIAL-C', role: 'Sub' }, { acc: 'SERIAL-SUMIDO', role: 'Member' }] };
 
 test('jogador sem Discord entra no banco e aparece no grupo com nick e avatar cinza; o serial não sai', async () => {
   const r = await syncGame([
-    { account: 'SERIAL-A', nick: 'Lider', level: 40, kills: 20, deaths: 5, playMinutes: 600, group: 'Os Bráбo', badges: { founder: 1 } },
-    { account: 'SERIAL-B', nick: '#00FF00Novato', level: 3, kills: 0, deaths: 2, group: 'Os Bráбo' },
-    { account: 'SERIAL-C', nick: 'Sub', level: 12, group: 'Os Bráбo' },
+    { account: 'SERIAL-A', nick: 'Lider', level: 40, kills: 20, deaths: 5, playMinutes: 600, group: 'Os Brábo', badges: { founder: 1 } },
+    { account: 'SERIAL-B', nick: '#00FF00Novato', level: 3, kills: 0, deaths: 2, group: 'Os Brábo' },
+    { account: 'SERIAL-C', nick: 'Sub', level: 12, group: 'Os Brábo' },
   ], [GROUP]);
   assert.deepEqual(r.json, { players: 3, groups: 1 });
 
@@ -212,7 +212,7 @@ test('jogador sem Discord entra no banco e aparece no grupo com nick e avatar ci
 });
 
 test('vinculou depois: o histórico que já existia aparece com a foto do Discord, no perfil e no grupo', async () => {
-  await syncGame([{ account: 'SERIAL-A', nick: 'Lider', level: 40, kills: 20, deaths: 5, playMinutes: 600, group: 'Os Bráбo', badges: { founder: 1, newyear2026: 1 } }], [GROUP]);
+  await syncGame([{ account: 'SERIAL-A', nick: 'Lider', level: 40, kills: 20, deaths: 5, playMinutes: 600, group: 'Os Brábo', badges: { founder: 1, newyear2026: 1 } }], [GROUP]);
   const before = await pub('/api/groups');
   const slug = before.json.groups[0].slug;
   const pidBefore = (await pub(`/api/group/${slug}`)).json.members[0].pid;
@@ -223,7 +223,7 @@ test('vinculou depois: o histórico que já existia aparece com a foto do Discor
   assert.equal(me.profile.level, 40);
   assert.equal(me.profile.pid, pidBefore, 'o pid não muda com o vínculo');
   assert.deepEqual(me.profile.badges, { founder: 1, newyear2026: 1 });
-  assert.equal(me.profile.group.name, 'Os Bráбo');
+  assert.equal(me.profile.group.name, 'Os Brábo');
 
   const m = (await pub(`/api/group/${slug}`)).json.members[0];
   assert.equal(m.linked, true);
@@ -243,6 +243,29 @@ test('sync atualiza números sem trocar o pid; lista de grupos nova substitui a 
   await syncGame([{ account: 'SERIAL-A', nick: 'A2', level: 9 }], [GROUP]);
   await syncGame([{ account: 'SERIAL-A', nick: 'A3', level: 10 }]);
   assert.equal((await pub('/api/groups')).json.groups.length, 1);
+});
+
+test('ranking de jogadores: ordena, traz grupo com cor e foto só de quem vinculou; emblema e descrição do grupo', async () => {
+  await syncGame([
+    { account: 'SERIAL-A', nick: 'Lider', level: 40, kills: 20, deaths: 5, playMinutes: 600, group: 'Os Brábo' },
+    { account: 'SERIAL-B', nick: 'Matador', level: 10, kills: 99, deaths: 9, playMinutes: 100 },
+    { account: 'SERIAL-Z', nick: 'NuncaJogou', level: 1, kills: 0, deaths: 0, playMinutes: 0 },
+  ], [GROUP]);
+  const c = await server('/api/link/mta/code', { account: 'SERIAL-A', nick: 'Lider' });
+  await authorize(`/v/${c.json.code}`);
+  const byKills = (await pub('/api/ranking/players')).json.players;
+  assert.deepEqual(byKills.map((p) => [p.rank, p.nick]), [[1, 'Matador'], [2, 'Lider']]);
+  assert.equal(byKills[0].avatarUrl, null);
+  assert.ok(byKills[1].avatarUrl.startsWith('https://cdn.discordapp.com/'));
+  assert.deepEqual(byKills[1].group, { name: 'Os Brábo', slug: 'os-brabo', tag: 'BRB', color: '#FF6A00' });
+  assert.equal((await pub('/api/ranking/players?by=level')).json.players[0].nick, 'Lider');
+  assert.equal((await pub('/api/ranking/players?by=hours')).json.players[0].nick, 'Lider');
+  assert.equal((await pub('/api/ranking/players?by=xpto;drop')).status, 400);
+  assert.ok(!JSON.stringify(byKills).includes('SERIAL'));
+  const g = (await pub('/api/groups')).json.groups[0];
+  assert.equal(g.emblem, '07');
+  assert.equal(g.description, 'Raid toda noite.script');
+  assert.equal((await pub('/api/group/os-brabo')).json.emblem, '07');
 });
 
 test('sync sem assinatura é recusado; perfil inexistente e slug inválido dão 404', async () => {

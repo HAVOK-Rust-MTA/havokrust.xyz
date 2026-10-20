@@ -6,6 +6,7 @@
 //   GET  /api/groups          público: grupos do wipe (sem membros)
 //   GET  /api/group/<slug>    público: o grupo com os membros (nick, cargo, números, foto do Discord ou null)
 //   GET  /api/player/<pid>    público: perfil (nick, números, grupo, badges, foto do Discord ou null)
+//   GET  /api/ranking/players?by=kills|level|hours   público: top 50 jogadores do wipe (com foto ou null e o grupo)
 //
 // A conta (serial) nunca sai daqui: fora do servidor o jogador é o pid.
 import { json, nowS, verifyServer, siteCors, clean, int, account, avatarUrl } from '../lib/util.js';
@@ -75,8 +76,10 @@ async function sync(request, env) {
       used.add(`s:${slug}`);
       const members = (Array.isArray(g.members) ? g.members : []).slice(0, 32).map((m) => ({ account: account(m && m.acc), role: ROLES.has(m && m.role) ? m.role : 'Member' }))
         .filter((m) => m.account);
-      stmts.push(db.prepare('INSERT INTO game_groups (name, slug, tag, color, rank, xp, kills, deaths, members, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        .bind(name, slug, clean(g.tag, 8) || null, color(g.color), i + 1, int(g.xp), int(g.kills), int(g.deaths), JSON.stringify(members), t));
+      stmts.push(db.prepare(`INSERT INTO game_groups (name, slug, tag, color, emblem, description, rank, xp, kills, deaths, members, updated_at)
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(name, slug, clean(g.tag, 8) || null, color(g.color), /^\d{2}$/.test(String(g.emblem)) ? String(g.emblem) : null, clean(g.desc, 160) || null,
+          i + 1, int(g.xp), int(g.kills), int(g.deaths), JSON.stringify(members), t));
       groups++;
     });
   }
@@ -105,7 +108,7 @@ export async function playerView(db, r) {
 }
 
 export function isGamePath(path) {
-  return path === '/api/game/mta/sync' || path === '/api/groups' || path.startsWith('/api/group/') || path.startsWith('/api/player/');
+  return path === '/api/game/mta/sync' || path === '/api/groups' || path.startsWith('/api/group/') || path.startsWith('/api/player/') || path === '/api/ranking/players';
 }
 
 export async function handleGameHttp(request, env, url) {
@@ -119,7 +122,7 @@ export async function handleGameHttp(request, env, url) {
   const db = env.DB;
 
   if (path === '/api/groups') {
-    const { results } = await db.prepare('SELECT slug, name, tag, color, rank, xp, kills, deaths, members FROM game_groups ORDER BY rank').all();
+    const { results } = await db.prepare('SELECT slug, name, tag, color, emblem, description, rank, xp, kills, deaths, members FROM game_groups ORDER BY rank').all();
     return json({ groups: results.map(({ members, ...g }) => ({ ...g, members: JSON.parse(members).length })) }, 200, h);
   }
 
@@ -136,7 +139,20 @@ export async function handleGameHttp(request, env, url) {
     }
     const order = { Leader: 1, Staff: 2, Sub: 3, Member: 4 };
     members.sort((a, b) => (order[a.role] - order[b.role]) || (b.level - a.level));
-    return json({ slug: g.slug, name: g.name, tag: g.tag, color: g.color, rank: g.rank, xp: g.xp, kills: g.kills, deaths: g.deaths, updatedAt: g.updated_at, members }, 200, h);
+    return json({ slug: g.slug, name: g.name, tag: g.tag, color: g.color, emblem: g.emblem, description: g.description, rank: g.rank, xp: g.xp,
+      kills: g.kills, deaths: g.deaths, updatedAt: g.updated_at, members }, 200, h);
+  }
+
+  if (path === '/api/ranking/players') {
+    const col = { kills: 'g.kills', level: 'g.level', hours: 'g.play_minutes' }[url.searchParams.get('by') || 'kills'];
+    if (!col) return json({ error: 'bad_sort' }, 400, h);
+    // só quem jogou neste wipe (o wipe zera os números)
+    const { results } = await db.prepare(`SELECT g.*, p.discord_id, p.avatar, gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color
+      FROM game_players g LEFT JOIN players p ON p.account = g.account LEFT JOIN game_groups gg ON gg.name = g.group_name
+      WHERE g.kills > 0 OR g.play_minutes > 0 ORDER BY ${col} DESC, g.level DESC, g.kills DESC LIMIT 50`).all();
+    return json({ players: results.map((r, i) => ({
+      rank: i + 1, ...publicPlayer(r), group: r.g_slug ? { name: r.group_name, slug: r.g_slug, tag: r.g_tag, color: r.g_color } : null,
+    })) }, 200, h);
   }
 
   if (path.startsWith('/api/player/')) {

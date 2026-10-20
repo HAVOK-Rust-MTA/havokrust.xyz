@@ -29,7 +29,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVER', footer_copy: '© 2026 HAVOK — Rust Survival. Not affiliated with Facepunch Studios.',
       bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench', bp_tip: 'Needs a blueprint: you must learn this recipe before you can craft it.', bench_tip: 'Needs a Workbench nearby to craft.', bp_explain: 'You must learn this blueprint before crafting. Put the item and Scrap in a Research Table to get the blueprint, or find one in airdrops and the patrol helicopter, then right click it → Learn. Learning is permanent.', bp_explain_loot: 'This blueprint cannot be researched. Find it in loot, then right click it → Learn. Learning is permanent.', bp_how: 'How blueprints work', legend_bp: 'needs a blueprint (learn the recipe first)', legend_bench: 'needs a Workbench',
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
-      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play', nav_wipe: 'Wipe', nav_profile: 'Profile',
+      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play', nav_wipe: 'Wipe', nav_profile: 'Profile', nav_ranking: 'Ranking', rk_full: 'See the full ranking',
      
       store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
       store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Monthly price; other periods on Discord',
@@ -63,7 +63,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVIDOR', footer_copy: '© 2026 HAVOK — Rust Survival. Sem afiliação com a Facepunch Studios.',
       bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada', bp_tip: 'Precisa de blueprint: você tem que aprender esta receita antes de craftar.', bench_tip: 'Precisa de uma Bancada perto para craftar.', bp_explain: 'Você precisa aprender esta blueprint antes de craftar. Coloque o item e Sucata na Mesa de Pesquisa para ganhar a blueprint, ou ache uma no airdrop e no helicóptero de patrulha. Depois clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_explain_loot: 'Esta blueprint não dá para pesquisar. Ache no loot e clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_how: 'Como funcionam as blueprints', legend_bp: 'precisa de blueprint (aprender a receita antes)', legend_bench: 'precisa de Bancada',
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
-      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar', nav_wipe: 'Wipe', nav_profile: 'Perfil',
+      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar', nav_wipe: 'Wipe', nav_profile: 'Perfil', nav_ranking: 'Ranking', rk_full: 'Ver o ranking completo',
      
       store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
       store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Preço por mês; outros períodos no Discord',
@@ -879,6 +879,7 @@
           <div class="rk-col"><h3>${lt('rk_players')}</h3><ol class="rk-list">${head(['', lt('rk_kills'), lt('rk_deaths'), lt('rk_kd')])}</ol><ol class="rk-list" id="rkPlayers">${loading}</ol></div>
         </div>
         <p class="rk-updated" id="rkUpdated"></p>
+        ${pfApi() ? `<p class="rk-more"><a class="chip" href="#/ranking">${t('rk_full')} ›</a></p>` : ''}
       </section>`;
   }
 
@@ -1011,7 +1012,9 @@
       err: { codigo: 'That link expired or was already used. Open the screen in game again.', ja_vinculada: 'That game account is already linked to another Discord.',
         expirou: 'The sign in took too long. Try again.', discord: 'Discord did not answer. Try again.', cancelado: 'Sign in cancelled.', config: 'Sign in is not available yet.' },
       down: 'Could not load your profile right now.', anon: 'Discord not linked', notfound: 'Player not found.', notfound_group: 'Group not found (groups reset every wipe).',
-      kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', nomembers: 'No members yet.' },
+      kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', member: 'member', nomembers: 'No members yet.',
+      rk_kicker: 'HAVOK · This wipe', rk_title: 'RANKING', rk_sub: 'Every group and every player of the current wipe. Click a group to see its members. Resets every wipe.',
+      rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, xp: 'XP', nogroups: 'No groups yet this wipe.', noplayers: 'Nobody has played this wipe yet.' },
     pt: { kicker: 'HAVOK · Perfil', title: 'SEU PERFIL', sub: 'Seus números, grupo e badges num lugar só, com a sua foto do Discord no ranking.',
       login: 'Entrar com Discord', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
       unlinked: 'Falta pouco: entre no servidor do HAVOK e a tela de vínculo abre sozinha. Um clique no Discord e a sua conta do jogo aparece aqui.',
@@ -1020,7 +1023,9 @@
       err: { codigo: 'Esse link venceu ou já foi usado. Abra a tela no jogo de novo.', ja_vinculada: 'Essa conta do jogo já está vinculada a outro Discord.',
         expirou: 'O login demorou demais. Tente de novo.', discord: 'O Discord não respondeu. Tente de novo.', cancelado: 'Login cancelado.', config: 'O login ainda não está disponível.' },
       down: 'Não deu para carregar seu perfil agora.', anon: 'Discord não vinculado', notfound: 'Jogador não encontrado.', notfound_group: 'Grupo não encontrado (os grupos zeram a cada wipe).',
-      kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', nomembers: 'Nenhum membro ainda.' },
+      kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', member: 'membro', nomembers: 'Nenhum membro ainda.',
+      rk_kicker: 'HAVOK · Este wipe', rk_title: 'RANKING', rk_sub: 'Todos os grupos e todos os jogadores do wipe atual. Clique num grupo para ver os membros. Zera a cada wipe.',
+      rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, xp: 'XP', nogroups: 'Nenhum grupo neste wipe ainda.', noplayers: 'Ninguém jogou neste wipe ainda.' },
   };
   const BADGE_EXTRA = { opening: ['Grand Opening', 'mythic'] }; // badges só do jogo (sem SVG no site): arte em PNG
   const badgeInfo = (id) => {
@@ -1036,6 +1041,9 @@
   const num = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
   const avatar = (url, cls = 'pf-avatar') => `<img class="${cls}" src="${esc(url || ANON)}" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${ANON}'">`;
   const ROLE = { en: { Leader: 'Leader', Staff: 'Officer', Sub: 'Co-leader', Member: 'Member' }, pt: { Leader: 'Líder', Staff: 'Oficial', Sub: 'Sub-líder', Member: 'Membro' } };
+  const gColor = (c) => (/^#[0-9a-fA-F]{6}$/.test(c || '') ? c : '#ff6a00');
+  // emblema do grupo (silhueta branca do jogo) pintado com a cor do grupo
+  const emblem = (g, cls = 'gp-emblem') => `<span class="${cls}" style="--gc:${gColor(g.color)}">${/^\d{2}$/.test(g.emblem || '') ? `<i style="-webkit-mask-image:url(img/emblems/${g.emblem}.png);mask-image:url(img/emblems/${g.emblem}.png)"></i>` : `<b>${esc((g.tag || g.name || '?').slice(0, 3))}</b>`}</span>`;
   const groupLink = (g) => (g ? `<a href="#/grupo/${esc(g.slug)}"><b>${esc(g.name)}</b>${g.tag ? ` [${esc(g.tag)}]` : ''}</a>` : '');
 
   // cartão do jogador (perfil próprio e perfil público): p = {nick, level, kills, deaths, playMinutes, badges, group, avatarUrl, linked}
@@ -1099,6 +1107,35 @@
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker_player}</p></section><div id="pfBox" class="pf"><p class="muted">…</p></div>`;
   }
 
+  // ranking completo do wipe (#/ranking): grupos com emblema/cor/descrição e jogadores com foto ou avatar cinza
+  let rkBy = 'kills';
+  function pageRanking() {
+    const P = PF[lang];
+    const api = pfApi();
+    setTimeout(async () => {
+      document.querySelectorAll('.rkp-sort button').forEach((b) => b.onclick = () => { rkBy = b.dataset.by; route(); });
+      const get = async (u) => { try { const r = await fetch(u); return r.ok ? await r.json() : null; } catch (e) { return null; } };
+      const [gr, pl] = await Promise.all([get(`${api}/api/groups`), get(`${api}/api/ranking/players?by=${rkBy}`)]);
+      const gBox = $('#rkpGroups'), pBox = $('#rkpPlayers');
+      if (!gBox) return;
+      gBox.innerHTML = !gr ? `<p class="muted">${P.down}</p>` : gr.groups.map((g) => `<a class="rkp-group" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
+          <span class="rkp-pos">${String(g.rank).padStart(2, '0')}</span>${emblem(g)}
+          <div class="rkp-gtxt"><b>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</b>${g.description ? `<p>${esc(g.description)}</p>` : ''}
+            <small>${num(g.members)} ${g.members === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.xp)} ${P.xp}</small></div></a>`).join('') || `<p class="muted">${P.nogroups}</p>`;
+      const val = (p) => (rkBy === 'level' ? `Lv ${num(p.level)}` : rkBy === 'hours' ? `${num(Math.floor(p.playMinutes / 60))}h` : num(p.kills));
+      pBox.innerHTML = !pl ? `<p class="muted">${P.down}</p>` : pl.players.map((p) => `<a class="rkp-player" href="#/jogador/${esc(p.pid)}">
+          <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
+          <div><b>${esc(p.nick)}</b><small>${p.group ? `<i style="color:${gColor(p.group.color)}">${esc(p.group.tag ? `[${p.group.tag}]` : p.group.name)}</i> · ` : ''}Lv ${num(p.level)} · K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</small></div>
+          <span class="rkp-val">${val(p)}</span></a>`).join('') || `<p class="muted">${P.noplayers}</p>`;
+    });
+    const sort = Object.entries(P.by).map(([k, n]) => `<button type="button" class="chip ${rkBy === k ? 'on' : ''}" data-by="${k}">${n}</button>`).join('');
+    return `<section class="bd-hero"><p class="l-kicker">${P.rk_kicker}</p><h1 class="page-title">${P.rk_title}</h1><p class="page-sub">${P.rk_sub}</p></section>
+      <div class="rkp">
+        <section class="rkp-col"><h3>${P.rk_groups}</h3><div id="rkpGroups"><p class="muted">…</p></div></section>
+        <section class="rkp-col"><div class="rkp-colhead"><h3>${P.rk_players}</h3><div class="rkp-sort">${sort}</div></div><div id="rkpPlayers"><p class="muted">…</p></div></section>
+      </div>`;
+  }
+
   // grupo (#/grupo/<slug>): todos os membros; quem não vinculou o Discord aparece com o nick e o avatar cinza
   function pageGrupo(slug) {
     const P = PF[lang];
@@ -1109,13 +1146,14 @@
       if (!box) return;
       if (!g) { box.innerHTML = `<p class="muted">${P.notfound_group}</p>`; return; }
       document.title = `${g.name} — HAVOK`;
-      const c = /^#[0-9a-fA-F]{6}$/.test(g.color || '') ? g.color : 'var(--accent)';
+      const c = gColor(g.color);
       const members = g.members.map((m) => `<a class="gp-member" href="#/jogador/${esc(m.pid)}">${avatar(m.avatarUrl, 'gp-avatar')}
           <div><b>${esc(m.nick)}</b><small>${ROLE[lang][m.role] || m.role} · Lv ${num(m.level)}</small></div>
           <span class="gp-k"><b>${num(m.kills)}</b><small>${P.kills}</small></span></a>`).join('');
       box.innerHTML = `<div class="pf-card" style="border-top-color:${c}">
-          <header class="gp-head"><span class="gp-rank">#${g.rank}</span><div><h2>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</h2>
-            <p class="muted">${num(g.members.length)} ${P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.deaths)} ${P.deaths.toLowerCase()}</p></div></header>
+          <header class="gp-head">${emblem(g, 'gp-emblem big')}<div><h2><span class="gp-rank">#${g.rank}</span> ${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</h2>
+            ${g.description ? `<p class="gp-desc">${esc(g.description)}</p>` : ''}
+            <p class="muted">${num(g.members.length)} ${g.members.length === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.deaths)} ${P.deaths.toLowerCase()} · ${num(g.xp)} ${P.xp}</p></div></header>
           <div class="gp-list">${members || `<p class="muted">${P.nomembers}</p>`}</div></div>`;
     });
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker_group}</p></section><div id="pfBox" class="pf"><p class="muted">…</p></div>`;
@@ -1131,7 +1169,7 @@
     let html;
     const landing = !parts.length;
     document.body.classList.toggle('landing', landing);
-    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil', 'jogador', 'grupo'].includes(parts[0]));
+    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil', 'jogador', 'grupo', 'ranking'].includes(parts[0]));
     if (landing) html = pageLanding();
     else if (parts[0] === 'wiki') html = pageHome();
     else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
@@ -1146,6 +1184,7 @@
     else if (parts[0] === 'badges') html = pageBadges();
     else if (parts[0] === 'wipe') html = pageWipe();
     else if (parts[0] === 'perfil' || parts[0] === 'profile') html = pagePerfil(query);
+    else if (parts[0] === 'ranking') html = pageRanking();
     else if (parts[0] === 'jogador' && parts[1]) html = pageJogador(parts[1]);
     else if (parts[0] === 'grupo' && parts[1]) html = pageGrupo(parts[1]);
     else if (parts[0] === 'vehicles') html = pageVehicles();
@@ -1153,7 +1192,7 @@
     $('#main').innerHTML = html;
     renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
     $('#sidebar').classList.remove('open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['grupo', 'jogador'].includes(parts[0]) ? 'wipe' : ['store', 'badges', 'wipe', 'perfil'].includes(parts[0]) ? parts[0] : 'wiki')));
+    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['grupo', 'jogador'].includes(parts[0]) ? 'ranking' : ['store', 'badges', 'wipe', 'perfil', 'ranking'].includes(parts[0]) ? parts[0] : 'wiki')));
     const it = parts[0] === 'items' && byId[parts[1]];
     document.title = landing ? 'HAVOK — Rust Survival' : parts[0] === 'wipe' ? 'Wipe — HAVOK' : parts[0] === 'perfil' ? (lang === 'pt' ? 'Perfil' : 'Profile') + ' — HAVOK' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
     window.scrollTo(0, 0);
