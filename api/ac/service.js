@@ -73,7 +73,9 @@ export async function handleAcHttp(request, env, url) {
   if (m[2] !== undefined) {
     const row = await env.DB.prepare('SELECT data FROM ac_frames WHERE clip_id = ? AND idx = ?').bind(m[1], Number(m[2])).first();
     if (!row) return json({ error: 'not_found' }, 404, h);
-    return new Response(row.data, {
+    // o D1 devolve BLOB como lista de números (não ArrayBuffer): sem isto a imagem saía com 0 bytes
+    const bytes = row.data instanceof ArrayBuffer ? new Uint8Array(row.data) : ArrayBuffer.isView(row.data) ? row.data : Uint8Array.from(row.data || []);
+    return new Response(bytes, {
       headers: { ...h, 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=1209600, immutable', 'X-Content-Type-Options': 'nosniff' },
     });
   }

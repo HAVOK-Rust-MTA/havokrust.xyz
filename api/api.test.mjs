@@ -15,7 +15,8 @@ class Stmt {
   bind(...args) { return new Stmt(this.db, this.sql, args); }
   runSync() { const r = this.db.prepare(this.sql).run(...this.args); return { success: true, meta: { changes: Number(r.changes), last_row_id: Number(r.lastInsertRowid) } }; }
   async run() { return this.runSync(); }
-  async first() { return this.db.prepare(this.sql).get(...this.args) ?? null; }
+  // igual ao D1 de verdade: BLOB volta como lista de números
+  async first() { const r = this.db.prepare(this.sql).get(...this.args) ?? null; if (r) for (const k in r) if (r[k] instanceof Uint8Array) r[k] = Array.from(r[k]); return r; }
   async all() { return { results: this.db.prepare(this.sql).all(...this.args) }; }
 }
 class FakeD1 {
@@ -351,7 +352,9 @@ test('ac: servidor guarda gravação assinada; o site lê pelo id; quadro sai co
   assert.ok(!JSON.stringify(meta).includes('SERIAL-X'));
   const img = await worker.fetch(new Request(`${API}/api/ac/clip/${r.json.id}/1.jpg`), env, ctx);
   assert.equal(img.headers.get('Content-Type'), 'image/jpeg');
-  assert.equal(new Uint8Array(await img.arrayBuffer())[4], 2);
+  const bytes = new Uint8Array(await img.arrayBuffer());
+  assert.equal(bytes.length, 8);
+  assert.equal(bytes[4], 2);
 });
 
 test('ac: sem assinatura, sem quadro válido ou id inventado não passa; some depois de 14 dias', async () => {
