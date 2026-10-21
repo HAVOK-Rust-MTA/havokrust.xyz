@@ -23,3 +23,8 @@ binding = "DB"
 database_name = "havok-recruit"
 database_id = "50f9c110-f21a-4476-b2b6-4f5ac92c8308"
 migrations_dir = "../worker/migrations"
+
+# gravações do anti-cheat (quadros JPEG em base64). A regra 'apagar-14-dias' do bucket apaga clips/ sozinha.
+[[r2_buckets]]
+binding = "AC_BUCKET"
+bucket_name = "havok-ac"

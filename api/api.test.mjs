@@ -386,3 +386,15 @@ test('ac: quadros chegam em lotes e entram na ordem; gravação velha não aceit
   advance(2 * 3600);
   assert.equal((await server('/api/ac/frames', { id: c.json.id, frames: [JPEG(13)] })).status, 404);
 });
+
+test('ac: com o R2 ligado os quadros vão para o bucket (e o D1 fica só com os dados)', async () => {
+  const store = new Map();
+  env.AC_BUCKET = { put: async (k, v) => { store.set(k, v); }, get: async (k) => (store.has(k) ? { text: async () => store.get(k) } : null) };
+  const c = await server('/api/ac/clip', { player: 'R2', reason: 'Fly', fps: 4, frames: [JPEG(20)] });
+  await server('/api/ac/frames', { id: c.json.id, frames: [JPEG(21)] });
+  assert.equal(store.size, 2);
+  assert.equal(env.DB.row('SELECT COUNT(*) AS n FROM ac_frames WHERE clip_id = ?', c.json.id).n, 0);
+  const img = await worker.fetch(new Request(`${API}/api/ac/clip/${c.json.id}/1.jpg`), env, ctx);
+  assert.equal(new Uint8Array(await img.arrayBuffer())[4], 21);
+  delete env.AC_BUCKET;
+});
