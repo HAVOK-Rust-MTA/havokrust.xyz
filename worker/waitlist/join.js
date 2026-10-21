@@ -39,7 +39,7 @@ export const TEXT = {
 };
 
 const nowS = () => Math.floor(Date.now() / 1000);
-const goalOf = (env) => Math.max(1, parseInt(env.GOAL, 10) || 125);
+const goalOf = (env) => Math.max(1, parseInt(env.GOAL, 10) || 30);
 
 // //------------------- CONFIGURAÇÕES (D1) -------------------\\
 const getSetting = async (db, key) => (await db.prepare('SELECT value FROM bot_settings WHERE key = ?').bind(key).first())?.value ?? null;

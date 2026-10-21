@@ -5,7 +5,7 @@ compatibility_date = "2026-10-01"
 [vars]
 GUILD_ID = "1560345146703482890"
 ROLE_ID = "1561050122446569643"   # cargo "Waiting List"
-GOAL = "125"
+GOAL = "30"
 ALLOWED_ORIGINS = "https://havokrust.xyz,https://www.havokrust.xyz,http://127.0.0.1:8080,http://localhost:8080"
 
 # painel no canal: ID da mensagem que o webhook enviou uma vez (o link do webhook vai no Secret WAITLIST_WEBHOOK)

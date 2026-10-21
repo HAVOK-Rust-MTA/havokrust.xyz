@@ -45,7 +45,7 @@ export function idsFromEmbed(embed) {
   return m ? m[1].split('.').filter(Boolean) : [];
 }
 
-// Progresso rumo à inauguração (GOAL = meta de lançamento, 125). A MESMA função desenha a barra nos dois painéis
+// Progresso rumo à inauguração (GOAL = meta de lançamento, 30). A MESMA função desenha a barra nos dois painéis
 // (status e "entrar na lista"). Passar da meta não é limite: a lista continua aceitando; só mostra 100% e 0 vagas.
 // Quadrados proporcionais, com pelo menos 1 aceso se houver alguém, e a barra só enche quando a meta foi alcançada.
 export function progress(n, goal, cells = 20) {

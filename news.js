@@ -5,7 +5,7 @@ window.HAVOK_NEWS = [
     date: '2026-10-17',
     title: { en: 'Waiting list and Bolt balance', pt: 'Lista de espera e ajuste no Bolt' },
     items: [
-      { tag: 'new', en: 'Waiting list: join on Discord and watch the counter on the home page. The server opens at 125 survivors.', pt: 'Lista de espera: entre pelo Discord e acompanhe o contador na página inicial. O servidor abre com 125 sobreviventes.' },
+      { tag: 'new', en: 'Waiting list: join on Discord and watch the counter on the home page. The server opens at 30 survivors.', pt: 'Lista de espera: entre pelo Discord e acompanhe o contador na página inicial. O servidor abre com 30 sobreviventes.' },
       { tag: 'balance', en: 'The Bolt Action Rifle now fires Sniper Ammo, like the L96, instead of 7.62mm Ammo.', pt: 'O Bolt agora usa Munição de Sniper, como a L96, e não mais a Munição 7.62mm.' },
       { tag: 'fix', en: 'Removing or pausing a VIP plan of an online player works again.', pt: 'Remover ou pausar o VIP de quem está online voltou a funcionar.' },
     ],

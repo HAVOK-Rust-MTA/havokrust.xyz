@@ -4,7 +4,7 @@ window.HAVOK = {
   discord: 'https://discord.gg/WZqhuFb2w5',
   // lista de espera: URL do Worker (worker/README.md). Vazio = o contador não aparece.
   // ex.: api: 'https://havok-waitlist.SEU-USUARIO.workers.dev/waitlist'
-  waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 125 },
+  waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 30 },
   // wipe: calendário oficial do Worker (o mesmo do Discord e do servidor). Sem wipe agendado, o contador não aparece.
   wipe: { api: 'https://havok-waitlist.havokrust.workers.dev/api/wipe/status' },
   // ranking do wipe atual (o servidor do jogo manda a cada 5 min). Vazio = a seção não aparece.
