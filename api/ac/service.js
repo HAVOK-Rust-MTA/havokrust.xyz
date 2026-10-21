@@ -1,81 +1,95 @@
-// HAVOK API: evidências do anti-cheat (resource havok_ac do servidor MTA).
+// HAVOK API: evidências do anti-cheat (resource havok_inventory do servidor MTA).
 //
-//   POST /api/ac/clip                 (assinado pelo servidor) guarda uma gravação: até 48 quadros JPEG em base64 (+ fps)
-//   GET  /api/ac/clip/<id>            dados da gravação (jogador, motivo, quantos quadros) para a página do site
+//   POST /api/ac/clip                 (assinado) abre uma gravação: jogador, motivo, fps -> { id }
+//   POST /api/ac/frames               (assinado) acrescenta até 12 quadros JPEG (base64) a uma gravação aberta
+//   GET  /api/ac/clip/<id>            dados da gravação (jogador, motivo, quantos quadros, fps) para o site
 //   GET  /api/ac/clip/<id>/<n>.jpg    um quadro
 //
-// O id tem 128 bits aleatórios e só é publicado no canal de staff do Discord: quem não tem o link não acha a gravação.
-// Tudo é apagado em 14 dias (acCron).
+// Os quadros chegam em lotes pequenos e são guardados em base64 como vieram: cada pedido gasta pouco processamento
+// (o plano grátis do Worker tem ~10 ms de CPU por pedido); a conversão para imagem só acontece quando alguém abre.
+// O id tem 128 bits aleatórios e só é publicado no canal de staff do Discord. Tudo é apagado em 14 dias (acCron).
 import { json, nowS, verifyServer, siteCors, clean, account } from '../lib/util.js';
 
-const MAX_FRAMES = 48;
-const MAX_FRAME_BYTES = 300 * 1024;
-const MAX_BODY = 16 * 1024 * 1024;
+const MAX_FRAMES = 160;
+const MAX_BATCH = 12;
+const MAX_FRAME_B64 = 400 * 1024;
+const MAX_BODY = 6 * 1024 * 1024;
+const OPEN_S = 3600; // gravação aberta aceita quadros por 1 h
 const KEEP_S = 14 * 86400;
 const ID_RE = /^[0-9a-f]{32}$/;
+const B64_JPEG = /^\/9j\/[A-Za-z0-9+/]+=*$/; // JPEG (FF D8 FF) em base64 começa com "/9j/"
 
 const randomId = () => [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
+const okFrame = (f) => typeof f === 'string' && f.length > 8 && f.length <= MAX_FRAME_B64 && B64_JPEG.test(f);
 
 const fromBase64 = (s) => {
-  if (typeof s !== 'string' || s.length > MAX_FRAME_BYTES * 1.4) return null;
-  try {
-    const bin = atob(s);
-    const out = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-    return out;
-  } catch {
-    return null;
-  }
+  const bin = atob(s);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
 };
-const isJpeg = (b) => b && b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
 
 export function isAcPath(path) {
   return path.startsWith('/api/ac/');
 }
 
-async function saveClip(request, env) {
-  const raw = await verifyServer(request, env, '/api/ac/clip', MAX_BODY);
-  if (raw === null) return json({ error: 'unauthorized' }, 401);
-  let body;
+const parse = (raw) => {
   try {
-    body = JSON.parse(raw);
+    return JSON.parse(raw);
   } catch {
-    return json({ error: 'bad_json' }, 400);
+    return null;
   }
-  const frames = Array.isArray(body.frames) ? body.frames.slice(-MAX_FRAMES) : [];
-  const decoded = [];
-  for (const f of frames) {
-    const b = fromBase64(f);
-    if (isJpeg(b) && b.length <= MAX_FRAME_BYTES) decoded.push(b);
-  }
-  if (decoded.length === 0) return json({ error: 'no_frames' }, 400);
+};
+
+async function openClip(request, env) {
+  const body = parse(await verifyServer(request, env, '/api/ac/clip', MAX_BODY));
+  if (!body) return json({ error: 'unauthorized' }, 401);
   const id = randomId();
-  const fps = Math.max(1, Math.min(4, Math.floor(Number(body.fps) || 1)));
-  const stmts = [
+  const fps = Math.max(1, Math.min(8, Math.floor(Number(body.fps) || 1)));
+  const frames = Array.isArray(body.frames) ? body.frames.filter(okFrame).slice(0, MAX_BATCH) : [];
+  await env.DB.batch([
     env.DB.prepare('INSERT INTO ac_clips (id, created_at, player, account, reason, detail, frames, fps) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(id, nowS(), clean(body.player, 40) || '?', account(body.account), clean(body.reason, 60) || '?', clean(body.detail, 600), decoded.length, fps),
-    ...decoded.map((b, i) => env.DB.prepare('INSERT INTO ac_frames (clip_id, idx, data) VALUES (?, ?, ?)').bind(id, i, b)),
-  ];
-  await env.DB.batch(stmts);
-  return json({ id, frames: decoded.length, fps });
+      .bind(id, nowS(), clean(body.player, 40) || '?', account(body.account), clean(body.reason, 60) || '?', clean(body.detail, 600), frames.length, fps),
+    ...frames.map((f, i) => env.DB.prepare('INSERT INTO ac_frames (clip_id, idx, data) VALUES (?, ?, ?)').bind(id, i, f)),
+  ]);
+  return json({ id, frames: frames.length, fps });
+}
+
+async function addFrames(request, env) {
+  const body = parse(await verifyServer(request, env, '/api/ac/frames', MAX_BODY));
+  if (!body) return json({ error: 'unauthorized' }, 401);
+  if (!ID_RE.test(body.id || '')) return json({ error: 'bad_id' }, 400);
+  const clip = await env.DB.prepare('SELECT created_at, frames FROM ac_clips WHERE id = ?').bind(body.id).first();
+  if (!clip || clip.created_at < nowS() - OPEN_S) return json({ error: 'not_found' }, 404);
+  const frames = Array.isArray(body.frames) ? body.frames.filter(okFrame).slice(0, MAX_BATCH) : [];
+  const start = clip.frames;
+  if (frames.length === 0) return json({ id: body.id, frames: start });
+  if (start + frames.length > MAX_FRAMES) return json({ error: 'too_many' }, 413);
+  await env.DB.batch([
+    ...frames.map((f, i) => env.DB.prepare('INSERT INTO ac_frames (clip_id, idx, data) VALUES (?, ?, ?)').bind(body.id, start + i, f)),
+    env.DB.prepare('UPDATE ac_clips SET frames = ? WHERE id = ?').bind(start + frames.length, body.id),
+  ]);
+  return json({ id: body.id, frames: start + frames.length });
 }
 
 export async function handleAcHttp(request, env, url) {
   const path = url.pathname;
   if (!env.DB) return json({ error: 'unavailable' }, 503);
-  if (path === '/api/ac/clip' && request.method === 'POST') return saveClip(request, env);
+  if (path === '/api/ac/clip' && request.method === 'POST') return openClip(request, env);
+  if (path === '/api/ac/frames' && request.method === 'POST') return addFrames(request, env);
 
   const h = siteCors(request, env);
   if (request.method === 'OPTIONS') return new Response(null, { status: h['Access-Control-Allow-Origin'] ? 204 : 403, headers: h });
   if (request.method !== 'GET') return json({ error: 'not_found' }, 404, h);
 
-  const m = path.match(/^\/api\/ac\/clip\/([0-9a-f]{32})(?:\/(\d{1,2})\.jpg)?$/);
+  const m = path.match(/^\/api\/ac\/clip\/([0-9a-f]{32})(?:\/(\d{1,3})\.jpg)?$/);
   if (!m || !ID_RE.test(m[1])) return json({ error: 'not_found' }, 404, h);
   if (m[2] !== undefined) {
     const row = await env.DB.prepare('SELECT data FROM ac_frames WHERE clip_id = ? AND idx = ?').bind(m[1], Number(m[2])).first();
     if (!row) return json({ error: 'not_found' }, 404, h);
-    // o D1 devolve BLOB como lista de números (não ArrayBuffer): sem isto a imagem saía com 0 bytes
-    const bytes = row.data instanceof ArrayBuffer ? new Uint8Array(row.data) : ArrayBuffer.isView(row.data) ? row.data : Uint8Array.from(row.data || []);
+    // novo: base64 (texto). Antigo: BLOB, que o D1 devolve como lista de números (não ArrayBuffer)
+    const d = row.data;
+    const bytes = typeof d === 'string' ? fromBase64(d) : d instanceof ArrayBuffer ? new Uint8Array(d) : ArrayBuffer.isView(d) ? d : Uint8Array.from(d || []);
     return new Response(bytes, {
       headers: { ...h, 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=1209600, immutable', 'X-Content-Type-Options': 'nosniff' },
     });

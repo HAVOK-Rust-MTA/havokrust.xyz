@@ -361,11 +361,28 @@ test('ac: servidor guarda gravação assinada; o site lê pelo id; quadro sai co
 test('ac: sem assinatura, sem quadro válido ou id inventado não passa; some depois de 14 dias', async () => {
   const fake = await worker.fetch(new Request(`${API}/api/ac/clip`, { method: 'POST', body: JSON.stringify({ frames: [JPEG(1)] }) }), env, ctx);
   assert.equal(fake.status, 401);
-  assert.equal((await server('/api/ac/clip', { player: 'x', reason: 'y', frames: ['nada'] })).status, 400);
+  // lixo não vira quadro; a gravação abre vazia
+  const empty = await server('/api/ac/clip', { player: 'x', reason: 'y', frames: ['nada'] });
+  assert.equal(empty.json.frames, 0);
+  assert.equal((await server('/api/ac/frames', { id: '0'.repeat(32), frames: [JPEG(1)] })).status, 404);
   assert.equal((await pub('/api/ac/clip/' + '0'.repeat(32))).status, 404);
   const r = await server('/api/ac/clip', { player: 'x', reason: 'y', frames: [JPEG(1)] });
   advance(15 * 86400);
   await worker.scheduled({}, env, { waitUntil: (p) => p });
   await new Promise((res) => setTimeout(res, 20));
   assert.equal((await pub(`/api/ac/clip/${r.json.id}`)).status, 404);
+});
+
+test('ac: quadros chegam em lotes e entram na ordem; gravação velha não aceita mais', async () => {
+  const c = await server('/api/ac/clip', { player: 'Lote', reason: 'Fly', fps: 4 });
+  assert.equal(c.json.frames, 0);
+  assert.equal((await server('/api/ac/frames', { id: c.json.id, frames: [JPEG(10), JPEG(11)] })).json.frames, 2);
+  assert.equal((await server('/api/ac/frames', { id: c.json.id, frames: [JPEG(12), 'lixo'] })).json.frames, 3);
+  const meta = (await pub(`/api/ac/clip/${c.json.id}`)).json;
+  assert.equal(meta.frames, 3);
+  assert.equal(meta.fps, 4);
+  const img = await worker.fetch(new Request(`${API}/api/ac/clip/${c.json.id}/2.jpg`), env, ctx);
+  assert.equal(new Uint8Array(await img.arrayBuffer())[4], 12);
+  advance(2 * 3600);
+  assert.equal((await server('/api/ac/frames', { id: c.json.id, frames: [JPEG(13)] })).status, 404);
 });
