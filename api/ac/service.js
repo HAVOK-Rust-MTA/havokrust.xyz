@@ -14,7 +14,7 @@ import { json, nowS, verifyServer, siteCors, clean, account } from '../lib/util.
 
 const MAX_FRAMES = 160;
 const MAX_BATCH = 12;
-const MAX_FRAME_B64 = 400 * 1024;
+const MAX_FRAME_B64 = 1300 * 1024; // print 1920x1080 em boa qualidade
 const MAX_BODY = 6 * 1024 * 1024;
 const OPEN_S = 3600; // gravação aberta aceita quadros por 1 h
 const KEEP_S = 14 * 86400;
