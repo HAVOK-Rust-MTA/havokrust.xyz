@@ -9,8 +9,8 @@
 import { json, nowS, verifyServer, siteCors, clean, account } from '../lib/util.js';
 
 const MAX_FRAMES = 48;
-const MAX_FRAME_BYTES = 200 * 1024;
-const MAX_BODY = 8 * 1024 * 1024;
+const MAX_FRAME_BYTES = 300 * 1024;
+const MAX_BODY = 16 * 1024 * 1024;
 const KEEP_S = 14 * 86400;
 const ID_RE = /^[0-9a-f]{32}$/;
 
