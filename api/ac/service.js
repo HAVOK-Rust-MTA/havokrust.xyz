@@ -1,6 +1,6 @@
 // HAVOK API: evidências do anti-cheat (resource havok_ac do servidor MTA).
 //
-//   POST /api/ac/clip                 (assinado pelo servidor) guarda uma gravação: até 40 quadros JPEG em base64
+//   POST /api/ac/clip                 (assinado pelo servidor) guarda uma gravação: até 48 quadros JPEG em base64 (+ fps)
 //   GET  /api/ac/clip/<id>            dados da gravação (jogador, motivo, quantos quadros) para a página do site
 //   GET  /api/ac/clip/<id>/<n>.jpg    um quadro
 //
@@ -8,7 +8,7 @@
 // Tudo é apagado em 14 dias (acCron).
 import { json, nowS, verifyServer, siteCors, clean, account } from '../lib/util.js';
 
-const MAX_FRAMES = 40;
+const MAX_FRAMES = 48;
 const MAX_FRAME_BYTES = 200 * 1024;
 const MAX_BODY = 8 * 1024 * 1024;
 const KEEP_S = 14 * 86400;
@@ -50,13 +50,14 @@ async function saveClip(request, env) {
   }
   if (decoded.length === 0) return json({ error: 'no_frames' }, 400);
   const id = randomId();
+  const fps = Math.max(1, Math.min(4, Math.floor(Number(body.fps) || 1)));
   const stmts = [
-    env.DB.prepare('INSERT INTO ac_clips (id, created_at, player, account, reason, detail, frames) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(id, nowS(), clean(body.player, 40) || '?', account(body.account), clean(body.reason, 60) || '?', clean(body.detail, 600), decoded.length),
+    env.DB.prepare('INSERT INTO ac_clips (id, created_at, player, account, reason, detail, frames, fps) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(id, nowS(), clean(body.player, 40) || '?', account(body.account), clean(body.reason, 60) || '?', clean(body.detail, 600), decoded.length, fps),
     ...decoded.map((b, i) => env.DB.prepare('INSERT INTO ac_frames (clip_id, idx, data) VALUES (?, ?, ?)').bind(id, i, b)),
   ];
   await env.DB.batch(stmts);
-  return json({ id, frames: decoded.length });
+  return json({ id, frames: decoded.length, fps });
 }
 
 export async function handleAcHttp(request, env, url) {
@@ -79,7 +80,7 @@ export async function handleAcHttp(request, env, url) {
       headers: { ...h, 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=1209600, immutable', 'X-Content-Type-Options': 'nosniff' },
     });
   }
-  const clip = await env.DB.prepare('SELECT id, created_at, player, reason, detail, frames FROM ac_clips WHERE id = ?').bind(m[1]).first();
+  const clip = await env.DB.prepare('SELECT id, created_at, player, reason, detail, frames, fps FROM ac_clips WHERE id = ?').bind(m[1]).first();
   if (!clip) return json({ error: 'not_found' }, 404, h);
   return json(clip, 200, h);
 }

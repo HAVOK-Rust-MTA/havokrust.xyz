@@ -1305,6 +1305,7 @@
       try { const r = await fetch(`${api}/api/ac/clip/${id}`); c = r.ok ? await r.json() : null; } catch (e) { c = null; }
       if (!c) { box.innerHTML = `<p class="muted">${pt ? 'Gravação não encontrada ou já apagada (ficam 14 dias).' : 'Recording not found or already deleted (kept for 14 days).'}</p>`; return; }
       const when = new Date(c.created_at * 1000).toLocaleString(pt ? 'pt-BR' : 'en-US');
+      const fps = Math.max(1, Number(c.fps) || 1);
       const src = (n) => `${api}/api/ac/clip/${id}/${n}.jpg`;
       box.innerHTML = `<div class="ac-head"><b>${esc(c.player)}</b><span class="ac-reason">${esc(c.reason)}</span><span class="muted">${esc(when)}</span></div>
         ${c.detail ? `<p class="ac-detail">${esc(c.detail)}</p>` : ''}
@@ -1312,13 +1313,13 @@
         <div class="ac-ctrl"><button id="acPlay" class="ac-play">${pt ? 'Pausar' : 'Pause'}</button>
           <input id="acSeek" type="range" min="0" max="${c.frames - 1}" value="0" aria-label="${pt ? 'Quadro' : 'Frame'}">
           <span class="ac-speed">${[1, 2, 4].map((v) => `<button data-sp="${v}" class="${v === 1 ? 'on' : ''}">${v}x</button>`).join('')}</span></div>
-        <p class="muted ac-note">${pt ? `${c.frames} quadros, 1 por segundo: o último é o momento do alerta. Isto é evidência para a staff analisar, não prova sozinha.` : `${c.frames} frames, 1 per second: the last one is the moment of the alert. This is evidence for staff review, not proof on its own.`}</p>`;
+        <p class="muted ac-note">${pt ? `${c.frames} quadros, ${fps} por segundo: o último é o momento do alerta. Isto é evidência para a staff analisar, não prova sozinha.` : `${c.frames} frames, ${fps} per second: the last one is the moment of the alert. This is evidence for staff review, not proof on its own.`}</p>`;
       // pré-carrega todos os quadros e toca em loop
       const imgs = [...Array(c.frames)].map((_, n) => { const im = new Image(); im.src = src(n); return im; });
       let n = 0, speed = 1, playing = true, timer;
-      const show = () => { $('#acImg').src = imgs[n].src; $('#acSeek').value = n; $('#acTime').textContent = `${n - (c.frames - 1)}s`; };
+      const show = () => { $('#acImg').src = imgs[n].src; $('#acSeek').value = n; $('#acTime').textContent = `${((n - (c.frames - 1)) / fps).toFixed(fps > 1 ? 1 : 0)}s`; };
       const tick = () => { if (!$('#acImg')) return clearInterval(timer); n = (n + 1) % c.frames; show(); };
-      const restart = () => { clearInterval(timer); if (playing) timer = setInterval(tick, 1000 / speed); };
+      const restart = () => { clearInterval(timer); if (playing) timer = setInterval(tick, 1000 / (speed * fps)); };
       $('#acPlay').onclick = () => { playing = !playing; $('#acPlay').textContent = playing ? (pt ? 'Pausar' : 'Pause') : (pt ? 'Tocar' : 'Play'); restart(); };
       $('#acSeek').oninput = (e) => { n = Number(e.target.value); show(); };
       document.querySelectorAll('.ac-speed button').forEach((b) => b.onclick = () => {

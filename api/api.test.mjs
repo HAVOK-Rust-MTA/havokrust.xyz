@@ -8,7 +8,7 @@ import worker from './index.js';
 import { hmacHex } from './lib/util.js';
 import { sanitizeBadges, slugify } from './game/service.js';
 
-const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql', '0008_profile_social.sql', '0009_ac_clips.sql']
+const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql', '0008_profile_social.sql', '0009_ac_clips.sql', '0010_ac_fps.sql']
   .map((f) => readFileSync(new URL(`../worker/migrations/${f}`, import.meta.url), 'utf8')).join('\n');
 class Stmt {
   constructor(db, sql, args = []) { this.db = db; this.sql = sql; this.args = args; }
@@ -341,7 +341,7 @@ test('badges e slug aguentam lixo', () => {
 const JPEG = (n) => Buffer.from([0xff, 0xd8, 0xff, 0xe0, n, 1, 2, 3]).toString('base64');
 
 test('ac: servidor guarda gravação assinada; o site lê pelo id; quadro sai como JPEG', async () => {
-  const r = await server('/api/ac/clip', { player: 'Suspeito#FF0000', account: 'SERIAL-X', reason: 'Fly', detail: 'teste', frames: [JPEG(1), 'lixo', JPEG(2)] });
+  const r = await server('/api/ac/clip', { player: 'Suspeito#FF0000', account: 'SERIAL-X', reason: 'Fly', detail: 'teste', fps: 2, frames: [JPEG(1), 'lixo', JPEG(2)] });
   assert.equal(r.status, 200);
   assert.match(r.json.id, /^[0-9a-f]{32}$/);
   assert.equal(r.json.frames, 2);
@@ -349,6 +349,7 @@ test('ac: servidor guarda gravação assinada; o site lê pelo id; quadro sai co
   assert.equal(meta.player, 'Suspeito');
   assert.equal(meta.reason, 'Fly');
   assert.equal(meta.frames, 2);
+  assert.equal(meta.fps, 2);
   assert.ok(!JSON.stringify(meta).includes('SERIAL-X'));
   const img = await worker.fetch(new Request(`${API}/api/ac/clip/${r.json.id}/1.jpg`), env, ctx);
   assert.equal(img.headers.get('Content-Type'), 'image/jpeg');
