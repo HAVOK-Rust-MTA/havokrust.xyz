@@ -76,12 +76,13 @@ async function sync(request, env) {
       used.add(`s:${slug}`);
       const members = (Array.isArray(g.members) ? g.members : []).slice(0, 32).map((m) => ({ account: account(m && m.acc), role: ROLES.has(m && m.role) ? m.role : 'Member' }))
         .filter((m) => m.account);
-      // prêmio da posição (top 3): quantos são sorteados, quantos dias e qual VIP
-      const pz = g.prize && typeof g.prize === 'object' ? { winners: Math.min(99, int(g.prize.winners)), days: Math.min(365, int(g.prize.days)), tier: Math.min(3, int(g.prize.tier)) } : null;
+      // prêmio da posição (top 3): horas de VIP para todo o grupo (desde 21/10/2026) ou o sorteio antigo
+      // (quantos sorteados e quantos dias), e qual VIP
+      const pz = g.prize && typeof g.prize === 'object' ? { hours: Math.min(720, int(g.prize.hours)), winners: Math.min(99, int(g.prize.winners)), days: Math.min(365, int(g.prize.days)), tier: Math.min(3, int(g.prize.tier)) } : null;
       stmts.push(db.prepare(`INSERT INTO game_groups (name, slug, tag, color, emblem, description, rank, xp, kills, deaths, members, prize, updated_at)
                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
         .bind(name, slug, clean(g.tag, 8) || null, color(g.color), /^\d{2}$/.test(String(g.emblem)) ? String(g.emblem) : null, clean(g.desc, 160) || null,
-          i + 1, int(g.xp), int(g.kills), int(g.deaths), JSON.stringify(members), pz && pz.winners && pz.days ? JSON.stringify(pz) : null, t));
+          i + 1, int(g.xp), int(g.kills), int(g.deaths), JSON.stringify(members), pz && (pz.hours || (pz.winners && pz.days)) ? JSON.stringify(pz) : null, t));
       groups++;
     });
   }

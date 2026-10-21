@@ -1032,7 +1032,7 @@
       kicker_player: 'HAVOK · Player', kicker_group: 'HAVOK · Group', members: 'members', member: 'member', nomembers: 'No members yet.',
       rk_kicker: 'HAVOK · This wipe', rk_title: 'RANKING', rk_sub: 'Every group and every player of the current wipe. Click a group to see its members. Resets every wipe.',
       rk_groups: 'Groups', rk_players: 'Players', by: { kills: 'Kills', level: 'Level', hours: 'Hours' }, kills_l: 'kills', hours_l: 'played',
-      prize: (z) => `Prize: ${z.days}-day VIP for ${z.winners} drawn members (leader included)`, prize_note: 'The top 3 groups of the wipe win VIP by draw. The leader always wins.', xp: 'XP', nogroups: 'No groups yet this wipe.', noplayers: 'Nobody has played this wipe yet.' },
+      prize: (z) => z.hours ? `Prize: ${z.hours} h of VIP for the whole group` : `Prize: ${z.days}-day VIP for ${z.winners} drawn members (leader included)`, prize_note: 'The top 3 groups of the wipe win VIP for every member, valid next wipe (8 h, 6 h and 4 h of play).', xp: 'XP', nogroups: 'No groups yet this wipe.', noplayers: 'Nobody has played this wipe yet.' },
     pt: { kicker: 'HAVOK · Perfil', title: 'SEU PERFIL', sub: 'Seus números, grupo e badges num lugar só, com a sua foto do Discord no ranking.',
       login: 'Entrar com Discord', connect: 'Conectar Discord', my_profile: 'Meu perfil', how: 'Depois é só entrar no servidor: a tela de vínculo aparece sozinha. Aponte o celular para o QR ou clique em COPIAR LINK. Nada de comando.',
       unlinked: 'Falta pouco: entre no servidor do HAVOK e a tela de vínculo abre sozinha. Um clique no Discord e a sua conta do jogo aparece aqui.',
@@ -1046,7 +1046,7 @@
       kicker_player: 'HAVOK · Jogador', kicker_group: 'HAVOK · Grupo', members: 'membros', member: 'membro', nomembers: 'Nenhum membro ainda.',
       rk_kicker: 'HAVOK · Este wipe', rk_title: 'RANKING', rk_sub: 'Todos os grupos e todos os jogadores do wipe atual. Clique num grupo para ver os membros. Zera a cada wipe.',
       rk_groups: 'Grupos', rk_players: 'Jogadores', by: { kills: 'Kills', level: 'Level', hours: 'Horas' }, kills_l: 'kills', hours_l: 'jogadas',
-      prize: (z) => `Prêmio: VIP de ${z.days} dia${z.days > 1 ? 's' : ''} para ${z.winners} sorteados (o líder sempre ganha)`, prize_note: 'Os 3 primeiros grupos do wipe ganham VIP por sorteio. O líder sempre ganha.', xp: 'XP', nogroups: 'Nenhum grupo neste wipe ainda.', noplayers: 'Ninguém jogou neste wipe ainda.' },
+      prize: (z) => z.hours ? `Prêmio: ${z.hours} h de VIP para todo o grupo` : `Prêmio: VIP de ${z.days} dia${z.days > 1 ? 's' : ''} para ${z.winners} sorteados (o líder sempre ganha)`, prize_note: 'Os 3 primeiros grupos do wipe ganham VIP para todos os membros, valendo no próximo wipe (8 h, 6 h e 4 h de jogo).', xp: 'XP', nogroups: 'Nenhum grupo neste wipe ainda.', noplayers: 'Ninguém jogou neste wipe ainda.' },
   };
   const BADGE_EXTRA = { opening: ['Grand Opening', 'mythic'] }; // badges só do jogo (sem SVG no site): arte em PNG
   const badgeInfo = (id) => {
