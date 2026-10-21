@@ -15,6 +15,7 @@ import { loadEmojis, cachedEmojis, emojiPicker } from './emojis.js';
 import { ensureCommands } from './register.js';
 import { isWaitlistInteraction, handleWaitlist } from '../waitlist/join.js';
 import { isWipeInteraction, handleWipeCommand } from '../wipe/service.js';
+import { isReportInteraction, handleReport } from '../reports/service.js';
 import { EPHEMERAL, IDS, panelMessage, introMessage, step1DoneMessage, modal1, modal2, reviewMessages, filledNotice, statusText, appNumber } from './views.js';
 
 const TYPE = { PING: 1, COMMAND: 2, COMPONENT: 3, MODAL: 5 };
@@ -438,6 +439,7 @@ export async function handleInteraction(request, env, ctx) {
   // lista de espera: mesmo endpoint e mesma verificação, mas não depende da configuração do recrutamento
   if (isWaitlistInteraction(i)) return handleWaitlist(env, i, ctx, { isAdmin });
   if (isWipeInteraction(i)) return handleWipeCommand(env, i, ctx, { isAdmin });
+  if (isReportInteraction(i)) return handleReport(env, i, ctx, { isAdmin });
   const problem = configProblem(env);
   if (problem) {
     console.error('recruit config:', problem);
