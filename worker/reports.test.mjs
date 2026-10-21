@@ -44,7 +44,8 @@ const now = () => Math.floor(Date.now() / 1000);
 beforeEach(() => {
   env = { DB: new FakeD1(), SITE_URL: 'https://havokrust.xyz', API_PUBLIC_URL: 'https://api.havokrust.xyz', STAFF_ADMIN_ROLE_IDS: '500000000000000001', DISCORD_BOT_TOKEN: 'x', DISCORD_APPLICATION_ID: '1' };
   calls = []; pending = [];
-  env.DB.db.prepare('INSERT INTO ac_reports (code, created_at, expires_at, reporter, target, info) VALUES (?, ?, ?, ?, ?, ?)').run('HV-ABCDEF', now(), now() + 86400, 'Vitima', 'Cheater', 'AK, 30 m');
+  env.DB.db.prepare('INSERT INTO ac_reports (code, created_at, expires_at, reporter, reporter_account, target, target_account, info) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run('HV-ABCDEF', now(), now() + 86400, 'Vitima', 'SERIAL-V', 'Cheater', 'SERIAL-CHEATER', 'AK, 30 m');
+  env.DB.db.prepare('INSERT INTO players (discord_id, discord_name, account, created_at, updated_at) VALUES (?, ?, ?, ?, ?)').run('600000000000000001', 'cheaterzin', 'SERIAL-CHEATER', now(), now());
   env.DB.db.prepare('INSERT INTO ac_clips (id, created_at, player, reason, frames, fps, report) VALUES (?, ?, ?, ?, ?, ?, ?)').run('a'.repeat(32), now(), 'Cheater', 'Denúncia de morte', 60, 6, 'HV-ABCDEF');
 });
 
@@ -65,6 +66,9 @@ test('botão abre o formulário; código válido abre thread privada com a staff
   const post = calls.find((c) => c.path === '/channels/900000000000000001/messages').body;
   assert.match(post.content, /<@&500000000000000001>/);
   assert.match(post.embeds[0].description, /Cheater/);
+  assert.match(post.embeds[0].description, /SERIAL-CHEATER/);
+  assert.match(post.embeds[0].description, /<@600000000000000001> \(cheaterzin\)/);
+  assert.match(post.embeds[0].description, /SERIAL-V` · sem Discord vinculado/);
   assert.match(post.embeds[0].description, /havokrust\.xyz\/#\/ac\/a{32}/);
   assert.equal(post.embeds.length, 4); // galeria de 4 quadros
   assert.match(await last(await handleReport(env, modal('HV-ABCDEF'), ctx, { isAdmin: () => false })), /já foi usado: <#900000000000000001>/);

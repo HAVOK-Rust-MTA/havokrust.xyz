@@ -75,7 +75,7 @@ async function openTicket(env, i, user) {
   const code = field(i, 'code').trim().toUpperCase();
   const reason = clip(field(i, 'reason').trim(), 800);
   if (!CODE_RE.test(code)) return 'Código inválido. Ele tem o formato `HV-XXXXXX` e aparece no chat do jogo depois da denúncia.';
-  const rep = await env.DB.prepare('SELECT code, created_at, expires_at, reporter, target, info, used_at, thread_id FROM ac_reports WHERE code = ?').bind(code).first();
+  const rep = await env.DB.prepare('SELECT code, created_at, expires_at, reporter, reporter_account, target, target_account, info, used_at, thread_id FROM ac_reports WHERE code = ?').bind(code).first();
   if (!rep) return 'Não achei esse código. Confira no jogo com `/denuncias`.';
   if (rep.expires_at < nowS()) return 'Esse código já expirou (vale 14 dias).';
   if (rep.used_at) return `Esse código já foi usado${rep.thread_id ? `: <#${rep.thread_id}>` : ''}.`;
@@ -95,22 +95,31 @@ async function openTicket(env, i, user) {
   }
   await env.DB.prepare('UPDATE ac_reports SET thread_id = ? WHERE code = ?').bind(thread.id, code).run();
   const staff = idList(env.STAFF_ADMIN_ROLE_IDS);
-  const links = (clips || []).map((c) => `▶ [${clip(c.player, 40)} — ${clip(c.reason, 60)} (${c.frames} quadros)](${site(env)}/#/ac/${c.id})`);
-  const first = (clips || []).find((c) => c.frames > 0);
-  const gallery = [];
-  if (first) {
-    const n = first.frames;
-    const seen = new Set();
+  // quem matou primeiro (é a tela que mostra mira/wallhack), depois a visão da vítima
+  const ordered = [...(clips || [])].sort((a, b) => (a.player === rep.target ? 0 : 1) - (b.player === rep.target ? 0 : 1));
+  const links = ordered.map((c) => `▶ [${clip(c.player, 40)} — ${clip(c.reason, 60)} (${c.frames} quadros)](${site(env)}/#/ac/${c.id})`);
+  // serial e Discord de quem foi acusado (e de quem denunciou), para a staff chegar no jogador
+  const who = async (acc) => (acc ? env.DB.prepare('SELECT discord_id, discord_name FROM players WHERE account = ?').bind(acc).first() : null);
+  const tgt = await who(rep.target_account);
+  const rpt = await who(rep.reporter_account);
+  const ident = (acc, d) => [acc ? `serial \`${clip(acc, 40)}\`` : 'serial ?', d && d.discord_id ? `<@${d.discord_id}> (${clip(d.discord_name, 40)})` : 'sem Discord vinculado'].join(' · ');
+  const galleryOf = (c) => {
+    const n = c.frames, seen = new Set(), out = [];
     for (const k of [0, Math.floor((n - 1) / 3), Math.floor((n - 1) * 2 / 3), n - 1]) {
-      if (!seen.has(k)) { seen.add(k); gallery.push(k); }
+      if (!seen.has(k)) { seen.add(k); out.push(k); }
     }
-  }
+    return out;
+  };
+  const shown = ordered.filter((c) => c.frames > 0).slice(0, 2);
+  const first = shown[0];
   const url = first ? `${site(env)}/#/ac/${first.id}` : site(env);
   const embeds = [{
     title: `🚨 Denúncia ${code}`, url, color: 0xe5544b,
     description: [
       `**Denunciado:** ${clip(rep.target, 40)}`,
+      `↳ ${ident(rep.target_account, tgt)}`,
       `**Quem denunciou:** ${clip(rep.reporter, 40)} (<@${user.id}>)`,
+      `↳ ${ident(rep.reporter_account, rpt)}`,
       rep.info ? `**Morte:** ${clip(rep.info, 300)}` : '',
       `**Quando:** <t:${rep.created_at}:f>`,
       '',
@@ -118,10 +127,19 @@ async function openTicket(env, i, user) {
       '',
       links.length ? `**Gravações:**\n${links.join('\n')}` : '_As gravações ainda estão subindo ou não chegaram: a staff confere no canal de alertas._',
     ].filter((x) => x !== '').join('\n'),
-    ...(first ? { image: { url: `${api(env)}/api/ac/clip/${first.id}/${gallery[gallery.length - 1]}.jpg` } } : {}),
     footer: { text: 'Gravação é evidência para a staff analisar: não é prova sozinha.' },
   }];
-  for (const k of gallery.slice(0, -1)) embeds.push({ url, image: { url: `${api(env)}/api/ac/clip/${first.id}/${k}.jpg` } });
+  // uma galeria (até 4 imagens, mesma url) para cada gravação: primeiro a de quem matou
+  shown.forEach((c, gi) => {
+    const cUrl = `${site(env)}/#/ac/${c.id}`;
+    const ks = galleryOf(c).reverse(); // o último quadro (o momento) primeiro
+    ks.forEach((k, j) => {
+      const img = { url: `${api(env)}/api/ac/clip/${c.id}/${k}.jpg` };
+      if (gi === 0 && j === 0) { embeds[0].image = img; return; }
+      if (j === 0) embeds.push({ title: `🎥 ${clip(c.player, 40)} — ${clip(c.reason, 60)}`, url: cUrl, color: 0xe5544b, image: img });
+      else embeds.push({ url: cUrl, image: img });
+    });
+  });
   await sendMessage(env, thread.id, {
     content: `<@${user.id}>${staff.length ? ' ' + staff.map((r) => `<@&${r}>`).join(' ') : ''}`,
     embeds,
