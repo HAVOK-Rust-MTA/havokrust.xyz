@@ -409,6 +409,8 @@ test('ac: denúncia de morte gera código de 14 dias, a gravação aponta pra el
   assert.equal(mine.length, 1);
   assert.equal(mine[0].target, 'Cheater');
   assert.equal((await server('/api/ac/mine', { account: 'SERIAL-OUTRO' })).json.reports.length, 0);
-  advance(15 * 86400);
+  advance(15 * 86400); // expirada: ainda aparece (7 dias) para o jogador ver o status
+  assert.equal((await server('/api/ac/mine', { account: 'SERIAL-V' })).json.reports.length, 1);
+  advance(7 * 86400);
   assert.equal((await server('/api/ac/mine', { account: 'SERIAL-V' })).json.reports.length, 0);
 });

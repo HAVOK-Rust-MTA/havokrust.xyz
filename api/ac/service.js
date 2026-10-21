@@ -108,7 +108,7 @@ async function myReports(request, env) {
   const acc = account(body.account);
   if (!acc) return json({ reports: [] });
   const { results } = await env.DB.prepare('SELECT code, created_at, expires_at, target, used_at FROM ac_reports WHERE reporter_account = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 15')
-    .bind(acc, nowS()).all();
+    .bind(acc, nowS() - 7 * 86400).all(); // expiradas ficam 7 dias para o jogador ver o status
   return json({ reports: results || [] });
 }
 
@@ -152,6 +152,6 @@ export async function acCron(env) {
   await env.DB.batch([
     env.DB.prepare('DELETE FROM ac_frames WHERE clip_id IN (SELECT id FROM ac_clips WHERE created_at < ?)').bind(old),
     env.DB.prepare('DELETE FROM ac_clips WHERE created_at < ?').bind(old),
-    env.DB.prepare('DELETE FROM ac_reports WHERE expires_at < ?').bind(nowS() - 86400),
+    env.DB.prepare('DELETE FROM ac_reports WHERE expires_at < ?').bind(nowS() - 8 * 86400),
   ]);
 }
