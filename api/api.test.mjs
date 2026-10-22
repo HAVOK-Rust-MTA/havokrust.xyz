@@ -279,9 +279,13 @@ test('ranking de jogadores: ordena, traz grupo com cor e foto só de quem vincul
 test('prêmio do pódio: o jogo manda, o site lê (limpo); fora do top 3 não tem', async () => {
   await syncGame([], [{ ...GROUP, prize: { winners: 6, days: 1, tier: 1, extra: 'x' } }, { ...GROUP, name: 'Outro', prize: null }]);
   const gs = (await pub('/api/groups')).json.groups;
-  assert.deepEqual(gs[0].prize, { winners: 6, days: 1, tier: 1 });
+  // prêmio antigo (sorteio): sem horas
+  assert.deepEqual(gs[0].prize, { hours: 0, winners: 6, days: 1, tier: 1 });
   assert.equal(gs[1].prize, null);
-  assert.deepEqual((await pub(`/api/group/${gs[0].slug}`)).json.prize, { winners: 6, days: 1, tier: 1 });
+  assert.deepEqual((await pub(`/api/group/${gs[0].slug}`)).json.prize, { hours: 0, winners: 6, days: 1, tier: 1 });
+  // prêmio novo (21/10/2026): horas de VIP para o grupo todo
+  await syncGame([], [{ ...GROUP, prize: { hours: 8, tier: 1 } }]);
+  assert.deepEqual((await pub(`/api/group/${(await pub('/api/groups')).json.groups[0].slug}`)).json.prize, { hours: 8, winners: 0, days: 0, tier: 1 });
 });
 
 test('sync sem assinatura é recusado; perfil inexistente e slug inválido dão 404', async () => {
