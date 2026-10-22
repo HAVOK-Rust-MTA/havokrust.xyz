@@ -8,7 +8,7 @@ import worker from './index.js';
 import { hmacHex } from './lib/util.js';
 import { sanitizeBadges, slugify } from './game/service.js';
 
-const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql', '0008_profile_social.sql', '0009_ac_clips.sql', '0010_ac_fps.sql', '0011_ac_reports.sql']
+const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql', '0008_profile_social.sql', '0009_ac_clips.sql', '0010_ac_fps.sql', '0011_ac_reports.sql', '0012_ac_reports_close.sql']
   .map((f) => readFileSync(new URL(`../worker/migrations/${f}`, import.meta.url), 'utf8')).join('\n');
 class Stmt {
   constructor(db, sql, args = []) { this.db = db; this.sql = sql; this.args = args; }
@@ -408,6 +408,11 @@ test('ac: denúncia de morte gera código de 14 dias, a gravação aponta pra el
   const mine = (await server('/api/ac/mine', { account: 'SERIAL-V' })).json.reports;
   assert.equal(mine.length, 1);
   assert.equal(mine[0].target, 'Cheater');
+  assert.equal(mine[0].closed_at, null); // aberta: a staff ainda não concluiu
+  env.DB.db.prepare('UPDATE ac_reports SET closed_at = ?, verdict = ? WHERE code = ?').run(nowS(), 'Cheater banido', r.json.code);
+  const done = (await server('/api/ac/mine', { account: 'SERIAL-V' })).json.reports[0];
+  assert.ok(done.closed_at);
+  assert.equal(done.verdict, 'Cheater banido');
   assert.equal((await server('/api/ac/mine', { account: 'SERIAL-OUTRO' })).json.reports.length, 0);
   advance(15 * 86400); // expirada: ainda aparece (7 dias) para o jogador ver o status
   assert.equal((await server('/api/ac/mine', { account: 'SERIAL-V' })).json.reports.length, 1);

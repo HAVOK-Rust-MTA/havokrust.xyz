@@ -3,7 +3,7 @@
 //   POST /api/ac/clip                 (assinado) abre uma gravação: jogador, motivo, fps -> { id }
 //   POST /api/ac/frames               (assinado) acrescenta até 12 quadros JPEG (base64) a uma gravação aberta
 //   POST /api/ac/report               (assinado) denúncia de morte: cria o código (14 dias) -> { code, expires_at }
-//   POST /api/ac/mine                 (assinado) as denúncias de uma conta (/denuncias no jogo)
+//   POST /api/ac/mine                 (assinado) as denúncias de uma conta (/denuncias e F5 no jogo), com o status (concluída)
 //   GET  /api/ac/clip/<id>            dados da gravação (jogador, motivo, quantos quadros, fps) para o site
 //   GET  /api/ac/clip/<id>/<n>.jpg    um quadro
 //
@@ -107,7 +107,7 @@ async function myReports(request, env) {
   if (!body) return json({ error: 'unauthorized' }, 401);
   const acc = account(body.account);
   if (!acc) return json({ reports: [] });
-  const { results } = await env.DB.prepare('SELECT code, created_at, expires_at, target, used_at FROM ac_reports WHERE reporter_account = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 15')
+  const { results } = await env.DB.prepare('SELECT code, created_at, expires_at, target, used_at, closed_at, verdict FROM ac_reports WHERE reporter_account = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 15')
     .bind(acc, nowS() - 7 * 86400).all(); // expiradas ficam 7 dias para o jogador ver o status
   return json({ reports: results || [] });
 }

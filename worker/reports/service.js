@@ -3,6 +3,8 @@
 //
 //   /denuncias painel     (admin) publica o painel com o botão neste canal
 //   botão report:open  -> formulário (código + motivo) -> report:modal -> thread privada
+//   botão report:close:<código> (só staff) -> formulário do resultado -> report:closed:<código> -> concluída,
+//   a thread é arquivada e trancada e o jogo mostra CONCLUÍDA no F5
 //
 // O bot precisa, no canal do painel: Ver canal, Enviar mensagens, Criar threads privadas, Enviar mensagens em threads,
 // Inserir links. As tabelas (ac_reports, ac_clips) são do mesmo D1 da havok-api.
@@ -33,18 +35,27 @@ const reply = (content) => new Response(JSON.stringify({ type: 4, data: { flags:
   { headers: { 'Content-Type': 'application/json' } });
 const deferred = () => new Response(JSON.stringify({ type: 5, data: { flags: EPHEMERAL } }), { headers: { 'Content-Type': 'application/json' } });
 
-export const panelMessage = () => ({
+// imagem/GIF opcional que mostra onde fica o código (REPORT_HELP_IMAGE no wrangler.toml; só https)
+const helpImage = (env) => (/^https:\/\/\S+$/.test(String((env && env.REPORT_HELP_IMAGE) || '')) ? String(env.REPORT_HELP_IMAGE) : '');
+
+export const panelMessage = (env) => ({
   embeds: [{
     title: '🚨 Denúncias · Reports',
     color: 0xe5544b,
     description: [
       'Morreu de um jeito estranho? Na tela de morte do jogo clique em **MORTE SUSPEITA**.',
-      'Você recebe um **código** (ex.: `HV-7K3Q9A`) no chat do jogo. Ele vale **14 dias**; no jogo, `/denuncias` mostra os seus.',
+      'Você recebe um **código** (ex.: `HV-7K3Q9A`). Ele vale **14 dias**.',
       '',
-      'Clique no botão abaixo, cole o código e conte o que aconteceu. A staff recebe as gravações da morte num ticket privado.',
+      '**Onde fica o código:**',
+      '• no **chat do jogo**, logo depois de clicar em MORTE SUSPEITA;',
+      '• no jogo, aperte **F5** → aba **DENÚNCIAS** → botão **COPIAR** ao lado do código (cola aqui com Ctrl+V);',
+      '• ou digite `/denuncias` no chat do jogo.',
       '',
-      '_Died in a weird way? Click **SUSPICIOUS DEATH** on the death screen, get a code in the game chat (valid 14 days) and paste it here._',
+      'Clique no botão abaixo, cole o código e conte o que aconteceu. A staff recebe as gravações da morte num ticket privado e avisa quando concluir.',
+      '',
+      '_Died in a weird way? Click **SUSPICIOUS DEATH** on the death screen. Your code is in the game chat, in **F5 → REPORTS** (COPY button) or `/denuncias`. Valid 14 days._',
     ].join('\n'),
+    ...(helpImage(env) ? { image: { url: helpImage(env) } } : {}),
   }],
   components: [{ type: 1, components: [{ type: 2, style: 4, custom_id: 'report:open', label: 'Abrir denúncia · Open report', emoji: { name: '🚨' } }] }],
 });
@@ -144,8 +155,39 @@ async function openTicket(env, i, user) {
     content: `<@${user.id}>${staff.length ? ' ' + staff.map((r) => `<@&${r}>`).join(' ') : ''}`,
     embeds,
     allowed_mentions: { users: [user.id], roles: staff },
+    components: [{ type: 1, components: [{ type: 2, style: 3, custom_id: `report:close:${code}`, label: 'Concluir denúncia', emoji: { name: '✅' } }] }],
   });
   return `Ticket aberto: <#${thread.id}>. A staff vai analisar as gravações.`;
+}
+
+// formulário de conclusão (só staff): o resultado vai para o ticket e fica guardado
+const closeModal = (code) => ({
+  type: 9,
+  data: {
+    custom_id: `report:closed:${code}`,
+    title: `Concluir ${code}`.slice(0, 45),
+    components: [
+      { type: 1, components: [{ type: 4, custom_id: 'verdict', label: 'Resultado (o jogador vê no ticket)', style: 2, min_length: 3, max_length: 400, required: true, placeholder: 'Ex.: cheater banido / sem irregularidade nas gravações' }] },
+    ],
+  },
+});
+
+async function closeTicket(env, i, user, code) {
+  const verdict = clip(field(i, 'verdict').trim(), 400);
+  const rep = await env.DB.prepare('SELECT code, thread_id, closed_at FROM ac_reports WHERE code = ?').bind(code).first();
+  if (!rep) return 'Denúncia não encontrada.';
+  if (rep.closed_at) return 'Essa denúncia já foi concluída.';
+  const r = await env.DB.prepare('UPDATE ac_reports SET closed_at = ?, closed_by = ?, verdict = ? WHERE code = ? AND closed_at IS NULL')
+    .bind(nowS(), user.id, verdict, code).run();
+  if (!r.meta || !r.meta.changes) return 'Essa denúncia acabou de ser concluída.';
+  const thread = rep.thread_id || i.channel_id;
+  await sendMessage(env, thread, {
+    embeds: [{ title: `✅ Denúncia ${code} concluída`, color: 0x6cc070, description: `**Resultado:** ${verdict}\n\nConcluída por <@${user.id}> em <t:${nowS()}:f>.` }],
+    allowed_mentions: NO_MENTIONS,
+  });
+  // arquiva e tranca: o ticket some da lista, ninguém escreve mais (a staff ainda pode reabrir pelo Discord)
+  await discordRequest(env, 'PATCH', `/channels/${thread}`, { archived: true, locked: true }).catch((e) => console.error('report archive:', e.message));
+  return `Denúncia ${code} concluída.`;
 }
 
 export async function handleReport(env, i, ctx, { isAdmin }) {
@@ -154,14 +196,28 @@ export async function handleReport(env, i, ctx, { isAdmin }) {
   if (i.type === 3 && i.data.custom_id === 'report:open') {
     return new Response(JSON.stringify(modal()), { headers: { 'Content-Type': 'application/json' } });
   }
+  const closeBtn = /^report:close:(HV-[A-HJ-NP-Z2-9]{6})$/.exec(String(i.data.custom_id || ''));
+  if (i.type === 3 && closeBtn) {
+    if (!isAdmin(env, i.member)) return reply('Só a staff conclui denúncias.');
+    return new Response(JSON.stringify(closeModal(closeBtn[1])), { headers: { 'Content-Type': 'application/json' } });
+  }
   if (!(await claimInteraction(env.DB, String(i.id)))) return reply('Esta ação já foi processada.');
   if (i.type === 2) {
     if (!isAdmin(env, i.member)) return reply('Você não tem permissão para fazer isso.');
-    ctx.waitUntil(sendMessage(env, i.channel_id, panelMessage())
+    ctx.waitUntil(sendMessage(env, i.channel_id, panelMessage(env))
       .then(() => 'Painel de denúncias publicado neste canal.')
       .catch((e) => (e instanceof DiscordError && e.status === 403 ? 'O bot não tem permissão nesse canal (Ver canal, Enviar mensagens, Inserir links).' : 'Não consegui publicar agora.'))
       .then((content) => editOriginal(env, i, { content }))
       .catch((e) => console.error('report panel:', e.message)));
+    return deferred();
+  }
+  const closed = /^report:closed:(HV-[A-HJ-NP-Z2-9]{6})$/.exec(String(i.data.custom_id || ''));
+  if (i.type === 5 && closed) {
+    if (!isAdmin(env, i.member)) return reply('Só a staff conclui denúncias.');
+    ctx.waitUntil(closeTicket(env, i, user, closed[1])
+      .catch((e) => { console.error('report close:', e.message); return 'Não consegui concluir agora. Tente de novo em instantes.'; })
+      .then((content) => editOriginal(env, i, { content }))
+      .catch((e) => console.error('report close followup:', e.message)));
     return deferred();
   }
   if (i.type === 5 && i.data.custom_id === 'report:modal') {

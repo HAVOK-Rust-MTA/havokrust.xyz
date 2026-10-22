@@ -88,3 +88,37 @@ test('painel só para admin', async () => {
   await last(await handleReport(env, cmd('p2'), ctx, { isAdmin: () => true }));
   assert.ok(calls.some((c) => c.path === '/channels/800000000000000001/messages' && c.body.components));
 });
+
+test('ticket tem o botão Concluir; só a staff conclui; fica guardado e a thread é arquivada e trancada', async () => {
+  await last(await handleReport(env, modal('HV-ABCDEF'), ctx, { isAdmin: () => false }));
+  const post = calls.find((c) => c.path === '/channels/900000000000000001/messages').body;
+  assert.equal(post.components[0].components[0].custom_id, 'report:close:HV-ABCDEF');
+  const btn = (id) => ({ id, type: 3, channel_id: '900000000000000001', member, application_id: '1', token: 't', data: { custom_id: 'report:close:HV-ABCDEF' } });
+  const denied = await handleReport(env, btn('c1'), ctx, { isAdmin: () => false });
+  assert.match((await denied.json()).data.content, /Só a staff/);
+  const form = await handleReport(env, btn('c2'), ctx, { isAdmin: () => true });
+  const f = await form.json();
+  assert.equal(f.type, 9);
+  assert.equal(f.data.custom_id, 'report:closed:HV-ABCDEF');
+  const submit = (id) => ({ id, type: 5, channel_id: '900000000000000001', member, application_id: '1', token: 't',
+    data: { custom_id: 'report:closed:HV-ABCDEF', components: [{ components: [{ custom_id: 'verdict', value: 'Cheater banido' }] }] } });
+  assert.match(await last(await handleReport(env, submit('c3'), ctx, { isAdmin: () => true })), /concluída/);
+  const row = env.DB.db.prepare('SELECT closed_at, closed_by, verdict FROM ac_reports WHERE code = ?').get('HV-ABCDEF');
+  assert.ok(row.closed_at);
+  assert.equal(row.closed_by, USER.id);
+  assert.equal(row.verdict, 'Cheater banido');
+  assert.ok(calls.some((c) => c.method === 'PATCH' && c.path === '/channels/900000000000000001' && c.body.archived && c.body.locked));
+  assert.match(await last(await handleReport(env, submit('c4'), ctx, { isAdmin: () => true })), /já foi concluída/);
+});
+
+test('painel explica onde fica o código e mostra a imagem só se for https', async () => {
+  const cmd = (id) => ({ id, type: 2, channel_id: '800000000000000001', member, application_id: '1', token: 't', data: { name: 'denuncias', options: [{ name: 'painel' }] } });
+  env.REPORT_HELP_IMAGE = 'https://havokrust.xyz/img/denuncia.gif';
+  await last(await handleReport(env, cmd('h1'), ctx, { isAdmin: () => true }));
+  const msg = calls.filter((c) => c.path === '/channels/800000000000000001/messages').pop().body;
+  assert.match(msg.embeds[0].description, /F5/);
+  assert.equal(msg.embeds[0].image.url, 'https://havokrust.xyz/img/denuncia.gif');
+  env.REPORT_HELP_IMAGE = 'javascript:alert(1)';
+  await last(await handleReport(env, cmd('h2'), ctx, { isAdmin: () => true }));
+  assert.equal(calls.filter((c) => c.path === '/channels/800000000000000001/messages').pop().body.embeds[0].image, undefined);
+});

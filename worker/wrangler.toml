@@ -22,6 +22,9 @@ STAFF_ADMIN_ROLE_IDS = "1561366785062862998,1561367057717661799"   # suporter, a
 # denúncias do jogo (reports/): links das gravações no site e imagens da API
 SITE_URL = "https://havokrust.xyz"
 API_PUBLIC_URL = "https://api.havokrust.xyz"
+# opcional: imagem/GIF (URL https) mostrando onde fica o código da denúncia, no painel /denuncias painel. Vazio = sem imagem.
+# Depois de mudar: deploy e publicar o painel de novo (/denuncias painel).
+REPORT_HELP_IMAGE = ""
 # opcional: IDs de pessoas que podem tudo isso mesmo sem o cargo, separados por vírgula
 STAFF_ADMIN_USER_IDS = ""
 # cargos dados automaticamente a quem for APROVADO, separados por vírgula. Vazio = não dá cargo.
