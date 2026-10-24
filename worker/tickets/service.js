@@ -8,7 +8,8 @@
 //
 // Limite: 1 ticket aberto de cada tipo por pessoa. O bot precisa, no canal do painel: Ver canal, Enviar mensagens,
 // Criar threads privadas, Enviar mensagens em threads, Gerenciar threads (para trancar ao fechar).
-import { discordRequest, sendMessage, editOriginal, NO_MENTIONS, DiscordError } from '../recruit/discord.js';
+import { discordRequest, sendMessage, sendDM, editOriginal, NO_MENTIONS, DiscordError } from '../recruit/discord.js';
+import { lockThread } from '../reports/service.js';
 import { claimInteraction } from '../recruit/db.js';
 import { BRAND, SITE, LOGO, COLORS } from '../recruit/config.js';
 
@@ -164,7 +165,7 @@ async function openTicket(env, i, user, kind) {
 }
 
 async function closeTicket(env, i, user, id, staff) {
-  const t = await env.DB.prepare('SELECT id, kind, user_id, thread_id, closed_at FROM tickets WHERE id = ?').bind(id).first();
+  const t = await env.DB.prepare('SELECT id, kind, user_id, reason, thread_id, closed_at FROM tickets WHERE id = ?').bind(id).first();
   if (!t) return 'Ticket não encontrado.';
   if (t.user_id !== user.id && !staff) return 'Só quem abriu ou a staff fecha o ticket.';
   if (t.closed_at) return 'Esse ticket já foi fechado.';
@@ -175,9 +176,23 @@ async function closeTicket(env, i, user, id, staff) {
     embeds: [{ title: `🔒 Ticket #${id} fechado`, color: 0x6cc070, description: `Fechado por <@${user.id}> em <t:${nowS()}:f>.` }],
     allowed_mentions: NO_MENTIONS,
   });
-  // arquiva e tranca: some da lista e ninguém escreve mais (a staff ainda pode reabrir pelo Discord)
-  await discordRequest(env, 'PATCH', `/channels/${thread}`, { archived: true, locked: true }).catch((e) => console.error('ticket archive:', e.message));
-  return `Ticket #${id} fechado.`;
+  // fechado pela staff: quem abriu fica sabendo no privado (pode estar com a DM fechada)
+  if (t.user_id !== user.id) {
+    const k = KINDS[t.kind] || { emoji: '🎫', label: t.kind };
+    await sendDM(env, t.user_id, {
+      embeds: [{
+        author: { name: `${BRAND} · Tickets`, icon_url: LOGO },
+        title: `🔒 Seu ticket #${id} foi fechado`,
+        color: COLORS.brand,
+        description: [`**Categoria:** ${k.emoji} ${k.label}`, `**Motivo:** ${clip(t.reason, 100)}`, `**Fechado por:** <@${user.id}>`, '', `Ticket: <#${thread}>`, '', 'Precisa de mais alguma coisa? Abra outro ticket no painel.'].join('\n'),
+        footer: { text: BRAND, icon_url: LOGO },
+        timestamp: new Date().toISOString(),
+      }],
+      allowed_mentions: NO_MENTIONS,
+    }).catch((e) => console.error('ticket dm:', e.message));
+  }
+  const shut = await lockThread(env, thread, 'ticket');
+  return [`Ticket #${id} fechado.`, shut].filter(Boolean).join(' ');
 }
 
 export async function handleTicket(env, i, ctx, { isAdmin }) {

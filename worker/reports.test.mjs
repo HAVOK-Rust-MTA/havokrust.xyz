@@ -107,7 +107,12 @@ test('ticket tem o botão Concluir; só a staff conclui; fica guardado e a threa
   assert.ok(row.closed_at);
   assert.equal(row.closed_by, USER.id);
   assert.equal(row.verdict, 'Cheater banido');
-  assert.ok(calls.some((c) => c.method === 'PATCH' && c.path === '/channels/900000000000000001' && c.body.archived && c.body.locked));
+  assert.ok(calls.some((c) => c.method === 'PATCH' && c.path === '/channels/900000000000000001' && c.body.locked));
+  assert.ok(calls.some((c) => c.method === 'PATCH' && c.path === '/channels/900000000000000001' && c.body.archived));
+  // quem denunciou recebe o resultado no privado, em embed
+  const dmOpen = calls.find((c) => c.path === '/users/@me/channels');
+  assert.equal(dmOpen.body.recipient_id, USER.id);
+  assert.ok(calls.some((c) => c.method === 'POST' && c.path === '/channels/1/messages' && /concluída/.test(c.body.embeds[0].title)));
   assert.match(await last(await handleReport(env, submit('c4'), ctx, { isAdmin: () => true })), /já foi concluída/);
 });
 

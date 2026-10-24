@@ -8,7 +8,8 @@
 //
 // O bot precisa, no canal do painel: Ver canal, Enviar mensagens, Criar threads privadas, Enviar mensagens em threads,
 // Inserir links. As tabelas (ac_reports, ac_clips) são do mesmo D1 da havok-api.
-import { discordRequest, sendMessage, editOriginal, NO_MENTIONS, DiscordError } from '../recruit/discord.js';
+import { discordRequest, sendMessage, sendDM, editOriginal, NO_MENTIONS, DiscordError } from '../recruit/discord.js';
+import { BRAND, LOGO } from '../recruit/config.js';
 import { claimInteraction } from '../recruit/db.js';
 
 const EPHEMERAL = 64;
@@ -175,9 +176,18 @@ const closeModal = (code) => ({
   },
 });
 
+// tranca (ninguém escreve) e arquiva (some da lista). Trancar exige "Gerenciar threads" no canal; sem ela, ao menos arquiva.
+export async function lockThread(env, thread, tag) {
+  let locked = true;
+  await discordRequest(env, 'PATCH', `/channels/${thread}`, { locked: true }).catch((e) => { locked = false; console.error(`${tag} lock:`, e.message); });
+  const archived = await discordRequest(env, 'PATCH', `/channels/${thread}`, { archived: true }).then(() => true, (e) => { console.error(`${tag} archive:`, e.message); return false; });
+  if (locked && archived) return '';
+  return 'Não consegui ' + (archived ? 'trancar' : 'fechar') + ' o ticket: dê ao bot a permissão **Gerenciar threads** no canal.';
+}
+
 async function closeTicket(env, i, user, code) {
   const verdict = clip(field(i, 'verdict').trim(), 400);
-  const rep = await env.DB.prepare('SELECT code, thread_id, closed_at FROM ac_reports WHERE code = ?').bind(code).first();
+  const rep = await env.DB.prepare('SELECT code, thread_id, closed_at, target, used_by FROM ac_reports WHERE code = ?').bind(code).first();
   if (!rep) return 'Denúncia não encontrada.';
   if (rep.closed_at) return 'Essa denúncia já foi concluída.';
   const r = await env.DB.prepare('UPDATE ac_reports SET closed_at = ?, closed_by = ?, verdict = ? WHERE code = ? AND closed_at IS NULL')
@@ -188,9 +198,20 @@ async function closeTicket(env, i, user, code) {
     embeds: [{ title: `✅ Denúncia ${code} concluída`, color: 0x6cc070, description: `**Resultado:** ${verdict}\n\nConcluída por <@${user.id}> em <t:${nowS()}:f>.` }],
     allowed_mentions: NO_MENTIONS,
   });
-  // arquiva e tranca: o ticket some da lista, ninguém escreve mais (a staff ainda pode reabrir pelo Discord)
-  await discordRequest(env, 'PATCH', `/channels/${thread}`, { archived: true, locked: true }).catch((e) => console.error('report archive:', e.message));
-  return `Denúncia ${code} concluída.`;
+  // quem denunciou recebe o resultado no privado (pode estar com a DM fechada: aí só fica no ticket)
+  const dm = rep.used_by ? await sendDM(env, rep.used_by, {
+    embeds: [{
+      author: { name: `${BRAND} · Denúncias`, icon_url: LOGO },
+      title: `✅ Sua denúncia ${code} foi concluída`,
+      color: 0x6cc070,
+      description: [`**Denunciado:** ${clip(rep.target, 40)}`, `**Resultado:** ${verdict}`, '', `Ticket: <#${thread}>`, '', 'Obrigado por ajudar a manter o servidor limpo.'].join('\n'),
+      footer: { text: `${BRAND} · a staff analisa cada denúncia com as gravações`, icon_url: LOGO },
+      timestamp: new Date().toISOString(),
+    }],
+    allowed_mentions: NO_MENTIONS,
+  }).then(() => true, (e) => { console.error('report dm:', e.message); return false; }) : false;
+  const shut = await lockThread(env, thread, 'report');
+  return [`Denúncia ${code} concluída.`, dm ? 'O jogador recebeu o resultado no privado.' : 'Não deu para mandar no privado do jogador (DM fechada): o resultado ficou no ticket.', shut].filter(Boolean).join(' ');
 }
 
 export async function handleReport(env, i, ctx, { isAdmin }) {
@@ -209,7 +230,11 @@ export async function handleReport(env, i, ctx, { isAdmin }) {
     if (!isAdmin(env, i.member)) return reply('Só a staff conclui denúncias.');
     const rep = await env.DB.prepare('SELECT code, closed_at FROM ac_reports WHERE thread_id = ?').bind(String(i.channel_id)).first();
     if (!rep) return reply('Use este comando dentro do ticket da denúncia.');
-    if (rep.closed_at) return reply('Essa denúncia já foi concluída.');
+    if (rep.closed_at) {
+      // já concluída, mas a thread ficou aberta (bot sem permissão na época): só fecha de novo
+      ctx.waitUntil(lockThread(env, String(i.channel_id), 'report').catch((e) => console.error('report relock:', e.message)));
+      return reply('Essa denúncia já foi concluída. Fechando o ticket.');
+    }
     return new Response(JSON.stringify(closeModal(rep.code)), { headers: { 'Content-Type': 'application/json' } });
   }
   if (!(await claimInteraction(env.DB, String(i.id)))) return reply('Esta ação já foi processada.');
