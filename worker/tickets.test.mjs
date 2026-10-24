@@ -59,11 +59,12 @@ test('reconhece só as interações de ticket', () => {
 });
 
 test('painel tem o menu com as categorias, Limpar seleção e o banner', () => {
-  const p = panelMessage({ SITE_URL: 'https://havokrust.xyz' });
+  const p = panelMessage({ PUBLIC_URL: 'https://havok-waitlist.havokrust.workers.dev' });
   const sel = p.components[0].components[0];
   assert.equal(sel.type, 3);
   assert.deepEqual(sel.options.map((o) => o.value), ['suporte', 'vip', 'sugestao', 'bug', 'limpar']);
-  assert.equal(p.embeds[0].image.url, 'https://havokrust.xyz/og.jpg');
+  assert.match(p.embeds[0].image.url, /^https:\/\/havok-waitlist\.havokrust\.workers\.dev\/recruit\/banner-tickets\.jpg\?v=\d+$/);
+  assert.equal(p.embeds[0].color, 0xff6a00);
   for (const k of ['suporte', 'vip', 'sugestao', 'bug']) {
     const md = sel.options.find((o) => o.value === k);
     assert.ok(md.label.length <= 100 && md.description.length <= 100);

@@ -10,6 +10,7 @@
 // Criar threads privadas, Enviar mensagens em threads, Gerenciar threads (para trancar ao fechar).
 import { discordRequest, sendMessage, editOriginal, NO_MENTIONS, DiscordError } from '../recruit/discord.js';
 import { claimInteraction } from '../recruit/db.js';
+import { BRAND, SITE, LOGO, COLORS } from '../recruit/config.js';
 
 const EPHEMERAL = 64;
 const nowS = () => Math.floor(Date.now() / 1000);
@@ -47,12 +48,14 @@ const json = (body) => new Response(JSON.stringify(body), { headers: { 'Content-
 const reply = (content) => json({ type: 4, data: { flags: EPHEMERAL, content, allowed_mentions: NO_MENTIONS } });
 const deferred = () => json({ type: 5, data: { flags: EPHEMERAL } });
 
-// banner do painel: TICKET_IMAGE (https) no wrangler.toml, senão a imagem de capa do site
+// banner do painel: TICKET_IMAGE (https) no wrangler.toml, senão o banner próprio servido pelo Worker
+// (tickets/make-banner.py -> recruit/banners.js). Trocou a imagem: suba TICKET_BANNER_VERSION.
+const TICKET_BANNER_VERSION = 1;
 const banner = (env) => {
   const own = String((env && env.TICKET_IMAGE) || '');
   if (/^https:\/\/\S+$/.test(own)) return own;
-  const site = String((env && env.SITE_URL) || '').replace(/\/+$/, '');
-  return /^https:\/\/\S+$/.test(site) ? `${site}/og.jpg` : '';
+  const base = String((env && env.PUBLIC_URL) || '').replace(/\/+$/, '');
+  return /^https:\/\/\S+$/.test(base) ? `${base}/recruit/banner-tickets.jpg?v=${TICKET_BANNER_VERSION}` : '';
 };
 
 const menu = () => ({ type: 1, components: [{
@@ -65,8 +68,9 @@ const menu = () => ({ type: 1, components: [{
 
 export const panelMessage = (env) => ({
   embeds: [{
-    title: '🎫 Tickets · Atendimento',
-    color: 0xe5544b,
+    author: { name: `${BRAND} · Tickets`, url: SITE, icon_url: LOGO },
+    title: 'ATENDIMENTO DA STAFF',
+    color: COLORS.brand,
     description: [
       'Precisa falar com a staff? **Escolha a categoria no menu abaixo**, escreva o motivo e um ticket privado é aberto só para você e a staff.',
       '',
@@ -77,6 +81,7 @@ export const panelMessage = (env) => ({
       '_Need the staff? Pick a category, write the reason and a private ticket opens for you and the staff only._',
     ].join('\n'),
     ...(banner(env) ? { image: { url: banner(env) } } : {}),
+    footer: { text: `${BRAND} · 1 ticket aberto por categoria`, icon_url: LOGO },
   }],
   components: [menu()],
 });
