@@ -122,3 +122,17 @@ test('painel explica onde fica o código e mostra a imagem só se for https', as
   await last(await handleReport(env, cmd('h2'), ctx, { isAdmin: () => true }));
   assert.equal(calls.filter((c) => c.path === '/channels/800000000000000001/messages').pop().body.embeds[0].image, undefined);
 });
+
+test('/denuncias concluir dentro do ticket antigo abre o formulário de conclusão (só staff)', async () => {
+  env.DB.db.prepare('UPDATE ac_reports SET used_at = ?, thread_id = ? WHERE code = ?').run(now(), '900000000000000009', 'HV-ABCDEF');
+  const cmd = (mem, channel = '900000000000000009') => ({ id: String(++n), type: 2, channel_id: channel, member: mem, data: { name: 'denuncias', options: [{ name: 'concluir', type: 1 }] } });
+  const staffMember = { user: { id: '400000000000000009', username: 'staff' }, roles: ['500000000000000001'] };
+  const isStaff = (_e, mem) => (mem.roles || []).includes('500000000000000001');
+  const no = await (await handleReport(env, cmd(member), ctx, { isAdmin: isStaff })).json();
+  assert.match(no.data.content, /Só a staff/);
+  const outside = await (await handleReport(env, cmd(staffMember, '800000000000000001'), ctx, { isAdmin: isStaff })).json();
+  assert.match(outside.data.content, /dentro do ticket/);
+  const ok = await (await handleReport(env, cmd(staffMember), ctx, { isAdmin: isStaff })).json();
+  assert.equal(ok.type, 9);
+  assert.equal(ok.data.custom_id, 'report:closed:HV-ABCDEF');
+});

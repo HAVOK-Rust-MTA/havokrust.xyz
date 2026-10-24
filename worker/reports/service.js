@@ -25,7 +25,10 @@ export const REPORT_COMMAND = {
   type: 1,
   contexts: [0],
   default_member_permissions: '8',
-  options: [{ type: 1, name: 'painel', description: 'Publica o painel de denúncias neste canal' }],
+  options: [
+    { type: 1, name: 'painel', description: 'Publica o painel de denúncias neste canal' },
+    { type: 1, name: 'concluir', description: 'Conclui a denúncia deste ticket (para tickets antigos, sem o botão)' },
+  ],
 };
 
 export const isReportInteraction = (i) => (i.type === 2 && i.data && i.data.name === 'denuncias')
@@ -200,6 +203,14 @@ export async function handleReport(env, i, ctx, { isAdmin }) {
   if (i.type === 3 && closeBtn) {
     if (!isAdmin(env, i.member)) return reply('Só a staff conclui denúncias.');
     return new Response(JSON.stringify(closeModal(closeBtn[1])), { headers: { 'Content-Type': 'application/json' } });
+  }
+  // /denuncias concluir dentro do ticket: o mesmo formulário do botão (os tickets de antes do botão não têm ele)
+  if (i.type === 2 && ((i.data.options || [])[0] || {}).name === 'concluir') {
+    if (!isAdmin(env, i.member)) return reply('Só a staff conclui denúncias.');
+    const rep = await env.DB.prepare('SELECT code, closed_at FROM ac_reports WHERE thread_id = ?').bind(String(i.channel_id)).first();
+    if (!rep) return reply('Use este comando dentro do ticket da denúncia.');
+    if (rep.closed_at) return reply('Essa denúncia já foi concluída.');
+    return new Response(JSON.stringify(closeModal(rep.code)), { headers: { 'Content-Type': 'application/json' } });
   }
   if (!(await claimInteraction(env.DB, String(i.id)))) return reply('Esta ação já foi processada.');
   if (i.type === 2) {
