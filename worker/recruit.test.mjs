@@ -660,13 +660,13 @@ test('o Worker registra o /staff sozinho no cron, uma vez só por versão do com
   await recruitCron(env);
   await recruitCron(env);
   const regs = calls.filter((c) => c.method === 'POST' && c.path === `/applications/${APP_ID}/guilds/${GUILD}/commands`);
-  assert.deepEqual(regs.map((r) => r.body.name), ['staff', 'waitinglist', 'wipe', 'denuncias']); // todos, uma vez só
+  assert.deepEqual(regs.map((r) => r.body.name), ['staff', 'waitinglist', 'wipe', 'denuncias', 'tickets']); // todos, uma vez só
   assert.equal(regs[0].auth, 'Bot b0t-t0k3n');
   // sem Application ID configurado: não tenta
   _resetCommands();
   delete env.DISCORD_APPLICATION_ID;
   await recruitCron(env);
-  assert.equal(calls.filter((c) => c.path.endsWith('/commands')).length, 4);
+  assert.equal(calls.filter((c) => c.path.endsWith('/commands')).length, 5);
 });
 
 test('vagas à escolha: abrir com N, mudar no meio, nunca abaixo dos aprovados', async () => {

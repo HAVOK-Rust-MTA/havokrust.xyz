@@ -16,6 +16,7 @@ import { ensureCommands } from './register.js';
 import { isWaitlistInteraction, handleWaitlist } from '../waitlist/join.js';
 import { isWipeInteraction, handleWipeCommand } from '../wipe/service.js';
 import { isReportInteraction, handleReport } from '../reports/service.js';
+import { isTicketInteraction, handleTicket } from '../tickets/service.js';
 import { EPHEMERAL, IDS, panelMessage, introMessage, step1DoneMessage, modal1, modal2, reviewMessages, filledNotice, statusText, appNumber } from './views.js';
 
 const TYPE = { PING: 1, COMMAND: 2, COMPONENT: 3, MODAL: 5 };
@@ -440,6 +441,7 @@ export async function handleInteraction(request, env, ctx) {
   if (isWaitlistInteraction(i)) return handleWaitlist(env, i, ctx, { isAdmin });
   if (isWipeInteraction(i)) return handleWipeCommand(env, i, ctx, { isAdmin });
   if (isReportInteraction(i)) return handleReport(env, i, ctx, { isAdmin });
+  if (isTicketInteraction(i)) return handleTicket(env, i, ctx, { isAdmin });
   const problem = configProblem(env);
   if (problem) {
     console.error('recruit config:', problem);
