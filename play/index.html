@@ -49,6 +49,11 @@
     .links a { text-decoration: none; color: var(--muted); }
     .links a:hover { color: var(--accent); }
     .off { color: var(--dim); }
+    .live { margin: 14px 0 0; font: 600 14px 'Barlow', sans-serif; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+    .live i { width: 8px; height: 8px; border-radius: 50%; background: #5fbf6a; box-shadow: 0 0 10px #5fbf6a; }
+    .live.locked i { background: #ff6a00; box-shadow: 0 0 10px #ff6a00; }
+    .live.down i { background: #6a625a; box-shadow: none; }
+    .live b { color: var(--text); }
     .demo-tag { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 4px; background: #f5b83d; color: #140a02; font: 700 12px/1.3 system-ui, sans-serif; letter-spacing: .04em; text-align: center; max-width: calc(100% - 32px); }
 </style>
 </head>
@@ -62,6 +67,7 @@
       <code id="addr"></code>
       <button class="ghost" id="copy" type="button" data-t="copy">Copiar IP</button>
     </div>
+    <p class="live" id="live" hidden></p>
     <div class="steps">
       <b data-t="first">Primeira vez?</b>
       <ol>
@@ -113,6 +119,19 @@
           b.textContent = en ? T.copied : 'Copiado!';
         }, function () {});
       };
+      // jogadores online (o Worker lê a lista pública do MTA)
+      var api = (H.serverStatus || {}).api, live = document.getElementById('live');
+      function players() {
+        fetch(api, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+          if (!d || typeof d.online !== 'boolean') return;
+          live.hidden = false;
+          live.className = 'live' + (!d.online ? ' down' : d.locked ? ' locked' : '');
+          live.innerHTML = '<i></i>' + (!d.online ? 'Offline'
+            : d.locked ? (en ? 'Opening soon' : 'Abrindo em breve')
+            : '<b>' + d.players + '/' + d.max + '</b> ' + (en ? 'players online' : 'jogadores online'));
+        }, function () {});
+      }
+      if (api) { players(); setInterval(function () { if (!document.hidden) players(); }, 30000); }
       if (demo) {
         var tag = document.createElement('div');
         tag.className = 'demo-tag';

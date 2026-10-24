@@ -653,9 +653,10 @@
   // Loja e VIP ficam fora deste fluxo de propósito.
   const LT = {
     en: {
-      eyebrow: 'MTA: San Andreas · Rust survival · Pre-launch',
+      eyebrow: 'MTA: San Andreas · Rust survival · Online now',
       h1a: 'SURVIVE', h1b: 'THE FIRST DAY.',
-      sub: 'HAVOK opens its doors once {n} survivors are on the waiting list. Join now and get the launch date first, on Discord.',
+      sub: 'The server is live. Gather, build your base, raid the others and survive until the wipe.',
+      sv: 'Server', sv_on: 'Online', sv_locked: 'Opening soon', sv_off: 'Offline', sv_players: 'players online', sv_err: 'Player count unavailable right now.', sv_copy: 'Copy IP', sv_copied: 'Copied!', sv_join: 'Join the server', sv_note: 'Free · PC · MTA:SA',
       wl: 'Waiting list', wl_of: 'of {n} survivors', wl_join: 'Join the waiting list', wl_note: 'Free · Through Discord · PC',
       wl_left: '{n} spots to go until the launch is scheduled.', wl_left1: '1 spot to go until the launch is scheduled.',
       wl_full: 'Goal reached! The launch date is coming on Discord.', wl_err: 'Counter unavailable right now.', wl_load: 'Checking the list...',
@@ -668,27 +669,28 @@
         ['vehicles', 'Explore', 'Fix up cars, loot military zones and fight for airdrops.', 'world-and-events'],
         ['pvp', 'Fight', 'Take on other players and shoot down the patrol helicopter for its loot.', 'combat-raiding-and-recovery'],
       ],
-      join: 'How to join the launch', join_h: 'Three steps. Less than a minute.',
+      join: 'How to play', join_h: 'Three steps. A few minutes.',
       steps: [
-        ['Enter the Discord', 'Use the button below. It is free and takes a few seconds.'],
-        ['Pick the waiting list', 'In the welcome questions, choose the waiting list option. You get the Waiting List role and count on this page.'],
-        ['Wait for the call', 'When the bar fills up, the launch date is announced and everyone on the list gets pinged.'],
+        ['Have GTA San Andreas', 'The PC version, installed.'],
+        ['Install Multi Theft Auto', 'MTA:SA is free: multitheftauto.com.'],
+        ['Join the server', 'Click the button below, or open MTA → Quick Connect and paste the IP.'],
       ],
       faq: 'Questions', faqs: [
         ['Do I have to pay to play?', 'No. The server is free. You only need GTA San Andreas for PC and Multi Theft Auto (MTA:SA), which is also free.'],
-        ['When does the server open?', 'When the waiting list reaches {n} survivors, the date is announced on Discord. The more people join, the sooner it opens.'],
+        ['Is the server open?', 'Yes, since October 24, 2026. The IP and the players online are at the top of this page.'],
         ['Is it like Rust?', 'The loop is: gather, craft, build a base, protect it and raid others. Everything happens on the San Andreas map, with its own mechanics.'],
         ['Can I play with friends?', 'Yes. Groups have up to 8 members, with their own tag, emblem and color, plus a group ranking.'],
         ['Does it run on a weak PC?', 'MTA runs on modest hardware. The server interface was built to stay light.'],
       ],
       rk_kicker: 'This wipe', rk_title: 'Who rules the island', rk_groups: 'Groups', rk_players: 'Players', rk_kills: 'Kills', rk_deaths: 'Deaths', rk_members: 'Members', rk_kd: 'K/D', rk_updated: 'Updated {t} · resets every wipe', rk_none: 'Nobody has scored yet this wipe. The first kills show up here.', wp_kicker: 'Current wipe', wp_title: 'The race for the island', wp_sub: 'At this time the server resets everything: bases, items and the ranking. Badges and paid VIP stay.', cd_more: 'See the wipe',
       cd_wipe: 'Next wipe in', cd_pvp: 'FINAL 24 HOURS · INSANE PvP: weapons and loot are easier to find until the wipe', cd_every: 'full wipe every {n} days', cd_at: 'Next wipe: {d}', cd_pending: 'Wipe in progress', cd_failed: 'Wipe delayed', cd_stale: 'No connection to the server right now; trying again…',
-      news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and the launch countdown.',
+      news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and wipe news.',
     },
     pt: {
-      eyebrow: 'MTA: San Andreas · Rust survival · Pré-lançamento',
+      eyebrow: 'MTA: San Andreas · Rust survival · No ar',
       h1a: 'SOBREVIVA', h1b: 'AO PRIMEIRO DIA.',
-      sub: 'O HAVOK abre as portas quando {n} sobreviventes estiverem na lista de espera. Entre agora e saiba a data antes de todo mundo, no Discord.',
+      sub: 'O servidor está no ar. Colete, construa sua base, raide os outros e sobreviva até o wipe.',
+      sv: 'Servidor', sv_on: 'Online', sv_locked: 'Abrindo em breve', sv_off: 'Offline', sv_players: 'jogadores online', sv_err: 'Contagem de jogadores indisponível no momento.', sv_copy: 'Copiar IP', sv_copied: 'Copiado!', sv_join: 'Entrar no servidor', sv_note: 'Grátis · PC · MTA:SA',
       wl: 'Lista de espera', wl_of: 'de {n} sobreviventes', wl_join: 'Entrar na lista de espera', wl_note: 'Grátis · Pelo Discord · PC',
       wl_left: 'Faltam {n} vagas para marcar a inauguração.', wl_left1: 'Falta 1 vaga para marcar a inauguração.',
       wl_full: 'Meta batida! A data da inauguração sai no Discord.', wl_err: 'Contador indisponível no momento.', wl_load: 'Conferindo a lista...',
@@ -701,22 +703,22 @@
         ['vehicles', 'Explore', 'Monte carros, saqueie zonas militares e dispute airdrops.', 'world-and-events'],
         ['pvp', 'Lute', 'Enfrente outros jogadores e derrube o helicóptero de patrulha para pegar o loot.', 'combat-raiding-and-recovery'],
       ],
-      join: 'Como participar da inauguração', join_h: 'Três passos. Menos de um minuto.',
+      join: 'Como jogar', join_h: 'Três passos. Poucos minutos.',
       steps: [
-        ['Entre no Discord', 'Use o botão abaixo. É grátis e leva poucos segundos.'],
-        ['Escolha a lista de espera', 'Nas perguntas de boas-vindas, marque a opção da lista de espera. Você ganha o cargo Waiting List e passa a contar nesta página.'],
-        ['Aguarde o chamado', 'Quando a barra encher, a data da inauguração é anunciada e todo mundo da lista é avisado.'],
+        ['Tenha o GTA San Andreas', 'A versão de PC, instalada.'],
+        ['Instale o Multi Theft Auto', 'O MTA:SA é grátis: multitheftauto.com.'],
+        ['Entre no servidor', 'Clique no botão abaixo, ou abra o MTA → Quick Connect e cole o IP.'],
       ],
       faq: 'Perguntas frequentes', faqs: [
         ['Preciso pagar para jogar?', 'Não. O servidor é gratuito. Você só precisa do GTA San Andreas para PC e do Multi Theft Auto (MTA:SA), que também é grátis.'],
-        ['Quando o servidor abre?', 'Quando a lista de espera chegar a {n} sobreviventes, a data sai no Discord. Quanto mais gente entrar, mais cedo abre.'],
+        ['O servidor já abriu?', 'Sim, desde 24/10/2026. O IP e os jogadores online ficam no topo desta página.'],
         ['É parecido com Rust?', 'O ciclo é: coletar, craftar, construir a base, protegê-la e raidar os outros. Tudo no mapa de San Andreas, com mecânicas próprias.'],
         ['Dá para jogar com amigos?', 'Sim. Grupos têm até 8 membros, com tag, emblema e cor próprios, e um ranking de grupos.'],
         ['Roda em PC fraco?', 'O MTA roda em máquinas modestas. A interface do servidor foi feita para ser leve.'],
       ],
       rk_kicker: 'Este wipe', rk_title: 'Quem manda na ilha', rk_groups: 'Grupos', rk_players: 'Jogadores', rk_kills: 'Kills', rk_deaths: 'Mortes', rk_members: 'Membros', rk_kd: 'K/D', rk_updated: 'Atualizado {t} · zera a cada wipe', rk_none: 'Ninguém pontuou ainda neste wipe. As primeiras kills aparecem aqui.', wp_kicker: 'Wipe atual', wp_title: 'A disputa pela ilha', wp_sub: 'Nesse horário o servidor zera tudo: bases, itens e o ranking. Badges e VIP pago ficam.', cd_more: 'Ver o wipe',
       cd_wipe: 'Próximo wipe em', cd_pvp: 'ÚLTIMAS 24 HORAS · PvP INSANO: armas e loot mais fáceis até o wipe', cd_every: 'wipe completo a cada {n} dias', cd_at: 'Próximo wipe: {d}', cd_pending: 'Wipe em andamento', cd_failed: 'Wipe adiado', cd_stale: 'Sem conexão com o servidor agora; tentando de novo…',
-      news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e a contagem para a inauguração.',
+      news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e novidades de cada wipe.',
     },
   };
   const lt = (k, vars) => {
@@ -726,6 +728,53 @@
   };
   const fmtDate = (d) => { const [y, m, dd] = d.split('-'); return lang === 'pt' ? `${dd}/${m}/${y}` : `${m}/${dd}/${y}`; };
   let newsAll = false;
+
+  // servidor no ar: IP + jogadores online (o Worker lê a lista pública do MTA, /api/server; atualiza a cada 30 s)
+  let svTimer = null, svLast = null;
+  function serverCard() {
+    const H = window.HAVOK || {}, api = (H.serverStatus || {}).api, addr = H.server || '';
+    if (api) setTimeout(() => { if (svLast) paintServer(svLast); loadServer(); clearInterval(svTimer); svTimer = setInterval(() => { if (!document.hidden) loadServer(); }, 30000); });
+    setTimeout(() => {
+      const b = $('#svCopy');
+      if (b) b.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(addr) : Promise.reject()).then(() => { b.textContent = lt('sv_copied'); }, () => {});
+    });
+    return `<div class="wl sv" id="sv" data-state="${api ? 'loading' : 'error'}">
+        <div class="wl-top"><span class="wl-label"><i class="wl-live"></i><span id="svState">${lt('sv')}</span></span><span class="wl-of">MTA:SA</span></div>
+        <div class="wl-count" aria-live="polite"><b id="svNum">--</b><span id="svMax"></span></div>
+        <p class="wl-msg" id="svMsg">${lt('sv_players')}</p>
+        ${addr ? `<div class="sv-addr"><code>${esc(addr)}</code><button type="button" id="svCopy">${lt('sv_copy')}</button></div>` : ''}
+        <a class="wl-btn" href="play/">${svg('zap')}<span>${lt('sv_join')}</span></a>
+        <small class="wl-note">${lt('sv_note')}</small>
+      </div>`;
+  }
+  function paintServer(d) {
+    const box = $('#sv');
+    if (!box) return;
+    if (!d) {
+      if (box.dataset.state === 'loading') box.dataset.state = 'error';
+      $('#svMsg').textContent = lt('sv_err');
+      return;
+    }
+    box.dataset.state = !d.online ? 'off' : d.locked ? 'locked' : 'ok';
+    $('#svState').textContent = !d.online ? lt('sv_off') : d.locked ? lt('sv_locked') : lt('sv_on');
+    $('#svNum').textContent = d.online ? String(d.players).padStart(2, '0') : '--';
+    $('#svMax').textContent = d.online && d.max ? '/' + d.max : '';
+    $('#svMsg').textContent = lt('sv_players');
+  }
+  async function loadServer() {
+    const api = ((window.HAVOK || {}).serverStatus || {}).api;
+    let d = null;
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 10000);
+      const r = await fetch(api, { signal: ctrl.signal, cache: 'no-cache' });
+      clearTimeout(to);
+      const j = r.ok ? await r.json() : null;
+      if (j && typeof j.online === 'boolean' && Number.isInteger(j.players)) d = j;
+    } catch (e) { d = null; }
+    if (d) svLast = d;
+    paintServer(d);
+  }
 
   // lista de espera: barra com uma marca por vaga (até 60; acima disso 50 marcas proporcionais)
   let wlTimer = null, wlLast = null;
@@ -941,7 +990,7 @@
             ${countdownBox(true)}
             <div class="l-links"><a href="#/wiki">${svg('book')} ${lt('wiki')}</a><button type="button" id="toHow">${svg('chevron')} ${lt('scroll')}</button></div>
           </div>
-          ${waitlistCard()}
+          ${serverCard()}
         </div>
       </section>
       <div class="l-body">
@@ -958,7 +1007,7 @@
             <p class="l-kicker">02 · ${lt('join')}</p>
             <h2 class="l-h2">${lt('join_h')}</h2>
             <ol class="l-steps">${lt('steps').map(([title, desc]) => `<li><b>${esc(title)}</b><span>${esc(desc)}</span></li>`).join('')}</ol>
-            <a class="wl-btn inline" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${lt('wl_join')}</span></a>
+            <a class="wl-btn inline" href="play/">${svg('zap')}<span>${lt('sv_join')}</span></a>
           </div>
         </section>
 
@@ -1335,6 +1384,7 @@
 
   function route() {
     clearInterval(wlTimer);
+    clearInterval(svTimer);
     const full = (location.hash || '#/').slice(1) || '/';
     // #/perfil?vinculado=1 -> rota sem a query
     const [h, query] = full.split('?');

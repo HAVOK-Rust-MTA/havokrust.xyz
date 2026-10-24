@@ -13,7 +13,7 @@
 import { handleInteraction, recruitCron, serveBanner } from './recruit/interactions.js';
 import { refreshWaitlist, readFirstWaitlist } from './waitlist/join.js';
 import { handleWipeHttp, wipeCron } from './wipe/service.js';
-import { statusCron } from './status/service.js';
+import { statusCron, fetchServer, serverAddr } from './status/service.js';
 
 const API = 'https://discord.com/api/v10';
 const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
@@ -162,6 +162,18 @@ export default {
       }
     }
     if (request.method === 'OPTIONS' && url.pathname === '/waitlist/first') return new Response(null, { status: origin ? 204 : 403, headers: corsHeaders(origin) });
+    // status do servidor para o site (IP e jogadores), lido da lista pública do MTA (status/service.js)
+    if (url.pathname === '/api/server') {
+      if (request.method === 'OPTIONS') return new Response(null, { status: origin ? 204 : 403, headers: corsHeaders(origin) });
+      if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, origin);
+      try {
+        const s = await fetchServer(env);
+        return json({ addr: serverAddr(env), online: !!s, locked: s ? s.locked : false, players: s ? s.players : 0, max: s ? s.max : 0, updatedAt: new Date().toISOString() }, 200, origin, 30);
+      } catch (e) {
+        console.error('server:', e.message);
+        return json({ error: 'unavailable', addr: serverAddr(env) }, 502, origin);
+      }
+    }
     if (url.pathname !== '/waitlist') return json({ error: 'not_found' }, 404, origin);
     if (request.method === 'OPTIONS') return new Response(null, { status: origin ? 204 : 403, headers: corsHeaders(origin) });
     if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, origin);

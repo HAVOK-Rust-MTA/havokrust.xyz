@@ -14,6 +14,7 @@ const LIST_URL = 'https://mtasa.com/api/';
 const nowS = () => Math.floor(Date.now() / 1000);
 // IP:porta do servidor (SERVER_ADDR no wrangler.toml troca sem mexer no código)
 const addr = (env) => String((env && env.SERVER_ADDR) || '177.54.146.12:22360');
+export const serverAddr = addr;
 
 export const STATUS_COMMAND = {
   name: 'servidor',

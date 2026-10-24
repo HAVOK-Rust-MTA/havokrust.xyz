@@ -10,6 +10,7 @@
 import { discordRequest, sendMessage, editMessage, deleteMessage, editOriginal, NO_MENTIONS, DiscordError } from '../recruit/discord.js';
 import { claimInteraction } from '../recruit/db.js';
 import { loadEmojis } from '../recruit/emojis.js';
+import { serverAddr } from '../status/service.js';
 import { progress, updatePanel, roleMembers, orderQueue, idsFromEmbed, buildEmbed, signature, readFirst, readFirstFromEmbed } from '../panel.js';
 
 export const JOIN_ID = 'waitlist:join';
@@ -120,9 +121,40 @@ async function noteGoal(env, n, goal) {
 }
 
 // uma rodada: lê os membros com o cargo e o painel, e edita SÓ se algo mudou (nunca cria mensagem)
+// servidor aberto: a lista acabou. O painel vira a homenagem aos primeiros (a fila congela como estava) e perde o botão.
+export const closedOn = (env) => (/^\d{4}-\d{2}-\d{2}$/.test(String((env && env.WAITLIST_CLOSED) || '')) ? String(env.WAITLIST_CLOSED) : '');
+const CLOSED_TITLE = '🎟️ WAITING LIST · ENCERRADA · CLOSED';
+export function closedMessage(prev, day, addr) {
+  const [y, m, d] = day.split('-');
+  const n = idsFromEmbed(prev).length || readFirstFromEmbed(prev, 999).length;
+  return {
+    content: '',
+    embeds: [{
+      ...prev,
+      title: CLOSED_TITLE,
+      description: `🇧🇷 O HAVOK abriu em **${d}/${m}/${y}**. Obrigado aos **${n}** sobreviventes que entraram na lista: os primeiros ficam aqui para sempre.\n`
+        + `🇺🇸 HAVOK opened on **${m}/${d}/${y}**. Thanks to the **${n}** survivors who joined the list: the first ones stay here forever.`,
+      footer: { text: '🇧🇷 Lista encerrada  ·  🇺🇸 List closed' },
+      timestamp: undefined,
+    }, {
+      title: '🟢 O SERVIDOR ESTÁ NO AR · THE SERVER IS LIVE',
+      color: 0xff6a00,
+      description: `**IP:** \`\`\`${addr}\`\`\`\nMTA:SA → **Quick Connect** → cole o IP · paste the IP`,
+    }],
+    components: [],
+  };
+}
+
 export async function refreshWaitlist(env, { force = false } = {}) {
   const ids = env.DB ? await panelIds(env.DB) : null;
   if (!ids) return { status: await updatePanel(env), count: null }; // ainda sem o painel do bot: segue o do webhook
+  if (closedOn(env)) {
+    const cur = await discordRequest(env, 'GET', `/channels/${ids.channel}/messages/${ids.message}`);
+    const prev = cur && cur.embeds && cur.embeds[0];
+    if (!force && prev && prev.title === CLOSED_TITLE) return { status: 'closed', count: null };
+    await editMessage(env, ids.channel, ids.message, closedMessage(prev || {}, closedOn(env), serverAddr(env)));
+    return { status: 'updated', count: null };
+  }
   const goal = goalOf(env);
   let current;
   try {
@@ -269,6 +301,7 @@ export async function handleWaitlist(env, i, ctx, { isAdmin }) {
 
   if (i.type === 3) {
     if (i.data.custom_id !== JOIN_ID) return privateText(TEXT.error);
+    if (closedOn(env)) return privateText(`🟢 A lista de espera acabou: o servidor já está no ar! · The waiting list is over: the server is live!\nIP: \`${serverAddr(env)}\``);
     // responde na hora ("pensando...", só para quem clicou) e termina em segundo plano: o Discord só espera 3 s
     ctx.waitUntil((async () => {
       const r = await joinClick(env, i);

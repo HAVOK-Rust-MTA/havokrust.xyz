@@ -21,8 +21,10 @@ window.HAVOK = {
       legendary: { brl: 90.00, usd: 15.99 },
     },
   },
-  // endereço do servidor MTA para a página /play (ex.: '203.0.113.10:22003'). Vazio = página sem o botão.
-  server: '',
+  // endereço do servidor MTA para a página /play e o card da home. Vazio = página sem o botão.
+  server: '177.54.146.12:22360',
+  // jogadores online (o Worker lê a lista pública do MTA). Vazio = sem a contagem.
+  serverStatus: { api: 'https://havok-waitlist.havokrust.workers.dev/api/server' },
   // redes sociais da home (vazio = escondido)
   socials: {
     youtube: 'https://www.youtube.com/@havokrust',
