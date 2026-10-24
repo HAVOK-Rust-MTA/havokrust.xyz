@@ -6,8 +6,9 @@ import { WAITLIST_COMMAND } from '../waitlist/commands.js';
 import { WIPE_COMMAND } from '../wipe/service.js';
 import { REPORT_COMMAND } from '../reports/service.js';
 import { TICKET_COMMAND } from '../tickets/service.js';
+import { STATUS_COMMAND } from '../status/service.js';
 
-export const ALL_COMMANDS = [STAFF_COMMAND, WAITLIST_COMMAND, WIPE_COMMAND, REPORT_COMMAND, TICKET_COMMAND];
+export const ALL_COMMANDS = [STAFF_COMMAND, WAITLIST_COMMAND, WIPE_COMMAND, REPORT_COMMAND, TICKET_COMMAND, STATUS_COMMAND];
 
 const SNOWFLAKE = /^\d{17,20}$/;
 let doneHash = null; // já conferido neste isolate

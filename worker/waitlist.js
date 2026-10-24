@@ -13,6 +13,7 @@
 import { handleInteraction, recruitCron, serveBanner } from './recruit/interactions.js';
 import { refreshWaitlist, readFirstWaitlist } from './waitlist/join.js';
 import { handleWipeHttp, wipeCron } from './wipe/service.js';
+import { statusCron } from './status/service.js';
 
 const API = 'https://discord.com/api/v10';
 const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
@@ -136,6 +137,8 @@ export default {
     ctx.waitUntil(recruitCron(env).catch((e) => console.error('recruit cron:', e.message)));
     // wipe: painel e avisos (quem executa o wipe é o servidor MTA, nunca o cron)
     ctx.waitUntil(wipeCron(env).catch((e) => console.error('wipe cron:', e.message)));
+    // status do servidor (IP e jogadores) no Discord, lido da lista pública do MTA
+    ctx.waitUntil(statusCron(env).catch((e) => console.error('status cron:', e.message)));
   },
 
   async fetch(request, env, ctx) {
