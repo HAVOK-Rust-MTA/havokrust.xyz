@@ -53,22 +53,34 @@ beforeEach(() => {
 });
 
 test('reconhece só as interações de ticket', () => {
-  assert.ok(isTicketInteraction({ type: 3, data: { custom_id: 'ticket:open:bug' } }));
+  assert.ok(isTicketInteraction({ type: 3, data: { custom_id: 'ticket:menu' } }));
   assert.ok(isTicketInteraction({ type: 2, data: { name: 'tickets' } }));
   assert.ok(!isTicketInteraction({ type: 3, data: { custom_id: 'report:open' } }));
 });
 
-test('painel tem um botão por tipo', () => {
-  const ids = panelMessage().components[0].components.map((c) => c.custom_id);
-  assert.deepEqual(ids, ['ticket:open:suporte', 'ticket:open:vendas', 'ticket:open:sugestao', 'ticket:open:bug']);
+test('painel tem o menu com as categorias, Limpar seleção e o banner', () => {
+  const p = panelMessage({ SITE_URL: 'https://havokrust.xyz' });
+  const sel = p.components[0].components[0];
+  assert.equal(sel.type, 3);
+  assert.deepEqual(sel.options.map((o) => o.value), ['suporte', 'vip', 'sugestao', 'bug', 'limpar']);
+  assert.equal(p.embeds[0].image.url, 'https://havokrust.xyz/og.jpg');
+  for (const k of ['suporte', 'vip', 'sugestao', 'bug']) {
+    const md = sel.options.find((o) => o.value === k);
+    assert.ok(md.label.length <= 100 && md.description.length <= 100);
+  }
 });
 
-test('botão abre formulário com motivo obrigatório; tipo inventado é recusado', async () => {
-  const res = await (await handleTicket(env, button('ticket:open:vendas', m(USER)), ctx, { isAdmin })).json();
+const pick = (value, member) => ({ ...button('ticket:menu', member), data: { custom_id: 'ticket:menu', component_type: 3, values: [value] } });
+test('menu abre formulário com motivo obrigatório; Limpar só reseta; categoria inventada é recusada', async () => {
+  const res = await (await handleTicket(env, pick('vip', m(USER)), ctx, { isAdmin })).json();
   assert.equal(res.type, 9);
-  assert.equal(res.data.custom_id, 'ticket:modal:vendas');
+  assert.equal(res.data.custom_id, 'ticket:modal:vip');
   assert.equal(res.data.components[0].components[0].required, true);
-  const bad = await (await handleTicket(env, button('ticket:open:hack', m(USER)), ctx, { isAdmin })).json();
+  for (const row of res.data.components) assert.ok(row.components[0].label.length <= 45);
+  const clear = await (await handleTicket(env, pick('limpar', m(USER)), ctx, { isAdmin })).json();
+  assert.equal(clear.type, 7);
+  assert.equal(clear.data.components[0].components[0].custom_id, 'ticket:menu');
+  const bad = await (await handleTicket(env, pick('hack', m(USER)), ctx, { isAdmin })).json();
   assert.equal(bad.type, 4);
 });
 
@@ -95,7 +107,7 @@ test('falha ao criar a thread não deixa ticket preso', async () => {
 });
 
 test('só staff assume; fechar: quem abriu ou staff, uma vez só', async () => {
-  await handleTicket(env, sendModal('vendas', 'Quero comprar VIP'), ctx, { isAdmin });
+  await handleTicket(env, sendModal('vip', 'Quero comprar VIP'), ctx, { isAdmin });
   await flush();
   const id = env.DB.db.prepare('SELECT id FROM tickets').get().id;
   const nope = await (await handleTicket(env, button(`ticket:claim:${id}`, m(OTHER)), ctx, { isAdmin })).json();
@@ -110,7 +122,7 @@ test('só staff assume; fechar: quem abriu ou staff, uma vez só', async () => {
   await handleTicket(env, button(`ticket:close:${id}`, m(STAFF, ['500000000000000001'])), ctx, { isAdmin });
   assert.match(await last(), /já foi fechado/);
   // fechado libera abrir outro do mesmo tipo
-  await handleTicket(env, sendModal('vendas', 'Outra compra'), ctx, { isAdmin });
+  await handleTicket(env, sendModal('vip', 'Outra compra'), ctx, { isAdmin });
   assert.match(await last(), /Ticket aberto/);
 });
 

@@ -1,8 +1,8 @@
-// Tickets do Discord: suporte, vendas, sugestão e bug. Sem código: o jogador clica no botão do tipo, escreve o motivo
+// Tickets do Discord: suporte, VIPs, sugestão e bug. Sem código: o jogador escolhe a categoria no menu, escreve o motivo
 // e o bot abre um ticket privado (thread que só ele e a staff veem).
 //
-//   /tickets painel        (admin) publica o painel com os botões neste canal
-//   botão ticket:open:<tipo>  -> formulário (motivo + detalhes + nick) -> ticket:modal:<tipo> -> thread privada
+//   /tickets painel        (admin) publica o painel com o menu de categorias neste canal
+//   menu ticket:menu (valor <tipo>) -> formulário (motivo + detalhes + nick) -> ticket:modal:<tipo> -> thread privada
 //   botão ticket:claim:<id>   (só staff) -> "fulano assumiu"
 //   botão ticket:close:<id>   (staff ou quem abriu) -> a thread é arquivada e trancada
 //
@@ -17,19 +17,23 @@ const idList = (s) => String(s || '').split(',').map((x) => x.trim()).filter((x)
 const clip = (s, n) => String(s ?? '').replace(/[@`]/g, '').slice(0, n);
 
 export const KINDS = {
-  suporte: { emoji: '🛠️', label: 'Suporte', color: 0x4ea8ff, style: 1,
-    reason: 'Motivo (ex.: perdi meus itens, não consigo entrar)', details: 'Explique o que aconteceu' },
-  vendas: { emoji: '💰', label: 'Vendas · VIP', color: 0xffae2e, style: 3,
-    reason: 'Motivo (ex.: quero comprar VIP, dúvida de pagamento)', details: 'Detalhes (plano, forma de pagamento...)' },
-  sugestao: { emoji: '💡', label: 'Sugestão', color: 0xb07bff, style: 2,
+  suporte: { emoji: '🛠️', label: 'Suporte', color: 0x4ea8ff,
+    hint: 'Problema no jogo, conta, itens perdidos, dúvidas',
+    reason: 'Motivo do ticket', ex: 'Ex.: perdi meus itens, não consigo entrar', details: 'Explique o que aconteceu' },
+  vip: { emoji: '💎', label: 'VIPs', color: 0xffae2e,
+    hint: 'Comprar VIP, pagamentos e benefícios',
+    reason: 'Motivo do ticket', ex: 'Ex.: quero comprar VIP, dúvida de pagamento', details: 'Detalhes (plano, forma de pagamento...)' },
+  sugestao: { emoji: '💡', label: 'Sugestão', color: 0xb07bff,
+    hint: 'Ideias para melhorar o servidor',
     reason: 'Sua sugestão em uma frase', details: 'Explique a ideia e por que melhora o servidor' },
-  bug: { emoji: '🐞', label: 'Bug', color: 0xe5544b, style: 4,
+  bug: { emoji: '🐞', label: 'Bug', color: 0xe5544b,
+    hint: 'Algo quebrado no jogo ou no site',
     reason: 'Qual é o bug? (uma frase)', details: 'Como acontece? Onde? Passo a passo' },
 };
 
 export const TICKET_COMMAND = {
   name: 'tickets',
-  description: 'Tickets de suporte, vendas, sugestão e bug',
+  description: 'Tickets de suporte, VIPs, sugestão e bug',
   type: 1,
   contexts: [0],
   default_member_permissions: '8',
@@ -43,25 +47,38 @@ const json = (body) => new Response(JSON.stringify(body), { headers: { 'Content-
 const reply = (content) => json({ type: 4, data: { flags: EPHEMERAL, content, allowed_mentions: NO_MENTIONS } });
 const deferred = () => json({ type: 5, data: { flags: EPHEMERAL } });
 
-export const panelMessage = () => ({
+// banner do painel: TICKET_IMAGE (https) no wrangler.toml, senão a imagem de capa do site
+const banner = (env) => {
+  const own = String((env && env.TICKET_IMAGE) || '');
+  if (/^https:\/\/\S+$/.test(own)) return own;
+  const site = String((env && env.SITE_URL) || '').replace(/\/+$/, '');
+  return /^https:\/\/\S+$/.test(site) ? `${site}/og.jpg` : '';
+};
+
+const menu = () => ({ type: 1, components: [{
+  type: 3, custom_id: 'ticket:menu', placeholder: 'Selecione uma categoria...',
+  options: [
+    ...Object.entries(KINDS).map(([k, v]) => ({ value: k, label: v.label, description: v.hint, emoji: { name: v.emoji } })),
+    { value: 'limpar', label: 'Limpar seleção', description: 'Reseta o menu (não abre nenhum ticket)', emoji: { name: '🧹' } },
+  ],
+}] });
+
+export const panelMessage = (env) => ({
   embeds: [{
     title: '🎫 Tickets · Atendimento',
-    color: 0x4ea8ff,
+    color: 0xe5544b,
     description: [
-      'Precisa falar com a staff? Clique no botão do assunto, escreva o **motivo** e um ticket privado é aberto só para você e a staff.',
+      'Precisa falar com a staff? **Escolha a categoria no menu abaixo**, escreva o motivo e um ticket privado é aberto só para você e a staff.',
       '',
-      '🛠️ **Suporte**: problema no jogo, conta, itens perdidos, dúvidas.',
-      '💰 **Vendas · VIP**: compras, pagamentos, benefícios.',
-      '💡 **Sugestão**: ideias para melhorar o servidor.',
-      '🐞 **Bug**: algo quebrado no jogo ou no site.',
+      ...Object.values(KINDS).map((v) => `${v.emoji} **${v.label}**: ${v.hint.toLowerCase()}.`),
       '',
       'Denúncia de jogador (cheater) é no painel de **🚨 Denúncias**, com o código do jogo.',
       '',
-      '_Need the staff? Pick a topic, write the reason and a private ticket opens for you and the staff only._',
+      '_Need the staff? Pick a category, write the reason and a private ticket opens for you and the staff only._',
     ].join('\n'),
+    ...(banner(env) ? { image: { url: banner(env) } } : {}),
   }],
-  components: [{ type: 1, components: Object.entries(KINDS).map(([k, v]) => (
-    { type: 2, style: v.style, custom_id: `ticket:open:${k}`, label: v.label, emoji: { name: v.emoji } })) }],
+  components: [menu()],
 });
 
 const modal = (kind) => {
@@ -72,7 +89,7 @@ const modal = (kind) => {
       custom_id: `ticket:modal:${kind}`,
       title: `Ticket · ${k.label}`.slice(0, 45),
       components: [
-        { type: 1, components: [{ type: 4, custom_id: 'reason', label: k.reason.slice(0, 45), style: 1, min_length: 5, max_length: 100, required: true }] },
+        { type: 1, components: [{ type: 4, custom_id: 'reason', label: k.reason.slice(0, 45), style: 1, ...(k.ex ? { placeholder: k.ex } : {}), min_length: 5, max_length: 100, required: true }] },
         { type: 1, components: [{ type: 4, custom_id: 'details', label: k.details.slice(0, 45), style: 2, max_length: 1500, required: false }] },
         { type: 1, components: [{ type: 4, custom_id: 'nick', label: 'Seu nick no jogo (opcional)', style: 1, max_length: 32, required: false }] },
       ],
@@ -162,15 +179,17 @@ export async function handleTicket(env, i, ctx, { isAdmin }) {
   if (!env.DB) return reply('O banco (D1) não está configurado.');
   const user = i.member.user;
   const id = String((i.data && i.data.custom_id) || '');
-  const openBtn = /^ticket:open:(\w+)$/.exec(id);
-  if (i.type === 3 && openBtn) {
-    if (!KINDS[openBtn[1]]) return reply('Tipo de ticket desconhecido.');
-    return json(modal(openBtn[1]));
+  if (i.type === 3 && id === 'ticket:menu') {
+    const kind = String(((i.data && i.data.values) || [])[0] || '');
+    // "Limpar seleção" só redesenha o menu vazio (o Discord deixa a última opção marcada)
+    if (kind === 'limpar') return json({ type: 7, data: { components: [menu()] } });
+    if (!KINDS[kind]) return reply('Categoria de ticket desconhecida.');
+    return json(modal(kind));
   }
   if (!(await claimInteraction(env.DB, String(i.id)))) return reply('Esta ação já foi processada.');
   if (i.type === 2) {
     if (!isAdmin(env, i.member)) return reply('Você não tem permissão para fazer isso.');
-    ctx.waitUntil(sendMessage(env, i.channel_id, panelMessage())
+    ctx.waitUntil(sendMessage(env, i.channel_id, panelMessage(env))
       .then(() => 'Painel de tickets publicado neste canal.')
       .catch((e) => (e instanceof DiscordError && e.status === 403 ? 'O bot não tem permissão nesse canal (Ver canal, Enviar mensagens).' : 'Não consegui publicar agora.'))
       .then((content) => editOriginal(env, i, { content }))
