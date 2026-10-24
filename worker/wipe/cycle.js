@@ -149,12 +149,9 @@ export async function applyServerEvent(db, ev, { env, t = nowS() } = {}) {
                     VALUES (?, 'wipe_done', ?, 'mta', NULL, ?, ?)`).bind(id, at, `wipe_done:${id}`, t),
       ]);
       if (closed.meta.changes === 1) {
-        // o site zera junto com o jogo: ranking de jogadores e grupos é "deste wipe"
+        // o ranking do site zera junto com o jogo (jogadores e grupos são "deste wipe").
+        // Os vínculos com o Discord (players) e os logins do site NÃO: o vínculo é permanente.
         const reset = [db.prepare('DELETE FROM game_players'), db.prepare('DELETE FROM game_groups')];
-        // inauguração (o 1º ciclo de todos): também os vínculos com o Discord e os logins do site — começa do zero
-        if (cycle.previous_cycle_id == null) {
-          for (const tbl of ['sessions', 'link_codes', 'oauth_states', 'players']) reset.push(db.prepare(`DELETE FROM ${tbl}`));
-        }
         try { await db.batch(reset); } catch (e) { console.log('wipe: reset do site falhou', String(e)); }
       }
       const created = await db.prepare('SELECT * FROM wipe_cycles WHERE previous_cycle_id = ?').bind(id).first();
