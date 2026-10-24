@@ -37,8 +37,8 @@ beforeEach(async () => {
 
 test('publica com IP e jogadores; só admin', async () => {
   const post = calls.find((c) => c.method === 'POST' && c.path === '/channels/800000000000000001/messages');
-  assert.match(post.body.embeds[0].description, /177\.54\.146\.12:22360/);
-  assert.match(post.body.embeds[0].description, /3\/85/);
+  assert.match(JSON.stringify(post.body.embeds[0].fields), /177\.54\.146\.12:22360/);
+  assert.match(JSON.stringify(post.body.embeds[0].fields), /```3\/85```/);
   const no = await (await handleStatus(env, { id: 'z', type: 2, member: { user: { id: '2' }, roles: [] }, data: { name: 'servidor' } }, ctx, { isAdmin: () => false })).json();
   assert.match(no.data.content, /permissão/);
 });
@@ -47,7 +47,7 @@ test('edita só quando muda; offline só depois de 3 minutos fora da lista', asy
   assert.equal(await statusCron(env), 'igual');
   list = srv(7);
   assert.equal(await statusCron(env), 'atualizado');
-  assert.match(edits().pop().body.embeds[0].description, /7\/85/);
+  assert.match(JSON.stringify(edits().pop().body.embeds[0].fields), /```7\/85```/);
   list = [];
   assert.equal(await statusCron(env), 'fora da lista');
   assert.equal(await statusCron(env), 'fora da lista');
@@ -65,5 +65,6 @@ test('mensagem apagada: para de editar', async () => {
 });
 
 test('barra de jogadores', () => {
-  assert.match(statusMessage({}, { players: 0, max: 85, locked: false }).embeds[0].description, /^```177/);
+  const f = statusMessage({}, { players: 0, max: 85, locked: false }).embeds[0].fields;
+  assert.deepEqual(f.slice(0, 2).map((x) => x.value), ['```177.54.146.12:22360```', '```0/85```']);
 });

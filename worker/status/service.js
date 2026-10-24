@@ -49,14 +49,15 @@ export function statusMessage(env, s) {
   const state = !s ? { icon: '🔴', text: 'OFFLINE', color: 0x3a3632 }
     : s.locked ? { icon: '🟠', text: 'FECHADO (manutenção)', color: 0xd99a1e }
     : { icon: '🟢', text: 'ONLINE', color: COLORS.brand };
-  const lines = [`\`\`\`${addr(env)}\`\`\``];
-  if (s) lines.push(`👥 **${s.players}/${s.max}** jogadores\n${bar(s.players, s.max)}`);
+  // IP e players lado a lado, os dois em bloco (fácil de copiar no celular)
+  const fields = [{ name: '🌐 IP', value: `\`\`\`${addr(env)}\`\`\``, inline: true }];
+  if (s) fields.push({ name: '👥 Players', value: `\`\`\`${s.players}/${s.max}\`\`\``, inline: true }, { name: '\u200b', value: bar(s.players, s.max), inline: false });
   return {
     embeds: [{
       author: { name: BRAND, url: SITE, icon_url: LOGO },
       title: `${state.icon} ${state.text}`,
       color: state.color,
-      description: lines.join('\n'),
+      fields,
       footer: { text: 'Atualiza sozinho · MTA:SA → Quick Connect', icon_url: LOGO },
       timestamp: new Date().toISOString(),
     }],
@@ -64,7 +65,9 @@ export function statusMessage(env, s) {
   };
 }
 
-const viewKey = (s) => (s ? `${s.players}/${s.max}/${s.locked ? 1 : 0}` : 'off');
+// LAYOUT entra na chave: mudou o visual, o cron redesenha a mensagem que já está no canal
+const LAYOUT = 2;
+const viewKey = (s) => `${LAYOUT}:` + (s ? `${s.players}/${s.max}/${s.locked ? 1 : 0}` : 'off');
 
 const loadPanel = async (db) => {
   const row = await db.prepare('SELECT value FROM bot_settings WHERE key = ?').bind(KEY).first();
@@ -82,7 +85,7 @@ export async function statusCron(env) {
   const s = await fetchServer(env);
   const key = viewKey(s);
   // a lista some por 1 leitura quando o servidor reinicia: só mostra OFFLINE depois de 3 minutos fora
-  if (key === 'off') {
+  if (!s) {
     panel.missing = (panel.missing || 0) + 1;
     if (panel.missing < 3) { await savePanel(env.DB, panel); return 'fora da lista'; }
   } else {
