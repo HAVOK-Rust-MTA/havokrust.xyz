@@ -1,6 +1,7 @@
 // Status do servidor no Discord: uma mensagem fixa com o IP e os jogadores online, editada sozinha pelo cron.
-// Os jogadores vêm da lista pública do MTA (mtasa.com/api, a mesma do navegador de servidores do jogo, ~1 min de atraso):
-// não precisa de nada no servidor de jogo.
+// Os jogadores vêm, primeiro, do PRÓPRIO servidor: o havok_link avisa a havok-api a cada entrada/saída e 1x por minuto
+// ('status.live' no D1, o mesmo banco). Se esse número estiver velho (servidor caiu/reiniciando), cai para a lista
+// pública do MTA (mtasa.com/api, a do navegador de servidores, que atrasa vários minutos).
 //
 //   /servidor painel   (admin) publica a mensagem neste canal; o cron passa a editar ela
 //   cron (1 min)       -> lê a lista e edita a mensagem só quando algo mudou (jogadores, online/offline, senha)
@@ -30,8 +31,19 @@ export const isStatusInteraction = (i) => i.type === 2 && i.data && i.data.name 
 const json = (body) => new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } });
 const reply = (content) => json({ type: 4, data: { flags: EPHEMERAL, content, allowed_mentions: NO_MENTIONS } });
 
-// procura o servidor na lista do MTA; null = não está na lista (desligado ou reiniciando)
+const LIVE_MAX_AGE = 150; // s: o servidor manda pelo menos 1x por minuto
+
+// procura o servidor: o aviso do próprio servidor (na hora) ou a lista do MTA; null = desligado ou reiniciando
 export async function fetchServer(env) {
+  if (env.DB) {
+    const row = await env.DB.prepare("SELECT value FROM bot_settings WHERE key = 'status.live'").first().catch(() => null);
+    if (row) {
+      try {
+        const v = JSON.parse(row.value);
+        if (nowS() - Number(v.at) <= LIVE_MAX_AGE) return { players: Number(v.players) || 0, max: Number(v.max) || 0, locked: false, live: true };
+      } catch { /* valor estragado: usa a lista */ }
+    }
+  }
   const [ip, port] = addr(env).split(':');
   const res = await fetch(LIST_URL, { cf: { cacheTtl: 30, cacheEverything: true }, headers: { 'User-Agent': 'HAVOK-Status (https://havokrust.xyz, 1.0)' } });
   if (!res.ok) throw new Error(`lista do MTA: HTTP ${res.status}`);

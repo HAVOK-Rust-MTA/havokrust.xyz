@@ -733,7 +733,7 @@
   let svTimer = null, svLast = null;
   function serverCard() {
     const H = window.HAVOK || {}, api = (H.serverStatus || {}).api, addr = H.server || '';
-    if (api) setTimeout(() => { if (svLast) paintServer(svLast); loadServer(); clearInterval(svTimer); svTimer = setInterval(() => { if (!document.hidden) loadServer(); }, 30000); });
+    if (api) setTimeout(() => { if (svLast) paintServer(svLast); loadServer(); clearInterval(svTimer); svTimer = setInterval(() => { if (!document.hidden) loadServer(); }, 15000); });
     setTimeout(() => {
       const b = $('#svCopy');
       if (b) b.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(addr) : Promise.reject()).then(() => { b.textContent = lt('sv_copied'); }, () => {});

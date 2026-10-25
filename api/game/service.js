@@ -1,6 +1,8 @@
 // Jogadores e grupos do jogo para o site. Todo mundo que joga entra, com ou sem Discord vinculado.
 //
 //   POST /api/game/mta/sync   servidor MTA, assinado: {players: [...], groups: [...]?}
+//   POST /api/game/mta/live   servidor MTA, assinado: {players, max} — quantos estão online AGORA (vem a cada entrada/saída
+//                              e 1x por minuto). O site e a embed do Discord (havok-waitlist) leem daqui ('status.live').
 //                              players = quem mudou (online, saiu, ou a carga completa quando o servidor liga)
 //                              groups  = a lista COMPLETA de grupos do wipe (substitui a anterior)
 //   GET  /api/groups          público: grupos do wipe (sem membros)
@@ -30,6 +32,27 @@ export function sanitizeBadges(b) {
 export function slugify(name) {
   const s = String(name).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
   return s || 'grupo';
+}
+
+// //------------------- JOGADORES ONLINE AGORA -------------------\\
+async function live(request, env) {
+  if (request.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
+  const body = await verifyServer(request, env, '/api/game/mta/live', 1024);
+  if (body === null) return json({ error: 'unauthorized' }, 401);
+  let d;
+  try {
+    d = JSON.parse(body);
+  } catch {
+    return json({ error: 'bad_json' }, 400);
+  }
+  const players = Math.max(0, Math.min(1000, int(d.players)));
+  const max = Math.max(0, Math.min(1000, int(d.max)));
+  const value = JSON.stringify({ players, max, at: nowS() });
+  await env.DB.prepare(
+    `INSERT INTO bot_settings (key, value, updated_at) VALUES ('status.live', ?, ?)
+     ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+  ).bind(value, nowS()).run();
+  return json({ ok: true });
 }
 
 // //------------------- SYNC DO JOGO -------------------\\
@@ -141,13 +164,14 @@ async function cached(request, url, ctx, build) {
 }
 
 export function isGamePath(path) {
-  return path === '/api/game/mta/sync' || path === '/api/groups' || path.startsWith('/api/group/') || path.startsWith('/api/player/') || path === '/api/ranking/players';
+  return path === '/api/game/mta/sync' || path === '/api/game/mta/live' || path === '/api/groups' || path.startsWith('/api/group/') || path.startsWith('/api/player/') || path === '/api/ranking/players';
 }
 
 export async function handleGameHttp(request, env, url, ctx) {
   const path = url.pathname;
   if (!env.DB) return json({ error: 'unavailable' }, 503);
   if (path === '/api/game/mta/sync') return sync(request, env);
+  if (path === '/api/game/mta/live') return live(request, env);
 
   const h = { ...siteCors(request, env), 'Cache-Control': 'public, max-age=60' };
   if (request.method === 'OPTIONS') return new Response(null, { status: h['Access-Control-Allow-Origin'] ? 204 : 403, headers: h });
