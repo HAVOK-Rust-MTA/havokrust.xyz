@@ -183,8 +183,8 @@ test('PvP: só é anunciado depois que o servidor confirma; confirmar de novo n�
   await wipeCron(env);
   panel = panelEdits().pop().body.embeds[0];
   assert.match(panel.description, /PVP MODE ACTIVE · MODO PVP ATIVO/);
-  assert.equal(alerts().filter((a) => /ÚLTIMAS 24 HORAS/.test(a)).length, 1);
-  assert.ok(alerts().every((a) => !/@everyone|@here/.test(a)));
+  // o painel é a única mensagem: nenhum aviso novo no canal
+  assert.equal(alerts().length, 0);
 });
 
 test('wipe confirmado: fecha o ciclo, cria UM novo de 15 dias a partir da confirmação; confirmações repetidas não duplicam', async () => {
@@ -207,8 +207,7 @@ test('wipe confirmado: fecha o ciclo, cria UM novo de 15 dias a partir da confir
   assert.equal(env.DB.row('SELECT COUNT(*) n FROM wipe_cycles').n, 2);
   await wipeCron(env);
   await wipeCron(env);
-  assert.equal(alerts().filter((a) => /WIPE CONCLUÍDO/.test(a)).length, 1);
-  assert.equal(alerts().filter((a) => /WIPE COMEÇOU/.test(a)).length, 1);
+  assert.equal(alerts().length, 0);
   assert.match(panelEdits().pop().body.embeds[0].title, /WIPE STATUS/);
 });
 
@@ -222,7 +221,7 @@ test('wipe com falha: fica FAILED (sem ciclo novo) até a administração reagen
   assert.equal(env.DB.row('SELECT COUNT(*) n FROM wipe_cycles').n, 1);
   await wipeCron(env);
   assert.equal(panelEdits().pop().body.embeds[0].title, 'HAVOK — WIPE DELAYED');
-  assert.equal(alerts().filter((a) => /WIPE ATRASOU/.test(a)).length, 1);
+  assert.equal(alerts().length, 0);
   // recuperação: nova data volta a contar o MESMO ciclo
   const r = await defineWipe(env.DB, { at: nowS() + 3 * 86400, actor: 'admin1' });
   assert.ok(r.ok);

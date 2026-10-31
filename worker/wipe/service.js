@@ -12,7 +12,7 @@
 import { sendMessage, editMessage, editOriginal, NO_MENTIONS, DiscordError } from '../recruit/discord.js';
 import { claimInteraction } from '../recruit/db.js';
 import { currentCycle, recentCycles, cycleView, phaseOf, defineWipe, applyServerEvent, logEvent, nowS, getCycle } from './cycle.js';
-import { wipePanel, wipeAlert, countdown } from './panel.js';
+import { wipePanel, countdown } from './panel.js';
 
 const SNOWFLAKE = /^\d{17,20}$/;
 const EPHEMERAL = 64;
@@ -136,7 +136,6 @@ export async function handleWipeHttp(request, env, ctx, url) {
     }
     const r = await applyServerEvent(env.DB, ev, { env });
     console.log(`wipe: evento do servidor ${ev.type} ciclo ${ev.cycleId} -> ${r.result}`);
-    if (r.notify) ctx.waitUntil(notify(env, r.notify, Number(ev.cycleId)).catch((e) => console.error('wipe alert:', e.message)));
     ctx.waitUntil(syncPanel(env).catch((e) => console.error('wipe panel:', e.message)));
     const cur = await currentCycle(env.DB);
     return json({ ok: r.ok, result: r.result, nextCycleId: r.nextCycleId ?? null, current: cycleView(cur) }, r.status);
@@ -165,27 +164,9 @@ export async function syncPanel(env, { force = false } = {}) {
   return 'updated';
 }
 
-// aviso no canal do painel, uma vez por ciclo e tipo
-async function notify(env, kind, cycleId) {
-  const channel = await getSetting(env.DB, KEY.channel);
-  if (!channel) return;
-  if (!(await logEvent(env.DB, { cycleId, type: `alert_${kind}`, origin: 'cron', dedupe: `alert:${kind}:${cycleId}` }))) return;
-  const cycle = kind === 'done' ? await currentCycle(env.DB) : await getCycle(env.DB, cycleId);
-  try {
-    await sendMessage(env, channel, { ...wipeAlert(kind, cycle), allowed_mentions: NO_MENTIONS });
-  } catch (e) {
-    // não saiu: libera para tentar de novo no próximo minuto
-    await env.DB.prepare('DELETE FROM wipe_events WHERE dedupe_key = ?').bind(`alert:${kind}:${cycleId}`).run();
-    throw e;
-  }
-}
-
-// cron (1 min): painel + avisos que ficaram pendentes. Não apaga nada no servidor MTA (quem faz o wipe é ele).
+// cron (1 min): só o painel (uma única mensagem, editada no lugar; não há avisos novos no canal). Não apaga nada no servidor MTA (quem faz o wipe é ele).
 export async function wipeCron(env) {
   if (!env.DB || !env.DISCORD_BOT_TOKEN) return;
-  const cycle = await currentCycle(env.DB);
-  if (cycle && cycle.pvp_confirmed_at && phaseOf(cycle) === 'FINAL_PVP') await notify(env, 'pvp', cycle.id).catch((e) => console.error('wipe alert:', e.message));
-  if (cycle && cycle.previous_cycle_id) await notify(env, 'done', cycle.previous_cycle_id).catch((e) => console.error('wipe alert:', e.message));
   await syncPanel(env).catch((e) => console.error('wipe panel:', e.message));
 }
 
