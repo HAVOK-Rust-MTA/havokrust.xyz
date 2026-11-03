@@ -226,6 +226,12 @@ test('categoria, guia, itens, veículos e faq têm título próprio', async () =
   assert.equal(metas(await (await get('/wiki/faq')).text()).title, 'Perguntas frequentes — HAVOK');
 });
 
+test('/wiki/categoria/cosmeticos: galeria de roupas com texto próprio', async () => {
+  const m = metas(await (await get('/wiki/categoria/cosmeticos')).text());
+  assert.equal(m.title, 'Cosméticos — Wiki HAVOK');
+  assert.match(m.description, /^\d+ roupas e acessórios/);
+});
+
 // //------------------- grupo e jogador (API) -------------------\\
 test('/grupo/<slug>: tag, nome, posição, membros e abates da API', async () => {
   const m = metas(await (await get('/grupo/biriri')).text());

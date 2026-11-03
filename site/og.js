@@ -178,7 +178,7 @@ export async function metaFor(path, data) {
       const c = d.cats[parts[2]];
       return page({
         title: `${c.n} — Wiki HAVOK`,
-        description: `${plural(c.count, 'item', 'itens')} de ${c.n.toLowerCase()} no HAVOK: receitas, onde achar e para que serve cada um.`,
+        description: c.d || `${plural(c.count, 'item', 'itens')} de ${c.n.toLowerCase()} no HAVOK: receitas, onde achar e para que serve cada um.`,
         sec: 'wiki', alt: `${c.n} na wiki do HAVOK`,
       });
     }

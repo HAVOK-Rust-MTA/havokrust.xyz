@@ -89,7 +89,9 @@
   };
   const L = (o) => (o ? (o[lang] ?? o.en) : '');
 
-  const CATS = [
+  // categorias: rótulos do data.js (gerado do jogo); a lista abaixo só vale se o data.js for antigo.
+  // "cosmeticos" não é categoria de item: abre a galeria de roupas (/wiki/categoria/cosmeticos).
+  const CATS = [...((W.categories && W.categories.length) ? W.categories : [
     { id: 'weapons', icon: 'crosshair', en: 'Weapons', pt: 'Armas' },
     { id: 'tools', icon: 'wrench', en: 'Tools', pt: 'Ferramentas' },
     { id: 'resources', icon: 'gem', en: 'Resources', pt: 'Recursos' },
@@ -100,13 +102,14 @@
     { id: 'clothing', icon: 'user', en: 'Clothing', pt: 'Roupas' },
     { id: 'building', icon: 'building', en: 'Base Building', pt: 'Construção de Bases' },
     { id: 'constructions', icon: 'hammer', en: 'Constructions', pt: 'Construções' },
-  ];
+  ]), { id: 'cosmeticos', icon: 'shirt', en: 'Cosmetics', pt: 'Cosméticos', gallery: true }];
   const TYPES = {
     'Primary Weapon': ['Primary Weapon', 'Arma Primária'], 'Secondary Weapon': ['Secondary Weapon', 'Arma Secundária'], Explosive: ['Explosive', 'Explosivo'],
     Tool: ['Tool', 'Ferramenta'], Resource: ['Resource', 'Recurso'], Item: ['Component', 'Componente'], Ammo: ['Ammo', 'Munição'], Food: ['Food', 'Comida'],
     'Raw Food': ['Raw Food', 'Comida Crua'], Drink: ['Drink', 'Bebida'], Medicament: ['Medical', 'Medicamento'], 'Empty Can': ['Empty Can', 'Lata Vazia'],
     Helmet: ['Helmet', 'Capacete'], Vest: ['Vest', 'Colete'], Hazmat: ['Hazmat', 'Hazmat'], Shirt: ['Shirt', 'Camisa'], Pants: ['Pants', 'Calça'], Shoes: ['Shoes', 'Calçado'], Hat: ['Hat', 'Chapéu'], 'Base Object': ['Base Object', 'Estrutura de Base'],
     Construction: ['Construction', 'Construção'], 'Vehicle Part': ['Vehicle Part', 'Peça de Veículo'],
+    ...(W.types || {}),
   };
   const typeName = (ty) => (TYPES[ty] ? TYPES[ty][lang === 'pt' ? 1 : 0] : ty);
   const SOURCES = {
@@ -116,6 +119,7 @@
     tree: ['Trees', 'Árvores'], rock: ['Grey rocks', 'Pedras cinzas'], 'iron-rock': ['Iron rocks', 'Pedras de ferro'], 'sulfur-rock': ['Yellow sulfur rocks', 'Pedras amarelas de enxofre'],
     planter: ['Grown in a Planter', 'Plantado na Plantadora'], fill: ['Fill a canteen at a lake, river, Well or Water Barrel', 'Encha o cantil num lago, rio, Poço ou Barril de Água'],
     cook: ['Cook Raw Meat on a Campfire or Furnace', 'Cozinhe Carne Crua na Fogueira ou Fornalha'],
+    ...(W.sourceNames || {}),
   };
   const SRC_ICON = { tree: 'tree', rock: 'pickaxe', 'iron-rock': 'pickaxe', 'sulfur-rock': 'pickaxe', planter: 'sprout', fill: 'droplet', cook: 'flame', helicopter: 'zap', airdrop: 'package', hospital: 'cross' };
 
@@ -230,7 +234,117 @@
   }
 
   // ---------------------------------------------------------------- pages
-  const crumbs = (parts) => `<div class="crumbs">${parts.map((p, i) => (i < parts.length - 1 ? `<a href="${p[1]}">${esc(p[0])}</a>${svg('chevron')}` : `<span class="cur">${esc(p[0])}</span>`)).join('')}</div>`;
+  // //------------------- wiki (B3): textos, ícones extras e ajudantes -------------------\\
+  // Textos da wiki e do mapa ficam aqui (e não no T lá de cima) para a wiki mudar sem mexer no resto do site.
+  const WT = {
+    en: {
+      hero_t: 'HAVOK Wiki', hero_s: 'Every item, recipe, loot spot and system on the server, read straight from the game code.',
+      search_ph: 'Search items, guides, outfits, vehicles…', s_items: 'items', s_guides: 'guides', s_cos: 'outfits', s_veh: 'vehicles',
+      try: 'Popular', start_h: 'New here? Start with these', all_guides: 'All guides', cats_h: 'Categories', guides_h: 'Guides', more_h: 'Reference',
+      soon: 'Coming soon', soon_h: 'Coming in the next update', soon_s: 'Already running on the test server. They land on the official server with the next update.',
+      soon_note: 'Already in the game on the test server; it reaches the official server with the next update. Numbers can still change.',
+      results: '{n} results for “{q}”', res_items: 'Items', res_guides: 'Guides', res_cos: 'Cosmetics', res_veh: 'Vehicles',
+      no_match: 'Nothing found for “{q}”. Try the name in English or Portuguese, or browse the categories below.', see_all: 'See all {n}',
+      shop_h: 'Shop', shop_for: 'for {n}', shop_unit: 'each', scrap: 'Scrap', shop_how: 'How the shop works', shop_sec: 'Section',
+      where_h: 'Where to find', bp_drop: 'Ready-made blueprint', m_reward: 'Mission reward', m_bp: 'Blueprint from a mission', m_need: 'Mission asks for it',
+      air_chance: '{n}% chance in each airdrop', air_bp: 'blueprint: {n}%', missions_how: 'How missions work',
+      equip_h: 'Equipment', slot: 'Body slot', bonus: 'Extra inventory slots', durability: 'Durability', note: 'Good to know',
+      slots: ['Head', 'Mask', 'Torso', 'Legs', 'Vest', 'Backpack', 'Suit', 'Feet', 'Glasses', 'Radio'], equip_how: 'Equipment & backpacks',
+      f_shop: 'In the shop', f_soon: 'Coming soon', f_all: 'All', clear: 'Clear filters',
+      read_min: '{n} min read', on_page: 'On this page', in_guide: 'Items in this guide', guide_soon: 'Part of this guide covers features coming in the next update.',
+      faq_more: 'Still stuck?', faq_more_s: 'Ask on Discord: staff and players answer there.', faq_filter: 'Filter questions…', faq_none: 'No question matches that.',
+      cos_t: 'Cosmetics', cos_s: '{n} clothes and accessories for your character. Looks only: protection comes from vests, helmets, masks and suits.',
+      cos_note: 'Cosmetics come with the character creator in the next update. Prices and drops below are from the test server.',
+      cos_card: 'Clothes, caps, glasses and backpacks for your character', cos_open: 'Open the gallery',
+      tier: 'Tier', male: 'Male only', price: '{n} Scrap', all: 'All', cos_none: 'No outfit with these filters.',
+      w: { shop: 'Shop', loot: 'Loot', airdrop: 'Airdrop', craft: 'Craft' }, w_from: 'Drops from',
+      bonus_slots: '+{n} slots', see_item: 'See the item',
+      // mapa
+      map_h: 'Reading the map', map_s: 'Drag to move, scroll or pinch to zoom, click a marker for details. The filter panel hides or shows each layer.',
+      air_h: 'Airdrop', air_none: 'No crate in the air right now.', air_every: 'A plane drops a crate every {n} min somewhere on the map. The marker shows up on its own: no need to reload.',
+      air_falling: 'Falling now{near}.', air_landed: 'On the ground, still closed{near}.', air_opened: 'Already opened{near}.', air_err: 'Could not reach the server; the map keeps trying.', air_near: ' near {z}',
+      air_guide: 'What comes in the crate', map_guides: 'Related guides',
+      lg: {
+        safezone: 'No damage inside. Protection lasts {s} s after you leave; no building within {b} m.',
+        shop: 'Buy and sell for Scrap.', mission: 'Hand in items for rewards and XP.',
+        military: 'The best loot on the map, and the most players.', gate: 'Open with a KeyCard of the right color.',
+        radiation: 'Burns your blood. Gas mask or Radiation Suit.', cold: 'Freezes without an Arctic Suit.',
+        hospital: 'Med packs to loot.', recycler: 'Turn junk into Scrap and parts.', gas: 'Fill a Gas Can at the pump.',
+        oil: 'Out at sea, guarded loot.', island: 'Reach them by boat.', radio: 'HAVOK Radio plays here.',
+      },
+    },
+    pt: {
+      hero_t: 'Wiki do HAVOK', hero_s: 'Todos os itens, receitas, lugares de loot e sistemas do servidor, lidos direto do código do jogo.',
+      search_ph: 'Buscar itens, guias, roupas, veículos…', s_items: 'itens', s_guides: 'guias', s_cos: 'roupas', s_veh: 'veículos',
+      try: 'Mais buscados', start_h: 'Chegou agora? Comece por estes', all_guides: 'Todos os guias', cats_h: 'Categorias', guides_h: 'Guias', more_h: 'Consulta',
+      soon: 'Em breve', soon_h: 'Chega na próxima atualização', soon_s: 'Já rodando no servidor de testes. Sobe para o oficial no próximo pacote.',
+      soon_note: 'Já está no jogo no servidor de testes e chega ao servidor oficial na próxima atualização. Os números ainda podem mudar.',
+      results: '{n} resultados para “{q}”', res_items: 'Itens', res_guides: 'Guias', res_cos: 'Cosméticos', res_veh: 'Veículos',
+      no_match: 'Nada encontrado para “{q}”. Tente o nome em português ou inglês, ou navegue pelas categorias abaixo.', see_all: 'Ver todos os {n}',
+      shop_h: 'Loja', shop_for: 'por {n}', shop_unit: 'cada', scrap: 'Sucata', shop_how: 'Como funciona a loja', shop_sec: 'Seção',
+      where_h: 'Onde achar', bp_drop: 'Blueprint pronta', m_reward: 'Recompensa de missão', m_bp: 'Blueprint de missão', m_need: 'Missão pede este item',
+      air_chance: '{n}% de chance em cada airdrop', air_bp: 'blueprint: {n}%', missions_how: 'Como funcionam as missões',
+      equip_h: 'Equipamento', slot: 'Espaço do corpo', bonus: 'Espaços extras no inventário', durability: 'Durabilidade', note: 'Bom saber',
+      slots: ['Cabeça', 'Máscara', 'Tronco', 'Pernas', 'Colete', 'Mochila', 'Traje', 'Pés', 'Óculos', 'Rádio'], equip_how: 'Equipamento e mochilas',
+      f_shop: 'Na loja', f_soon: 'Em breve', f_all: 'Todos', clear: 'Limpar filtros',
+      read_min: '{n} min de leitura', on_page: 'Nesta página', in_guide: 'Itens deste guia', guide_soon: 'Parte deste guia fala de coisas que chegam na próxima atualização.',
+      faq_more: 'Ainda com dúvida?', faq_more_s: 'Pergunte no Discord: a staff e os jogadores respondem lá.', faq_filter: 'Filtrar perguntas…', faq_none: 'Nenhuma pergunta com isso.',
+      cos_t: 'Cosméticos', cos_s: '{n} roupas e acessórios para o seu personagem. Só visual: quem protege é colete, capacete, máscara e traje.',
+      cos_note: 'Os cosméticos chegam junto com o criador de personagem na próxima atualização. Preços e drops abaixo são do servidor de testes.',
+      cos_card: 'Roupas, bonés, óculos e mochilas para o seu personagem', cos_open: 'Abrir a galeria',
+      tier: 'Raridade', male: 'Só masculino', price: '{n} de Sucata', all: 'Todos', cos_none: 'Nenhuma roupa com esses filtros.',
+      w: { shop: 'Loja', loot: 'Loot', airdrop: 'Airdrop', craft: 'Craft' }, w_from: 'Cai em',
+      bonus_slots: '+{n} espaços', see_item: 'Ver o item',
+      map_h: 'Como ler o mapa', map_s: 'Arraste para mover, use a roda ou dois dedos para o zoom e clique num ponto para ver os detalhes. O painel de filtros mostra ou esconde cada camada.',
+      air_h: 'Airdrop', air_none: 'Nenhuma caixa no ar agora.', air_every: 'Um avião solta uma caixa a cada {n} min em algum ponto do mapa. O marcador aparece sozinho, sem recarregar a página.',
+      air_falling: 'Caindo agora{near}.', air_landed: 'No chão, ainda fechada{near}.', air_opened: 'Já foi aberta{near}.', air_err: 'Sem resposta do servidor; o mapa continua tentando.', air_near: ' perto de {z}',
+      air_guide: 'O que vem na caixa', map_guides: 'Guias relacionados',
+      lg: {
+        safezone: 'Ninguém leva dano lá dentro. A proteção dura {s} s depois de sair; não dá para construir a menos de {b} m.',
+        shop: 'Compra e venda por Sucata.', mission: 'Entregue itens e ganhe recompensa e XP.',
+        military: 'O melhor loot do mapa, e a maior parte dos jogadores.', gate: 'Abre com o KeyCard da cor certa.',
+        radiation: 'Tira sangue. Máscara de gás ou Roupa Anti-Radiação.', cold: 'Congela sem o Traje Ártico.',
+        hospital: 'Kits médicos para lootear.', recycler: 'Transforma lixo em Sucata e peças.', gas: 'Encha o Galão na bomba.',
+        oil: 'No meio do mar, loot com guarda.', island: 'Só de barco.', radio: 'Onde toca a HAVOK Rádio.',
+      },
+    },
+  };
+  const wt = (k, vars) => {
+    let s = WT[lang][k] ?? WT.en[k] ?? k;
+    if (vars && typeof s === 'string') for (const v in vars) s = s.split('{' + v + '}').join(vars[v]);
+    return s;
+  };
+  Object.assign(P, {
+    shirt: '<path d="M8 3 4 5.5 2 10l3 1.5V21h14v-9.5L22 10l-2-4.5L16 3c-.5 1.7-2 3-4 3S8.5 4.7 8 3z"/>',
+    coins: '<ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7"/><path d="M9 14v3c0 1.7 2.7 3 6 3s6-1.3 6-3v-4c0-1.6-2.4-2.9-5.5-3"/>',
+    hourglass: '<path d="M6 2h12M6 22h12M7 2c0 5 5 6 5 10s-5 5-5 10M17 2c0 5-5 6-5 10s5 5 5 10"/>',
+    backpack: '<path d="M5 20V10a7 7 0 0 1 14 0v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M9 4.5V3h6v1.5M8 22v-6h8v6M8 12h8"/>',
+    shield2: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 7v10M8 11h8"/>',
+    sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
+    arrowr: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    // os mesmos desenhos do mapa (mapa/mapa.js), para a legenda da página /mapa
+    m_fuel: '<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10M14 8l3 2v8a1.5 1.5 0 0 0 3 0V9l-3-3"/>',
+    m_card: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>',
+    m_rad: '<circle cx="12" cy="12" r="1.6"/><path d="M12 10.4 9.2 5.6a7.5 7.5 0 0 1 5.6 0zM13.4 12.8l5.5.1a7.5 7.5 0 0 1-2.8 4.9zM10.6 12.8l-2.7 5a7.5 7.5 0 0 1-2.8-4.9z"/>',
+    m_snow: '<path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/>',
+    m_speaker: '<path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>',
+    m_oil: '<path d="M8 21 12 3l4 18M9.5 14h5M10.5 9h3M4 21h16M12 3v-1"/><path d="M16 8h4v3"/>',
+  });
+  const SLOT_IC = ['user', 'skull', 'shirt', 'user', 'shield', 'backpack', 'shield2', 'user', 'search', 'megaphone'];
+  const isSoon = (x) => !!(x && x.soon);
+  const soonTag = (cls = '') => `<span class="soon-tag ${cls}" title="${esc(wt('soon_note'))}">${svg('hourglass')}${esc(wt('soon'))}</span>`;
+  const fmtN = (n) => Number(n).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
+  const scrapIc = () => (byId.scrap && byId.scrap.icon ? `<img class="scrap-ic" src="${abs(byId.scrap.icon)}" alt="" width="20" height="20" loading="lazy">` : svg('coins'));
+  const COS = (W.cosmetics || []);
+  const cosAll = COS.flatMap((c) => c.items.map((i) => Object.assign({ cat: c.id }, i)));
+  const cosTier = (k) => L((W.cosmeticTiers || {})[k]) || k;
+  const missionById = Object.fromEntries((W.missions || []).map((m) => [m.id, m]));
+  const shopCat = Object.fromEntries((W.shop || []).map((c) => [c.id, c]));
+  const guideBySlug = Object.fromEntries(W.guides.map((g) => [g.slug, g]));
+  const guideLink = (slug, label) => (guideBySlug[slug] ? `<a class="g-link" href="/wiki/guia/${slug}">${svg(guideBySlug[slug].icon)}<span>${esc(label || L(guideBySlug[slug]).title)}</span>${svg('chevron')}</a>` : '');
+  const catCount = (c) => (c.gallery ? cosAll.length : W.items.filter((i) => i.cat === c.id).length);
+
+  const crumbs = (parts) => `<nav class="crumbs" aria-label="breadcrumb">${parts.map((p, i) => (i < parts.length - 1 ? `<a href="${p[1]}">${esc(p[0])}</a>${svg('chevron')}` : `<span class="cur" aria-current="page">${esc(p[0])}</span>`)).join('')}</nav>`;
 
   function featuredVideo() {
     const yt = youtubeId((window.HAVOK || {}).featured);
@@ -238,55 +352,150 @@
     return `<div class="section-title">${t('featured')}</div>
       <figure class="media"><div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0" title="${t('featured')}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div></figure>`;
   }
-  function pageHome() {
-    const count = (id) => W.items.filter((i) => i.cat === id).length;
-    setTimeout(() => {
-      // a busca grande da wiki usa a mesma busca global
-      const big = $('#wikiSearch');
-      if (big) big.onclick = () => openSearch();
-    });
-    return `<section class="w-hero">
-        <p class="l-kicker">HAVOK · Wiki</p>
-        <h1 class="page-title">${t('wiki_title')}</h1><p class="page-sub">${t('wiki_sub')}</p>
-        <button type="button" class="w-search" id="wikiSearch">${svg('search')}<span>${t('search')}</span><kbd>Ctrl K</kbd></button>
-      </section>
-      ${featuredVideo()}
-      <div class="section-title">${t('categories')}</div>
-      <div class="w-cats">${CATS.map((c) => `<a class="w-cat" href="/wiki/categoria/${c.id}"><span class="w-cat-ic">${svg(c.icon)}</span><b>${esc(c[lang])}</b><small>${t('items_count', { n: count(c.id) })}</small></a>`).join('')}
-        <a class="w-cat" href="/wiki/veiculos"><span class="w-cat-ic">${svg('car')}</span><b>${lang === 'pt' ? 'Veículos' : 'Vehicles'}</b><small>${(W.vehicles || []).length} ${lang === 'pt' ? 'veículos' : 'vehicles'}</small></a>
-        <a class="w-cat" href="/wiki/itens"><span class="w-cat-ic">${svg('grid')}</span><b>${t('all_items')}</b><small>${t('items_count', { n: W.items.length })}</small></a></div>
-      <div class="section-title">${t('guides')}</div>
-      <div class="w-guides">${W.guides.map((g, i) => `<a class="w-guide" href="/wiki/guia/${g.slug}"><span class="w-guide-n">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}
-        <a class="w-guide" href="/wiki/faq"><span class="w-guide-n">?</span><span><b>FAQ</b><small>${t('faq_desc')}</small></span></a></div>`;
+
+  // //------------------- busca da wiki (itens, guias, cosméticos, veículos) -------------------\\
+  // nome começando com o termo vem antes de nome que só contém o termo; o outro idioma e o tipo também contam
+  function wikiFind(qRaw) {
+    const q = norm(qRaw.trim());
+    if (!q) return null;
+    const sc = (main, other, extra) => { const a = norm(main); return a.startsWith(q) ? 0 : a.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : a.includes(q) ? 2 : norm(other).includes(q) ? 3 : norm(extra).includes(q) ? 4 : 9; };
+    const rank = (arr, f) => arr.map((x) => [x, f(x)]).filter((x) => x[1] < 9).sort((a, b) => a[1] - b[1]).map((x) => x[0]);
+    return {
+      q: qRaw.trim(),
+      items: rank(W.items, (i) => sc(name(i), lang === 'pt' ? i.name.en : i.name.pt, typeName(i.type) + ' ' + (i.key || ''))),
+      guides: rank(W.guides, (g) => sc(L(g).title, (lang === 'pt' ? g.en : g.pt).title, L(g).description)),
+      cos: rank(cosAll, (c) => sc(L(c.name), lang === 'pt' ? c.name.en : c.name.pt, c.key)),
+      veh: rank(W.vehicles || [], (v) => sc(v.name, '', v.cat)),
+    };
+  }
+  function wikiResults(r) {
+    if (!r) return '';
+    const n = r.items.length + r.guides.length + r.cos.length + r.veh.length;
+    if (!n) return `<div class="ws-empty">${svg('search')}<p>${esc(wt('no_match', { q: r.q }))}</p></div>`;
+    const sec = (title, list, max, row, more) => (list.length ? `<section class="ws-sec"><h3>${esc(title)} <span>${list.length}</span></h3><div class="ws-list">${list.slice(0, max).map(row).join('')}</div>${list.length > max && more ? more : ''}</section>` : '');
+    return `<p class="ws-count" role="status">${esc(wt('results', { n, q: r.q }))}</p>
+      ${sec(wt('res_items'), r.items, 12, itemCard, `<a class="ws-more" href="/wiki/itens?q=${encodeURIComponent(r.q)}">${esc(wt('see_all', { n: r.items.length }))} ${svg('arrowr')}</a>`)}
+      ${sec(wt('res_guides'), r.guides, 6, (g) => `<a class="ws-guide" href="/wiki/guia/${g.slug}"><span class="w-guide-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`)}
+      ${sec(wt('res_cos'), r.cos, 8, cosCard, `<a class="ws-more" href="/wiki/categoria/cosmeticos">${esc(wt('cos_open'))} ${svg('arrowr')}</a>`)}
+      ${sec(wt('res_veh'), r.veh, 6, (v) => `<a class="ws-veh" href="/wiki/veiculos"><img src="/vehicles/${v.id}.webp" alt="" loading="lazy" width="102" height="62"><b>${esc(v.name)}</b></a>`)}`;
   }
 
-  const filt = { q: '', type: '', craft: false, bp: false, bench: false, sort: 'name' };
+  // //------------------- início da wiki -------------------\\
+  const POPULAR = ['c4', 'assault-rifle', 'furnace', 'workbench', 'backpack-alice-camo', 'helmet', 'scrap', 'sleeping-bag'];
+  function pageHome() {
+    const nVeh = (W.vehicles || []).length;
+    const start = ['first-10-minutes', 'getting-started', 'survival-basics'].map((s) => guideBySlug[s]).filter(Boolean);
+    const soonItems = W.items.filter(isSoon);
+    // 3 ícones de itens de verdade por categoria (os de maior level primeiro: mais reconhecíveis)
+    const peek = (c) => (c.gallery ? cosAll.filter((x) => x.image).slice(0, 40).filter((_, i) => i % 13 === 0).slice(0, 3).map((x) => x.image)
+      : W.items.filter((i) => i.cat === c.id && i.icon).sort((a, b) => (b.blueprint || 0) - (a.blueprint || 0) || (b.level || 0) - (a.level || 0)).slice(0, 3).map((i) => i.icon));
+    // peças de base não têm ícone no jogo: o desenho da peça na cor do material
+    const pieces = (c) => [['foundation', 2], ['wall', 3], ['door', 4]].map(([pc, tier]) => `<svg class="wk-piece" viewBox="0 0 24 24" style="color:${TIER_COL[tier]}">${PIECE_SVG[pc]}</svg>`).join('');
+    const popular = POPULAR.map((id) => byId[id]).filter(Boolean);
+    setTimeout(() => {
+      const inp = $('#wq'), out = $('#wqOut'), rest = $('#wRest');
+      if (!inp) return;
+      const run = () => {
+        const r = wikiFind(inp.value);
+        out.innerHTML = wikiResults(r);
+        out.hidden = !r;
+        rest.hidden = !!r;
+        try { history.replaceState(history.state, '', r ? `/wiki?q=${encodeURIComponent(r.q)}` : '/wiki'); } catch (e) { /* segue */ }
+      };
+      inp.addEventListener('input', run);
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { const a = out.querySelector('a[href]'); if (a) { e.preventDefault(); go(a.getAttribute('href')); } }
+        if (e.key === 'Escape') { inp.value = ''; run(); }
+      });
+      const q0 = new URLSearchParams(location.search).get('q');
+      if (q0) { inp.value = q0; run(); }
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !q0) inp.focus({ preventScroll: true });
+      document.querySelectorAll('.wq-pop button').forEach((b) => b.onclick = () => { inp.value = b.dataset.q; run(); inp.focus(); });
+    });
+    return `<div class="wk">
+      <section class="wk-hero">
+        <h1 class="wk-title">${esc(wt('hero_t'))}</h1>
+        <p class="wk-sub">${esc(wt('hero_s'))}</p>
+        <label class="wq">${svg('search')}<input id="wq" type="search" placeholder="${esc(wt('search_ph'))}" autocomplete="off" spellcheck="false" aria-label="${esc(wt('search_ph'))}" enterkeyhint="go"></label>
+        <div class="wq-pop"><span>${esc(wt('try'))}</span>${popular.map((i) => `<button type="button" data-q="${esc(name(i))}">${iconOf(i)}${esc(name(i))}</button>`).join('')}</div>
+        <dl class="wk-stats">
+          <div><dt>${esc(wt('s_items'))}</dt><dd>${W.items.length}</dd></div>
+          <div><dt>${esc(wt('s_guides'))}</dt><dd>${W.guides.length}</dd></div>
+          <div><dt>${esc(wt('s_cos'))}</dt><dd>${cosAll.length}</dd></div>
+          <div><dt>${esc(wt('s_veh'))}</dt><dd>${nVeh}</dd></div>
+        </dl>
+      </section>
+      <div id="wqOut" class="ws" hidden aria-live="polite"></div>
+      <div id="wRest">
+        ${featuredVideo()}
+        <section class="wk-sec">
+          <h2 class="wk-h">${esc(wt('start_h'))}</h2>
+          <div class="wk-start">${start.map((g, i) => `<a class="card wk-step" href="/wiki/guia/${g.slug}"><span class="wk-step-n">${i + 1}</span><span class="wk-step-ic">${svg(g.icon)}</span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></a>`).join('')}</div>
+        </section>
+        <section class="wk-sec">
+          <h2 class="wk-h">${esc(wt('cats_h'))}</h2>
+          <div class="wk-cats">${CATS.map((c) => `<a class="card wk-cat${c.gallery ? ' is-gallery' : ''}" href="/wiki/categoria/${c.id}">
+              <span class="wk-cat-art">${peek(c).map((src) => `<img src="${abs(src)}" alt="" loading="lazy">`).join('') || (W.items.some((i) => i.cat === c.id && i.piece) ? pieces(c) : svg(c.icon))}</span>
+              <span class="wk-cat-txt"><b>${esc(c[lang])}</b><small>${t('items_count', { n: catCount(c) })}${c.gallery ? ` · ${esc(wt('soon'))}` : ''}</small></span></a>`).join('')}
+            <a class="card wk-cat" href="/wiki/veiculos"><span class="wk-cat-art is-veh">${(W.vehicles || []).slice(0, 1).map((v) => `<img src="/vehicles/${v.id}.webp" alt="" loading="lazy">`).join('')}</span><span class="wk-cat-txt"><b>${lang === 'pt' ? 'Veículos' : 'Vehicles'}</b><small>${nVeh} ${esc(wt('s_veh'))}</small></span></a>
+          </div>
+        </section>
+        ${soonItems.length ? `<section class="wk-sec wk-soon">
+          <div class="wk-soon-head"><h2 class="wk-h">${soonTag()} ${esc(wt('soon_h'))}</h2><p>${esc(wt('soon_s'))}</p></div>
+          <div class="wk-soon-row">${soonItems.map((i) => `<a href="/wiki/item/${i.id}" title="${esc(name(i))}">${iconOf(i)}<span>${esc(name(i))}</span></a>`).join('')}
+            <a href="/wiki/categoria/cosmeticos" class="is-cos"><span class="ic">${svg('shirt')}</span><span>${esc(wt('cos_t'))} · ${cosAll.length}</span></a></div>
+        </section>` : ''}
+        <section class="wk-sec">
+          <div class="wk-sec-head"><h2 class="wk-h">${esc(wt('guides_h'))}</h2><a class="wk-more" href="/wiki/guias">${esc(wt('all_guides'))} ${svg('arrowr')}</a></div>
+          <div class="wk-guides">${W.guides.map((g) => guideRow(g)).join('')}</div>
+        </section>
+        <section class="wk-sec">
+          <h2 class="wk-h">${esc(wt('more_h'))}</h2>
+          <div class="wk-ref">
+            <a class="card wk-refc" href="/wiki/itens">${svg('grid')}<b>${t('all_items')}</b><small>${W.items.length} ${esc(wt('s_items'))}</small></a>
+            <a class="card wk-refc" href="/wiki/veiculos">${svg('car')}<b>${lang === 'pt' ? 'Veículos' : 'Vehicles'}</b><small>${nVeh} ${esc(wt('s_veh'))}</small></a>
+            <a class="card wk-refc" href="/wiki/faq">${svg('help')}<b>FAQ</b><small>${(W.faq[lang] || W.faq.en).length} ${lang === 'pt' ? 'perguntas' : 'questions'}</small></a>
+            <a class="card wk-refc" href="/mapa">${svg('map')}<b>${t('nav_map')}</b><small>${lang === 'pt' ? 'Safe zones, bases, radiação, airdrop' : 'Safe zones, bases, radiation, airdrop'}</small></a>
+          </div>
+        </section>
+      </div>
+    </div>`;
+  }
+  const guideRow = (g) => `<a class="w-guide${g.soon ? ' is-soon' : ''}" href="/wiki/guia/${g.slug}"><span class="w-guide-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}${g.soon ? ' ' + soonTag('sm') : ''}</b><small>${esc(L(g).description)}</small></span></a>`;
+
+  // //------------------- lista de itens -------------------\\
+  const filt = { q: '', type: '', craft: false, bp: false, bench: false, shop: false, soon: false, sort: 'name' };
   function itemCard(it) {
     if (!it) return '';
     const marks = [];
     if (it.blueprint !== undefined) marks.push(`<span class="m bp" title="${esc(t('bp_tip'))}">${svg('scroll')}BP</span>`);
     if (it.bench) marks.push(`<span class="m bench" title="${esc(t('bench_tip'))}">${svg('hammer')}</span>`);
-    return `<a class="item-card" href="/wiki/item/${it.id}">${iconOf(it)}<span class="ic-txt"><b>${esc(name(it))}</b><small>${esc(typeName(it.type))}</small></span>${marks.length ? `<span class="tags">${marks.join('')}</span>` : ''}</a>`;
+    const price = it.shop ? `<span class="ic-price" title="${esc(wt('shop_h'))}">${svg('coins')}${fmtN(it.shop.price)}</span>` : '';
+    return `<a class="item-card${isSoon(it) ? ' is-soon' : ''}" href="/wiki/item/${it.id}">${iconOf(it)}<span class="ic-txt"><b>${esc(name(it))}</b><small>${esc(typeName(it.type))}</small>${price}</span>${marks.length ? `<span class="tags">${marks.join('')}</span>` : ''}${isSoon(it) ? soonTag('corner') : ''}</a>`;
   }
   function pageList(catId) {
     const cat = CATS.find((c) => c.id === catId);
+    if (cat && cat.gallery) return pageCosmetics();
     const base = W.items.filter((i) => !catId || i.cat === catId);
     const types = [...new Set(base.map((i) => i.type))].sort((a, b) => typeName(a).localeCompare(typeName(b)));
     if (filt.type && !types.includes(filt.type)) filt.type = '';
+    const q0 = new URLSearchParams(location.search).get('q');
+    if (q0 !== null) filt.q = q0;
     const title = cat ? cat[lang] : t('items_title');
-    const tab = (href, label, on) => `<a href="${href}" class="${on ? 'on' : ''}">${esc(label)}</a>`;
+    const tab = (href, label, on) => `<a href="${href}" class="${on ? 'on' : ''}"${on ? ' aria-current="page"' : ''}>${esc(label)}</a>`;
+    const hasShop = base.some((i) => i.shop), hasSoon = base.some(isSoon);
+    const chip = (k, label, extra = '') => `<button type="button" class="chip ${filt[k] ? 'on' : ''}" data-f="${k}" aria-pressed="${filt[k]}">${extra}${esc(label)}</button>`;
     const html = `${crumbs(cat ? [['Wiki', '/wiki'], [t('items_title'), '/wiki/itens'], [title]] : [['Wiki', '/wiki'], [title]])}
-      <h1 class="page-title">${esc(title)}</h1>
+      <header class="wl-head"><h1 class="page-title">${esc(title)}</h1><span class="wl-n">${base.length}</span></header>
       <nav class="w-tabs" aria-label="${t('categories')}">${tab('/wiki/itens', t('all_items'), !catId)}${CATS.map((c) => tab('/wiki/categoria/' + c.id, c[lang], c.id === catId)).join('')}</nav>
       <div class="w-filters">
-        <label class="w-q">${svg('search')}<input type="search" id="fq" placeholder="${t('filter_here')}" value="${esc(filt.q)}" autocomplete="off"></label>
+        <label class="w-q">${svg('search')}<input type="search" id="fq" placeholder="${t('filter_here')}" value="${esc(filt.q)}" autocomplete="off" aria-label="${t('filter_here')}"></label>
         <div class="w-toggles">
-          <button type="button" class="chip ${filt.craft ? 'on' : ''}" data-f="craft" aria-pressed="${filt.craft}">${t('craftable')}</button>
-          <button type="button" class="chip ${filt.bp ? 'on' : ''}" data-f="bp" aria-pressed="${filt.bp}">${t('has_bp')}</button>
-          <button type="button" class="chip ${filt.bench ? 'on' : ''}" data-f="bench" aria-pressed="${filt.bench}">${t('workbench')}</button>
-          <select id="fsort" aria-label="${t('sort')}"><option value="name">${t('sort_name')}</option><option value="level" ${filt.sort === 'level' ? 'selected' : ''}>${t('sort_level')}</option></select>
+          ${chip('craft', t('craftable'))}${chip('bp', t('has_bp'))}${chip('bench', t('workbench'))}
+          ${hasShop ? chip('shop', wt('f_shop'), svg('coins')) : ''}${hasSoon ? chip('soon', wt('f_soon'), svg('hourglass')) : ''}
+          <select id="fsort" aria-label="${t('sort')}"><option value="name">${t('sort_name')}</option><option value="level" ${filt.sort === 'level' ? 'selected' : ''}>${t('sort_level')}</option><option value="price" ${filt.sort === 'price' ? 'selected' : ''}>${lang === 'pt' ? 'Preço na loja' : 'Shop price'}</option></select>
         </div>
-        ${types.length > 1 ? `<div class="w-types">${[['', t('all_types')], ...types.map((ty) => [ty, typeName(ty)])].map(([v, l]) => `<button type="button" class="chip type ${filt.type === v ? 'on' : ''}" data-type="${esc(v)}">${esc(l)}</button>`).join('')}</div>` : ''}
+        ${types.length > 1 ? `<div class="w-types">${[['', t('all_types')], ...types.map((ty) => [ty, typeName(ty)])].map(([v, l]) => `<button type="button" class="chip type ${filt.type === v ? 'on' : ''}" data-type="${esc(v)}" aria-pressed="${filt.type === v}">${esc(l)}</button>`).join('')}</div>` : ''}
       </div>
       <div class="w-meta"><div class="count" id="fcount" aria-live="polite"></div>
         <div class="w-legend"><span><span class="m bp">${svg('scroll')}BP</span> ${t('legend_bp')}</span><span><span class="m bench">${svg('hammer')}</span> ${t('legend_bench')}</span></div></div>
@@ -295,10 +504,14 @@
       const draw = () => {
         const q = norm(filt.q);
         const list = base.filter((i) => (!q || norm(name(i)).includes(q) || norm(i.name.en).includes(q) || norm(i.name.pt).includes(q) || norm(typeName(i.type)).includes(q))
-          && (!filt.type || i.type === filt.type) && (!filt.craft || i.recipe) && (!filt.bp || i.blueprint !== undefined) && (!filt.bench || i.bench))
-          .sort(filt.sort === 'level' ? (a, b) => (a.level || 0) - (b.level || 0) || sortByName(a, b) : sortByName);
+          && (!filt.type || i.type === filt.type) && (!filt.craft || i.recipe) && (!filt.bp || i.blueprint !== undefined) && (!filt.bench || i.bench)
+          && (!filt.shop || i.shop) && (!filt.soon || isSoon(i)))
+          .sort(filt.sort === 'level' ? (a, b) => (a.level || 0) - (b.level || 0) || sortByName(a, b)
+            : filt.sort === 'price' ? (a, b) => (a.shop ? 0 : 1) - (b.shop ? 0 : 1) || ((a.shop || {}).price || 0) - ((b.shop || {}).price || 0) || sortByName(a, b) : sortByName);
         $('#fcount').textContent = t('showing', { n: list.length, t: base.length });
-        $('#flist').innerHTML = list.length ? list.map(itemCard).join('') : `<div class="empty-state">${t('no_results')}</div>`;
+        $('#flist').innerHTML = list.length ? list.map(itemCard).join('') : `<div class="empty-state">${svg('search')}<p>${t('no_results')}</p><button type="button" class="btn btn-ghost sm" id="fclear">${esc(wt('clear'))}</button></div>`;
+        const c = $('#fclear');
+        if (c) c.onclick = () => { Object.assign(filt, { q: '', type: '', craft: false, bp: false, bench: false, shop: false, soon: false }); route(); };
       };
       $('#fq').oninput = (e) => { filt.q = e.target.value; draw(); };
       $('#fsort').onchange = (e) => { filt.sort = e.target.value; draw(); };
@@ -306,7 +519,7 @@
         const k = b.dataset.f; filt[k] = !filt[k]; b.classList.toggle('on', filt[k]); b.setAttribute('aria-pressed', filt[k]); draw();
       });
       document.querySelectorAll('.w-types .chip').forEach((b) => b.onclick = () => {
-        filt.type = b.dataset.type; document.querySelectorAll('.w-types .chip').forEach((x) => x.classList.toggle('on', x === b)); draw();
+        filt.type = b.dataset.type; document.querySelectorAll('.w-types .chip').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); draw();
       });
       const on = $('.w-tabs .on');
       if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
@@ -315,24 +528,41 @@
     return html;
   }
 
+  // //------------------- ficha do item -------------------\\
   function ingRow(id, qty, extra = '') {
     const it = byId[id];
-    return `<div class="ing">${iconOf(it)}<a href="/wiki/item/${id}"><b>${esc(name(it))}</b></a>${extra}<span class="qty">x${qty}</span></div>`;
+    return `<div class="ing">${iconOf(it)}<a href="/wiki/item/${id}"><b>${esc(name(it))}</b></a>${extra}<span class="qty">×${fmtN(qty)}</span></div>`;
   }
+  const srcName = (s) => (SOURCES[s] ? SOURCES[s][lang === 'pt' ? 1 : 0] : s);
+  const mName = (id) => { const m = missionById[id]; return m ? L(m.name) : '#' + id; };
   function pageItem(id) {
     const it = byId[id];
-    if (!it) return `<div class="empty-state">${t('not_found')}</div>`;
+    if (!it) return pageNotFound();
     const cat = CATS.find((c) => c.id === it.cat);
     const left = [];
     const right = [];
     const badges = [`<span class="badge type">${esc(typeName(it.type))}</span>`];
-    if (it.blueprint) badges.push(`<span class="badge bp" title="${esc(t('bp_tip'))}">${svg('scroll')} ${t('bp_badge', { n: it.blueprint })}</span>`);
+    if (isSoon(it)) badges.unshift(soonTag('lg'));
+    if (it.blueprint) badges.push(`<span class="badge bp" title="${esc(t('bp_tip'))}">${svg('scroll')} ${t('bp_badge', { n: fmtN(it.blueprint) })}</span>`);
     else if (it.blueprint === 0) badges.push(`<span class="badge bp" title="${esc(t('bp_tip'))}">${svg('scroll')} Blueprint · ${t('loot_badge')}</span>`);
     if (it.bench) badges.push(`<span class="badge bench">${svg('hammer')} ${t('bench_badge')}</span>`);
 
+    // números grandes logo abaixo do nome: o que mais se procura de cada item
+    const kpi = [];
+    if (it.weapon && it.weapon.damage != null) kpi.push([t('damage'), it.weapon.damage + '%']);
+    if (it.weapon && it.weapon.mag) kpi.push([t('mag'), it.weapon.mag]);
+    if (it.bonus) kpi.push([wt('bonus'), '+' + it.bonus]);
+    if (it.durability) kpi.push([wt('durability'), fmtN(it.durability)]);
+    if (it.hp) kpi.push([t('health'), fmtN(it.hp)]);
+    if (it.slots) kpi.push([t('slots'), it.slots]);
+    if (it.shop) kpi.push([wt('shop_h'), `${scrapIc()}${fmtN(it.shop.price)}`, true]);
+    if (it.stack && it.stack > 1 && kpi.length < 4) kpi.push([t('stack'), fmtN(it.stack)]);
+
+    if (isSoon(it)) left.push(`<div class="soon-note">${svg('hourglass')}<div><b>${esc(wt('soon'))}</b><p>${esc(wt('soon_note'))}</p></div></div>`);
+    if (it.note) left.push(`<div class="note-box">${svg('info')}<div><b>${esc(wt('note'))}</b><p>${esc(L(it.note))}</p></div></div>`);
     if (it.weapon) {
       const w = it.weapon;
-      left.push(`<div class="section-title">${t('weapon_stats')}</div><div class="box">
+      left.push(`<h2 class="section-title">${t('weapon_stats')}</h2><div class="box">
         ${w.damage != null ? `<div class="row"><span>${t('damage')} <small class="muted">(${t('damage_hint')})</small></span><b>${w.damage}%</b></div>` : ''}
         <div class="row"><span>${t('range')}</span><b>${w.range} m</b></div>
         ${w.mag ? `<div class="row"><span>${t('mag')}</span><b>${w.mag}</b></div>` : ''}
@@ -342,39 +572,115 @@
     if (it.recipe) {
       const foot = [`<span>${svg('hammer')} ${it.bench ? t('needs_bench') : t('anywhere')}</span>`];
       if (it.level) foot.push(`<span>${svg('star')} ${t('level', { n: it.level })}</span><span class="vip">${t('vip_level', { n: Math.floor(it.level * 0.75) })}</span>`);
-      if (it.receive) foot.push(`<span>${t('receive')}: <b>x${it.receive}</b></span>`);
-      left.push(`<div class="section-title">${t('recipe')}</div><div class="box">${it.recipe.map((r) => ingRow(r.id, r.qty)).join('')}<div class="box-foot">${foot.join('')}</div></div>`);
+      if (it.receive) foot.push(`<span>${t('receive')}: <b>×${it.receive}</b></span>`);
+      left.push(`<h2 class="section-title">${t('recipe')}</h2><div class="box">${it.recipe.map((r) => ingRow(r.id, r.qty)).join('')}<div class="box-foot">${foot.join('')}</div></div>`);
       if (it.blueprint !== undefined) left.push(`<div class="bp-note">${svg('scroll')}<div><b>Blueprint</b><p>${t(it.blueprint ? 'bp_explain' : 'bp_explain_loot')}</p><a href="/wiki/guia/loot-crafting-and-blueprints">${t('bp_how')} ${svg('chevron')}</a></div></div>`);
     }
-    if (it.ammoFor) left.push(`<div class="section-title">${t('compatible')}</div><div class="item-grid">${it.ammoFor.map((x) => itemCard(byId[x])).join('')}</div>`);
-    if (it.usedIn) left.push(`<div class="section-title">${t('used_in')}</div><div class="item-grid">${it.usedIn.map((x) => itemCard(byId[x])).filter(Boolean).join('')}</div>`);
+    // onde achar: loot, blueprint pronta, airdrop (com a chance), missões, fornalha, reciclagem
+    const where = [];
+    const airLoot = (((W.systems || {}).airdrop || {}).loot || []).filter((l) => l.id === it.id);
+    const airNormal = airLoot.find((l) => !l.bp), airBp = airLoot.find((l) => l.bp);
+    if (it.recipe) where.push(`<div class="obtain">${svg('hammer')}<span>${t('obtain_craft')}</span></div>`);
+    W.items.filter((x) => x.furnace && x.furnace.to === it.id).forEach((x) => where.push(`<div class="obtain">${svg('flame')}<span>${t('obtain_furnace')}: <a href="/wiki/item/${x.id}"><b>${esc(name(x))}</b></a></span></div>`));
+    if (W.items.some((x) => (x.recycler || []).some((r) => r.id === it.id))) where.push(`<div class="obtain">${svg('recycle')}<span>${t('obtain_recycler')}</span></div>`);
+    (it.sources || []).forEach((s) => {
+      const extra = s === 'airdrop' && airNormal ? ` <small>${esc(wt('air_chance', { n: airNormal.chance }))}</small>` : '';
+      where.push(`<div class="obtain">${svg(SRC_ICON[s] || 'box')}<span>${esc(srcName(s))}${extra}</span></div>`);
+    });
+    (it.rewardOf || []).forEach((m) => where.push(`<div class="obtain">${svg('gift')}<span>${esc(wt('m_reward'))}: <a href="/wiki/guia/missions"><b>${esc(mName(m))}</b></a></span></div>`));
+    if (where.length) right.push(`<div class="box"><h3>${t('how_obtain')}</h3>${where.join('')}</div>`);
+    const bpw = [];
+    (it.bpSources || []).forEach((s) => bpw.push(`<div class="obtain">${svg(SRC_ICON[s] || 'scroll')}<span>${esc(srcName(s))}${s === 'airdrop' && airBp ? ` <small>${esc(wt('air_bp', { n: airBp.chance }))}</small>` : ''}</span></div>`));
+    (it.bpRewardOf || []).forEach((m) => bpw.push(`<div class="obtain">${svg('gift')}<span>${esc(wt('m_bp'))}: <a href="/wiki/guia/missions"><b>${esc(mName(m))}</b></a></span></div>`));
+    if (bpw.length) right.push(`<div class="box"><h3>${esc(wt('bp_drop'))}</h3>${bpw.join('')}</div>`);
+    if (it.shop) {
+      const sc = shopCat[it.shop.cat];
+      right.push(`<div class="box shop-box"><h3>${esc(wt('shop_h'))}</h3>
+        <div class="shop-price">${scrapIc()}<b>${fmtN(it.shop.price)}</b><span>${esc(wt('scrap'))}${it.shop.qty > 1 ? ' ' + esc(wt('shop_for', { n: it.shop.qty })) : ''}</span></div>
+        ${sc ? `<div class="row"><span>${esc(wt('shop_sec'))}</span><b>${esc(L(sc.name))}</b></div>` : ''}
+        <a class="box-link" href="/wiki/guia/shop-and-scrap">${esc(wt('shop_how'))} ${svg('chevron')}</a></div>`);
+    }
+    if (it.equip) {
+      const rows = [`<div class="row"><span>${esc(wt('slot'))}</span><b><span class="slot-n">${it.equip}</span> ${esc(wt('slots')[it.equip - 1] || '')}</b></div>`];
+      if (it.bonus) rows.push(`<div class="row"><span>${esc(wt('bonus'))}</span><b>+${it.bonus}</b></div>`);
+      if (it.durability) rows.push(`<div class="row"><span>${esc(wt('durability'))}</span><b>${fmtN(it.durability)}</b></div>`);
+      right.push(`<div class="box"><h3>${esc(wt('equip_h'))}</h3>${rows.join('')}<a class="box-link" href="/wiki/guia/equipment-and-backpacks">${esc(wt('equip_how'))} ${svg('chevron')}</a></div>`);
+    }
+    if ((it.neededBy || []).length) right.push(`<div class="box"><h3>${esc(wt('m_need'))}</h3>${it.neededBy.map((m) => `<div class="obtain">${svg('list')}<a href="/wiki/guia/missions"><b>${esc(mName(m))}</b></a></div>`).join('')}</div>`);
+    if (it.ammoFor) left.push(`<h2 class="section-title">${t('compatible')}</h2><div class="item-grid">${it.ammoFor.map((x) => itemCard(byId[x])).join('')}</div>`);
+    if (it.usedIn) left.push(`<h2 class="section-title">${t('used_in')}</h2><div class="item-grid">${it.usedIn.map((x) => itemCard(byId[x])).filter(Boolean).join('')}</div>`);
 
     const props = [`<div class="row"><span>${t('type')}</span><b>${esc(typeName(it.type))}</b></div>`];
-    if (it.stack) props.push(`<div class="row"><span>${t('stack')}</span><b>${it.stack}</b></div>`);
+    if (it.stack) props.push(`<div class="row"><span>${t('stack')}</span><b>${fmtN(it.stack)}</b></div>`);
     if (it.recipe) props.push(`<div class="row"><span>${t('bench_req')}</span><b>${it.bench ? t('yes') : t('no')}</b></div>`);
     if (it.level) props.push(`<div class="row"><span>${t('level_req')}</span><b>Lv. ${it.level} <small class="muted">(Legendary ${Math.floor(it.level * 0.75)})</small></b></div>`);
-    if (it.blueprint !== undefined) props.push(`<div class="row"><span>${t('blueprint')}</span><b class="blue">${it.blueprint ? t('bp_cost', { n: it.blueprint }) : t('bp_loot')}</b></div>`);
-    if (it.hp) props.push(`<div class="row"><span>${t('health')}</span><b>${it.hp}</b></div>`);
+    if (it.blueprint !== undefined) props.push(`<div class="row"><span>${t('blueprint')}</span><b class="blue">${it.blueprint ? t('bp_cost', { n: fmtN(it.blueprint) }) : t('bp_loot')}</b></div>`);
+    if (it.hp) props.push(`<div class="row"><span>${t('health')}</span><b>${fmtN(it.hp)}</b></div>`);
     if (it.slots) props.push(`<div class="row"><span>${t('slots')}</span><b>${it.slots}</b></div>`);
     if (it.limit) props.push(`<div class="row"><span>${t('limit')}</span><b>${esc(L(it.limit))}</b></div>`);
     if (it.upgradeTo) props.push(`<div class="row"><span>${t('upgrade')}</span><b><a class="accent" href="/wiki/item/${it.upgradeTo}">${esc(name(byId[it.upgradeTo]))}</a></b></div>`);
-    right.push(`<div class="box"><h3>${t('properties')}</h3>${props.join('')}</div>`);
-
-    const ob = [];
-    if (it.recipe) ob.push(`<div class="obtain">${svg('hammer')}${t('obtain_craft')}</div>`);
-    W.items.filter((x) => x.furnace && x.furnace.to === it.id).forEach((x) => ob.push(`<div class="obtain">${svg('flame')}${t('obtain_furnace')}: <a href="/wiki/item/${x.id}"><b>${esc(name(x))}</b></a></div>`));
-    if (W.items.some((x) => (x.recycler || []).some((r) => r.id === it.id))) ob.push(`<div class="obtain">${svg('recycle')}${t('obtain_recycler')}</div>`);
-    (it.sources || []).forEach((s) => ob.push(`<div class="obtain">${svg(SRC_ICON[s] || 'box')}${esc(SOURCES[s] ? SOURCES[s][lang === 'pt' ? 1 : 0] : s)}</div>`));
-    if (ob.length) right.push(`<div class="box"><h3>${t('how_obtain')}</h3>${ob.join('')}</div>`);
+    right.unshift(`<div class="box"><h3>${t('properties')}</h3>${props.join('')}</div>`);
     if (it.furnace) right.push(`<div class="box"><h3>${t('furnace')}</h3>${ingRow(it.furnace.to, 1)}<div class="box-foot"><span>${svg('clock')} ${t('speed')}: ${T[lang].speeds[it.furnace.speed]}</span></div></div>`);
     if (it.recycler) right.push(`<div class="box"><h3>${t('recycler')}</h3>${it.recycler.map((r) => ingRow(r.id, r.qty)).join('')}</div>`);
+    // cosmético que é o mesmo item (mochilas): mostra a peça na galeria
+    const cosTwin = cosAll.find((c) => c.item === it.id);
 
     const related = W.items.filter((x) => x.id !== it.id && x.type === it.type && (!it.piece || x.piece === it.piece || x.tier === it.tier)).sort(sortByName).slice(0, 6);
 
     return `${crumbs([['Wiki', '/wiki'], [cat ? cat[lang] : t('items_title'), cat ? '/wiki/categoria/' + cat.id : '/wiki/itens'], [name(it)]])}
-      <div class="item-head">${iconOf(it)}<div><h1>${esc(name(it))}</h1><div class="badges">${badges.join('')}</div><p>${esc(L(it.desc))}</p></div></div>
-      <div class="cols"><div>${left.join('') || ''}</div><div style="margin-top:34px">${right.join('')}</div></div>
-      ${related.length ? `<div class="section-title" style="margin-top:44px">${t('related')}</div><div class="item-grid">${related.map(itemCard).join('')}</div>` : ''}`;
+      <div class="item-head${isSoon(it) ? ' is-soon' : ''}">${iconOf(it)}<div class="item-head-txt"><div class="badges">${badges.join('')}</div><h1>${esc(name(it))}</h1><p>${esc(L(it.desc))}</p>
+        ${kpi.length ? `<dl class="kpis">${kpi.slice(0, 4).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>` : ''}</div></div>
+      <div class="cols"><div class="cols-main">${left.join('')}</div><aside class="cols-side">${right.join('')}${cosTwin ? `<a class="box-link solo" href="/wiki/categoria/cosmeticos?c=${cosTwin.cat}">${svg('shirt')} ${esc(wt('cos_t'))} ${svg('chevron')}</a>` : ''}</aside></div>
+      ${related.length ? `<h2 class="section-title related-h">${t('related')}</h2><div class="item-grid">${related.map(itemCard).join('')}</div>` : ''}`;
+  }
+
+  // //------------------- galeria de cosméticos -------------------\\
+  const cosF = { cat: '', tier: '', where: '' };
+  function cosCard(c) {
+    const where = (c.where || []).map((w) => `<span class="cw cw-${w}">${esc(wt('w')[w] || w)}</span>`).join('');
+    const tip = (c.lootFrom || []).length ? `${wt('w_from')}: ${c.lootFrom.map(srcName).join(', ')}` : '';
+    const inner = `<span class="cos-art">${c.image ? `<img src="${abs(c.image)}" alt="" loading="lazy">` : svg('shirt')}</span>
+      <span class="cos-tier t-${esc(c.tier)}">${esc(cosTier(c.tier))}</span>
+      <b>${esc(L(c.name))}</b>
+      <span class="cos-meta">${where}${c.price ? `<span class="cos-price">${svg('coins')}${fmtN(c.price)}</span>` : ''}</span>
+      ${c.bonus ? `<span class="cos-bonus">${esc(wt('bonus_slots', { n: c.bonus }))}</span>` : ''}
+      ${c.maleOnly ? `<span class="cos-male">${svg('user')}${esc(wt('male'))}</span>` : ''}`;
+    return c.item && byId[c.item] ? `<a class="cos-card t-${esc(c.tier)}" href="/wiki/item/${c.item}" title="${esc(tip)}">${inner}</a>` : `<div class="cos-card t-${esc(c.tier)}" title="${esc(tip)}">${inner}</div>`;
+  }
+  function pageCosmetics() {
+    const qc = new URLSearchParams(location.search).get('c');
+    if (qc && COS.some((c) => c.id === qc)) cosF.cat = qc;
+    const tiers = Object.keys(W.cosmeticTiers || {});
+    const wheres = [...new Set(cosAll.flatMap((c) => c.where || []))];
+    const chip = (k, v, label, extra = '') => `<button type="button" class="chip ${cosF[k] === v ? 'on' : ''}" data-k="${k}" data-v="${esc(v)}" aria-pressed="${cosF[k] === v}">${extra}${esc(label)}</button>`;
+    setTimeout(() => {
+      const draw = () => {
+        const list = COS.filter((c) => !cosF.cat || c.id === cosF.cat).map((c) => [c, c.items.map((i) => Object.assign({ cat: c.id }, i)).filter((i) => (!cosF.tier || i.tier === cosF.tier) && (!cosF.where || (i.where || []).includes(cosF.where)))]).filter((x) => x[1].length);
+        const n = list.reduce((a, x) => a + x[1].length, 0);
+        $('#ccount').textContent = t('showing', { n, t: cosAll.length }).replace(lang === 'pt' ? 'itens' : 'items', lang === 'pt' ? 'peças' : 'pieces');
+        $('#clist').innerHTML = n ? list.map(([c, items]) => `<section class="cos-sec"><h2 class="wk-h">${esc(L(c.name))} <span>${items.length}</span></h2><div class="cos-grid">${items.map(cosCard).join('')}</div></section>`).join('')
+          : `<div class="empty-state">${svg('shirt')}<p>${esc(wt('cos_none'))}</p></div>`;
+      };
+      document.querySelectorAll('.cos-filters .chip').forEach((b) => b.onclick = () => {
+        cosF[b.dataset.k] = b.dataset.v;
+        document.querySelectorAll(`.cos-filters .chip[data-k="${b.dataset.k}"]`).forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+        draw();
+      });
+      draw();
+    });
+    return `${crumbs([['Wiki', '/wiki'], [wt('cos_t')]])}
+      <header class="cos-hero">
+        <div><div class="badges">${soonTag('lg')}</div><h1 class="page-title">${esc(wt('cos_t'))}</h1><p class="page-sub">${esc(wt('cos_s', { n: cosAll.length }))}</p></div>
+        <div class="cos-hero-art" aria-hidden="true">${cosAll.filter((c) => c.tier === 'rare' && c.image).slice(0, 5).map((c) => `<img src="${abs(c.image)}" alt="" loading="lazy">`).join('')}</div>
+      </header>
+      <div class="soon-note">${svg('hourglass')}<div><p>${esc(wt('cos_note'))}</p></div></div>
+      <div class="cos-filters">
+        <div class="w-types">${chip('cat', '', wt('all'))}${COS.map((c) => chip('cat', c.id, L(c.name))).join('')}</div>
+        <div class="w-types">${chip('tier', '', wt('tier') + ': ' + wt('all'))}${tiers.map((k) => chip('tier', k, cosTier(k), `<i class="tdot t-${k}"></i>`)).join('')}
+          <span class="cos-sep"></span>${chip('where', '', (lang === 'pt' ? 'Onde: ' : 'Where: ') + wt('all'))}${wheres.map((w) => chip('where', w, wt('w')[w] || w)).join('')}</div>
+      </div>
+      <div class="count" id="ccount" aria-live="polite"></div>
+      <div id="clist"></div>`;
   }
 
   // ---------------------------------------------------------------- markdown (o suficiente para os guias)
@@ -402,21 +708,28 @@
     const m = String(v).match(/(?:youtu\.be\/|v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/) || String(v).match(/^([\w-]{11})$/);
     return m ? m[1] : '';
   }
+  // gravações com o serial do jogador e o chat no canto: o site usa a cópia "<nome>-limpo" (tools/media-sem-serial.sh).
+  // É também a lista do que existe em media/: mídia nova gravada no jogo passa pelo script e entra aqui (senão aparece "em breve").
+  const MEDIA_CLEAN = new Set(['barrels', 'build-wheel', 'crates', 'first-house', 'gather-tools', 'place-object', 'upgrade', 'vehicles', 'hero', 'spawn', 'pvp', 'hud', 'craft-menu', 'upkeep']);
+  const mediaFile = (id) => (MEDIA_CLEAN.has(id) ? id + '-limpo' : id);
   function media(kind, id, caption) {
-    const soon = `<div class="soon"><div>${svg(kind === 'video' ? 'video' : 'image')}<b>${t(kind === 'video' ? 'soon_video' : 'soon_shot')}</b>${esc(caption)}<br><code>/media/${id}.${kind === 'video' ? 'mp4' : 'webp'}</code></div></div>`;
+    const soon = `<div class="soon"><div>${svg(kind === 'video' ? 'video' : 'image')}<b>${t(kind === 'video' ? 'soon_video' : 'soon_shot')}</b>${esc(caption)}</div></div>`;
     // vídeo no YouTube: o link vai em config.js (HAVOK.youtube), pelo nome da mídia (serve até no lugar de um print)
     const yt = youtubeId(((window.HAVOK || {}).youtube || {})[id]);
     if (yt) {
       return `<figure class="media"><div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0" title="${esc(caption)}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div><figcaption>${esc(caption)}</figcaption></figure>`;
     }
-    // "GIF": mp4 mudo, em loop, sem controles (no lugar de um print ou de um vídeo)
+    // arquivo que ainda não foi gravado (não está na lista das versões limpas): mostra o "em breve" direto, sem caixa preta vazia
+    if (!MEDIA_CLEAN.has(id)) return `<figure class="media${kind === 'shot' ? ' shot' : ''}">${soon}<figcaption>${esc(caption)}</figcaption></figure>`;
+    const f = mediaFile(id);
+    // "GIF": mp4 mudo, em loop, sem controles; só baixa e toca quando aparece na tela (lazyMedia)
     if (((window.HAVOK || {}).loops || []).includes(id)) {
-      return `<figure class="media"><video class="loop" autoplay muted loop playsinline preload="auto" aria-label="${esc(caption)}"><source src="/media/${id}.webm" type="video/webm"><source src="/media/${id}.mp4" type="video/mp4"></video><figcaption>${esc(caption)}</figcaption></figure>`;
+      return `<figure class="media"><video class="loop" muted loop playsinline preload="none" data-lazy aria-label="${esc(caption)}"><source data-src="/media/${f}.webm" type="video/webm"><source data-src="/media/${f}.mp4" type="video/mp4"></video><figcaption>${esc(caption)}</figcaption></figure>`;
     }
     if (kind === 'video') {
-      return `<figure class="media"><video src="/media/${id}.mp4" autoplay muted loop playsinline preload="metadata" onerror="this.outerHTML=this.nextElementSibling.innerHTML"></video><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
+      return `<figure class="media"><video data-src="/media/${f}.mp4" muted loop playsinline preload="none" data-lazy onerror="this.outerHTML=this.nextElementSibling.innerHTML"></video><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
     }
-    return `<figure class="media shot"><img src="/media/${id}.webp" alt="${esc(caption)}" loading="lazy" data-alt="png,jpg" onerror="havokImgFallback(this)"><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
+    return `<figure class="media shot"><img src="/media/${f}.webp" alt="${esc(caption)}" loading="lazy" data-alt="png,jpg" onerror="havokImgFallback(this)"><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
   }
   window.havokImgFallback = (img) => {
     const alts = (img.dataset.alt || '').split(',').filter(Boolean);
@@ -428,6 +741,24 @@
       img.outerHTML = img.nextElementSibling.innerHTML;
     }
   };
+  // vídeos dos guias: baixam e tocam só quando aparecem (economiza a internet do celular); fora da tela pausam
+  function lazyMedia(root) {
+    const vids = [...root.querySelectorAll('video[data-lazy]')];
+    const start = (v) => {
+      if (!v.dataset.on) {
+        v.dataset.on = 1;
+        if (v.dataset.src) v.src = v.dataset.src;
+        v.querySelectorAll('source').forEach((s) => { s.src = s.dataset.src; });
+        v.load();
+      }
+      if (!reduced()) v.play().catch(() => {});
+    };
+    if (!('IntersectionObserver' in window)) { vids.forEach(start); return; }
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) start(e.target); else e.target.pause(); }), { rootMargin: '150px 0px', threshold: 0.2 });
+    vids.forEach((v) => io.observe(v));
+    onLeave(() => io.disconnect());
+  }
+  const slugify = (s) => norm(s.replace(/<[^>]+>/g, '')).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   function md(src) {
     const lines = src.split('\n');
     let html = '', list = null, table = null, para = [];
@@ -446,7 +777,7 @@
       let m;
       if (!l) { flush(); continue; }
       if ((m = l.match(/^@(video|shot) ([a-z0-9-]+) \| (.+)$/))) { flush(); html += media(m[1], m[2], m[3]); continue; }
-      if ((m = l.match(/^(#{2,3}) (.+)$/))) { flush(); html += `<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`; continue; }
+      if ((m = l.match(/^(#{2,3}) (.+)$/))) { flush(); html += `<h${m[1].length} id="${slugify(m[2])}">${inline(m[2])}</h${m[1].length}>`; continue; }
       if (l.startsWith('|')) { flushP(); flushL(); (table = table || []).push(l); continue; }
       if ((m = l.match(/^- (.+)$/))) { flushP(); flushT(); if (!list || list.tag !== 'ul') { flushL(); list = { tag: 'ul', items: [] }; } list.items.push(m[1]); continue; }
       if ((m = l.match(/^\d+\. (.+)$/))) { flushP(); flushT(); if (!list || list.tag !== 'ol') { flushL(); list = { tag: 'ol', items: [] }; } list.items.push(m[1]); continue; }
@@ -456,24 +787,79 @@
     return html;
   }
 
+  // //------------------- guias -------------------\\
+  // ordem de leitura: começo, sobrevivência, base, luta, mundo, sistemas
+  const GUIDE_GROUPS = [
+    { en: 'First steps', pt: 'Primeiros passos', slugs: ['first-10-minutes', 'getting-started', 'survival-basics', 'resource-gathering'] },
+    { en: 'Crafting & base', pt: 'Craft e base', slugs: ['loot-crafting-and-blueprints', 'furnaces-recyclers-and-processing', 'base-building', 'equipment-and-backpacks', 'suits'] },
+    { en: 'Fighting & the world', pt: 'Luta e o mundo', slugs: ['combat-raiding-and-recovery', 'world-and-events', 'airdrop', 'cold-and-radiation', 'safe-zones'] },
+    { en: 'Server systems', pt: 'Sistemas do servidor', slugs: ['shop-and-scrap', 'missions', 'radio', 'teams-and-groups', 'wipe-kit', 'vip'] },
+  ];
+  function guideGroups() {
+    const used = new Set(GUIDE_GROUPS.flatMap((g) => g.slugs));
+    const groups = GUIDE_GROUPS.map((g) => ({ name: g[lang], list: g.slugs.map((s) => guideBySlug[s]).filter(Boolean) }));
+    const rest = W.guides.filter((g) => !used.has(g.slug));
+    if (rest.length) groups.push({ name: lang === 'pt' ? 'Outros' : 'More', list: rest });
+    return groups.filter((g) => g.list.length);
+  }
+  const readMin = (g) => Math.max(1, Math.round(L(g).body.replace(/@\w+ .*$/gm, '').split(/\s+/).length / 200));
   function pageGuides() {
     return `${crumbs([['Wiki', '/wiki'], [t('guides')]])}<h1 class="page-title">${t('guides')}</h1><p class="page-sub">${t('guides_desc')}</p>
-      <div class="grid">${W.guides.map((g) => `<a class="tile tall" href="/wiki/guia/${g.slug}"><span class="tile-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}</div>`;
+      ${guideGroups().map((gr) => `<section class="wk-sec"><h2 class="wk-h">${esc(gr.name)}</h2><div class="wk-guides">${gr.list.map((g) => `<a class="w-guide${g.soon ? ' is-soon' : ''}" href="/wiki/guia/${g.slug}"><span class="w-guide-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}${g.soon ? ' ' + soonTag('sm') : ''}</b><small>${esc(L(g).description)}</small><i class="w-guide-min">${esc(wt('read_min', { n: readMin(g) }))}</i></span></a>`).join('')}</div></section>`).join('')}`;
   }
   function pageGuide(slug) {
     const i = W.guides.findIndex((g) => g.slug === slug);
-    if (i < 0) return `<div class="empty-state">404</div>`;
+    if (i < 0) return pageNotFound();
     const g = W.guides[i], c = L(g), prev = W.guides[i - 1], next = W.guides[i + 1];
+    const body = md(c.body);
+    const toc = [...c.body.matchAll(/^## (.+)$/gm)].map((m) => [slugify(m[1]), m[1].replace(/\*\*/g, '')]);
+    // itens citados no guia (os nomes em negrito que viraram link), na ordem em que aparecem
+    const cited = [...new Set([...body.matchAll(/href="\/wiki\/item\/([a-z0-9-]+)"/g)].map((m) => m[1]))].map((id) => byId[id]).filter(Boolean);
+    setTimeout(() => {
+      const art = $('.prose');
+      if (!art) return;
+      lazyMedia(art);
+      // sumário: marca a seção que está na tela
+      const links = [...document.querySelectorAll('.g-toc a')];
+      if (!links.length || !('IntersectionObserver' in window)) return;
+      const io = new IntersectionObserver((es) => es.forEach((e) => {
+        if (e.isIntersecting) links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
+      }), { rootMargin: '-20% 0px -70% 0px' });
+      art.querySelectorAll('h2[id]').forEach((h) => io.observe(h));
+      onLeave(() => io.disconnect());
+      document.querySelectorAll('.g-toc a').forEach((a) => a.onclick = (e) => { e.preventDefault(); const h = document.getElementById(a.getAttribute('href').slice(1)); if (h) h.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' }); });
+    });
     return `${crumbs([['Wiki', '/wiki'], [t('guides'), '/wiki/guias'], [c.title]])}
-      <h1 class="page-title">${esc(c.title)}</h1><p class="page-sub">${esc(c.description)}</p>
-      <article class="prose">${md(c.body)}</article>
-      <div class="pager">${prev ? `<a href="/wiki/guia/${prev.slug}"><small>${t('prev')}</small><b>${esc(L(prev).title)}</b></a>` : '<span></span>'}
-      ${next ? `<a class="next" href="/wiki/guia/${next.slug}"><small>${t('next')}</small><b>${esc(L(next).title)}</b></a>` : ''}</div>`;
+      <header class="g-head"><span class="g-ic">${svg(g.icon)}</span><div>
+        <h1 class="page-title">${esc(c.title)}</h1><p class="page-sub">${esc(c.description)}</p>
+        <p class="g-meta">${svg('clock')} ${esc(wt('read_min', { n: readMin(g) }))}${g.soon ? ' ' + soonTag() : ''}</p></div></header>
+      <div class="g-wrap">
+        <article class="prose">${g.soon ? `<div class="soon-note">${svg('hourglass')}<div><p>${esc(wt('guide_soon'))}</p></div></div>` : ''}${body}</article>
+        <aside class="g-side">
+          ${toc.length > 2 ? `<nav class="g-toc" aria-label="${esc(wt('on_page'))}"><h3>${esc(wt('on_page'))}</h3>${toc.map(([id, txt]) => `<a href="#${id}">${esc(txt)}</a>`).join('')}</nav>` : ''}
+          ${cited.length ? `<div class="g-items"><h3>${esc(wt('in_guide'))}</h3>${cited.slice(0, 14).map((it) => `<a href="/wiki/item/${it.id}">${iconOf(it)}<span>${esc(name(it))}</span></a>`).join('')}</div>` : ''}
+        </aside>
+      </div>
+      <nav class="pager">${prev ? `<a href="/wiki/guia/${prev.slug}"><small>${t('prev')}</small><b>${esc(L(prev).title)}</b></a>` : '<span></span>'}
+      ${next ? `<a class="next" href="/wiki/guia/${next.slug}"><small>${t('next')}</small><b>${esc(L(next).title)}</b></a>` : ''}</nav>`;
   }
   function pageFaq() {
     const list = W.faq[lang] || W.faq.en;
+    setTimeout(() => {
+      const inp = $('#faqq');
+      if (!inp) return;
+      inp.oninput = () => {
+        const q = norm(inp.value.trim());
+        let n = 0;
+        document.querySelectorAll('.faq details').forEach((d) => { const on = !q || norm(d.textContent).includes(q); d.hidden = !on; if (on) n++; if (q && on) d.open = true; });
+        $('#faqNone').hidden = n > 0;
+      };
+    });
     return `${crumbs([['Wiki', '/wiki'], ['FAQ']])}<h1 class="page-title">FAQ</h1><p class="page-sub">${t('faq_desc')}</p>
-      <div class="faq">${list.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>`;
+      <label class="w-q faq-q">${svg('search')}<input type="search" id="faqq" placeholder="${esc(wt('faq_filter'))}" aria-label="${esc(wt('faq_filter'))}" autocomplete="off"></label>
+      <div class="faq">${list.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${inline(a)}</p></details>`).join('')}
+        <p class="empty-state" id="faqNone" hidden>${esc(wt('faq_none'))}</p></div>
+      <div class="card faq-more">${svg('discord')}<div><b>${esc(wt('faq_more'))}</b><p>${esc(wt('faq_more_s'))}</p></div><a class="btn btn-discord sm" href="${esc((window.HAVOK || {}).discord || '#')}" target="_blank" rel="noopener">Discord</a></div>`;
   }
 
 
@@ -1149,21 +1535,93 @@
     </div>`;
   }
 
-  // //------------------- mapa (página): o módulo em tela cheia; a B3 refaz o entorno -------------------\\
+  // //------------------- mapa (página /mapa): o módulo HavokMap em tela cheia + legenda, airdrop e guias -------------------\\
+  // Trocar o idioma redesenha a página: o mapa montado é guardado e volta para o lugar com setLang (sem baixar tudo de novo
+  // e sem perder o zoom). Saindo para outra página, destroy().
+  let mapKeep = null; // { el, m }
+  const MAP_LEGEND = [
+    ['safezone', 'safe-zones'], ['shop', 'shop-and-scrap'], ['mission', 'missions'], ['military', 'world-and-events'], ['gate', 'world-and-events'],
+    ['radiation', 'cold-and-radiation'], ['cold', 'cold-and-radiation'], ['hospital', 'world-and-events'], ['recycler', 'furnaces-recyclers-and-processing'],
+    ['gas', 'world-and-events'], ['oil', 'world-and-events'], ['island', 'world-and-events'], ['radio', 'radio'],
+  ];
+  function mapLegendIcon(c) {
+    const ic = String(c.icon || '');
+    if (ic.endsWith('.png')) return `<img src="/mapa/icons/${esc(ic)}" alt="" width="22" height="22" loading="lazy">`;
+    return svg(ic.startsWith('svg:') && P['m_' + ic.slice(4)] ? 'm_' + ic.slice(4) : 'map');
+  }
+  function paintAir(box, d) {
+    if (!box) return;
+    const sys = (W.systems || {}).airdrop || {};
+    const every = sys.every || ((W.systems || {}).timers || {}).airdropMinutes || 30;
+    const st = d && d.state && d.state !== 'none' ? d.state : null;
+    const near = d && d.zone ? wt('air_near', { z: d.zone }) : '';
+    box.dataset.state = d === null ? 'error' : st || 'none';
+    box.querySelector('.ma-now').textContent = d === null ? wt('air_err') : st ? wt('air_' + (['falling', 'landed', 'opened'].includes(st) ? st : 'landed'), { near }) : wt('air_none');
+    box.querySelector('.ma-every').textContent = wt('air_every', { n: every });
+  }
   function pageMap() {
+    const D = window.HAVOK_MAP_DATA;
+    const sz = (W.systems || {}).safezone || {};
+    const lg = wt('lg');
     setTimeout(async () => {
-      const el = $('#mapFull');
-      try {
-        await loadScript('/mapa/mapa.js');
-        if (!el || !el.isConnected) return;
-        const m = await window.HavokMap.mount(el, { lang, airdropUrl: `${API()}/api/airdrop` });
-        if (!el.isConnected) { m.destroy(); return; }
-        onLeave(() => m.destroy());
-      } catch (e) {
-        if (el && el.isConnected) el.innerHTML = `<div class="empty card">${svg('map')}<p>${lang === 'pt' ? 'Não deu para carregar o mapa. Confira a conexão e recarregue a página.' : 'Could not load the map. Check your connection and reload the page.'}</p></div>`;
+      const slot = $('#mapFull');
+      if (!slot) return;
+      // volta o mapa já montado (troca de idioma): só reencaixa e traduz
+      if (mapKeep) {
+        slot.replaceWith(mapKeep.el);
+        mapKeep.m.setLang(lang);
+        requestAnimationFrame(() => mapKeep && mapKeep.m.map.invalidateSize());
+      } else {
+        try {
+          await loadScript('/mapa/mapa.js');
+          if (!slot.isConnected) return;
+          const m = await window.HavokMap.mount(slot, { lang, airdropUrl: `${API()}/api/airdrop` });
+          if (!slot.isConnected) { m.destroy(); return; }
+          mapKeep = { el: slot, m };
+          paintLegend();
+        } catch (e) {
+          if (slot.isConnected) slot.innerHTML = `<div class="empty">${svg('map')}<p>${lang === 'pt' ? 'Não deu para carregar o mapa. Confira a conexão e recarregue a página.' : 'Could not load the map. Check your connection and reload the page.'}</p><button type="button" class="btn btn-ghost sm" onclick="location.reload()">${lang === 'pt' ? 'Recarregar' : 'Reload'}</button></div>`;
+        }
       }
+      paintLegend();
+      // airdrop: o mapa já mostra o marcador; aqui vai a frase em texto (a cada 30 s, só com a aba aberta)
+      const box = $('#mapAir');
+      const pull = async () => { if (!document.hidden && box && box.isConnected) paintAir(box, await getJson(`${API()}/api/airdrop`, { timeout: 8000 })); };
+      pull();
+      const iv = setInterval(pull, 30000);
+      onLeave(() => clearInterval(iv));
+      // sai do /mapa (ou só redesenha): na próxima página decide se destrói
+      onLeave(() => setTimeout(() => {
+        if (mapKeep && document.body.dataset.page !== 'map') { try { mapKeep.m.destroy(); } catch (e) { /* segue */ } mapKeep = null; }
+      }));
     });
-    return `<div class="map-page"><div class="map-full" id="mapFull"></div></div>`;
+    // legenda: precisa do map-data.js (vem junto com o mapa.js); sem ele fica só o texto
+    function paintLegend() {
+      const el = $('#mapLegend'), Dm = window.HAVOK_MAP_DATA;
+      if (!el || !Dm || el.dataset.done) return;
+      el.dataset.done = 1;
+      const cats = Object.fromEntries(Dm.categories.map((c) => [c.id, c]));
+      el.innerHTML = MAP_LEGEND.filter(([id]) => cats[id]).map(([id, g]) => {
+        const c = cats[id];
+        return `<a class="ml-row" href="/wiki/guia/${g}" style="--mc:${esc(c.color || '#ff6a00')}"><span class="ml-ic">${mapLegendIcon(c)}</span><span class="ml-txt"><b>${esc(L(c.name))} <i>${c.count}</i></b><small>${esc((lg[id] || '').replace('{s}', sz.leaveSeconds || 10).replace('{b}', sz.noBuild || 80))}</small></span></a>`;
+      }).join('');
+    }
+    return `<div class="map-page">
+      <div class="map-full" id="mapFull"></div>
+      <section class="map-info">
+        <div class="map-info-in">
+          <div class="mi-intro">
+            <h1 class="mi-title">${esc(t('nav_map'))} <span>San Andreas</span></h1>
+            <p>${esc(wt('map_s'))}</p>
+            <div class="card ma" id="mapAir" data-state="loading"><span class="ma-dot"></span><div><b>${esc(wt('air_h'))}</b><p class="ma-now">…</p><small class="ma-every"></small></div>
+              <a class="ma-link" href="/wiki/guia/airdrop">${esc(wt('air_guide'))} ${svg('chevron')}</a></div>
+            <h2 class="mi-h">${esc(wt('map_guides'))}</h2>
+            <div class="mi-guides">${['safe-zones', 'cold-and-radiation', 'airdrop', 'world-and-events', 'missions'].map((s) => guideLink(s)).join('')}</div>
+          </div>
+          <div class="mi-legend"><h2 class="mi-h">${esc(wt('map_h'))}</h2><div class="ml" id="mapLegend">${D ? '' : `<p class="muted">…</p>`}</div></div>
+        </div>
+      </section>
+    </div>`;
   }
 
   function pageNotFound() {
