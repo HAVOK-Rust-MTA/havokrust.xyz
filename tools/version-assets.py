@@ -22,3 +22,7 @@ if new != html:
     print('index.html atualizado')
 else:
     print('nada mudou')
+
+# 404.html = index.html: com o Worker de preview (site/) fora, o GitHub Pages ainda abre o site em /wiki, /ranking...
+# (o og-data.json e as imagens de og/ são do tools/build-og-data.mjs, que também faz esta cópia)
+(root / '404.html').write_text(index.read_text(encoding='utf-8'), encoding='utf-8')

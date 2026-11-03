@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff6a00">
+  <title>HAVOK — Rust Survival on MTA:SA</title>
+  <meta name="description" content="A Rust-style survival server on MTA: San Andreas. Wake up with nothing, farm, craft, build your base, team up and raid. Full wiki, guides and VIP store.">
+  <meta name="keywords" content="HAVOK, MTA, MTA:SA, Multi Theft Auto, Rust, survival, server, raid, base building, crafting, GTA San Andreas">
+  <meta name="author" content="HAVOK">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://havokrust.xyz/">
+  <link rel="icon" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <!-- Open Graph (Discord, WhatsApp, Facebook, LinkedIn) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="HAVOK — Rust Survival">
+  <meta property="og:title" content="HAVOK — Survive. Build. Raid.">
+  <meta property="og:description" content="Rust-style survival on MTA: San Andreas. Farm, craft, build your base and raid. Full wiki, guides and ranked groups.">
+  <meta property="og:url" content="https://havokrust.xyz/">
+  <meta property="og:image" content="https://havokrust.xyz/og.jpg?v=2">
+  <meta property="og:image:secure_url" content="https://havokrust.xyz/og.jpg?v=2">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="HAVOK logo over a forest at sunset with the words Survive. Build. Raid.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="pt_BR">
+
+  <!-- X / Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="HAVOK — Survive. Build. Raid.">
+  <meta name="twitter:description" content="Rust-style survival on MTA: San Andreas. Farm, craft, build your base and raid.">
+  <meta name="twitter:image" content="https://havokrust.xyz/og.jpg?v=2">
+  <meta name="twitter:image:alt" content="HAVOK logo over a forest at sunset">
+
+  <!-- dados para o Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "HAVOK — Rust Survival",
+    "url": "https://havokrust.xyz/",
+    "image": "https://havokrust.xyz/og.jpg?v=2",
+    "description": "A Rust-style survival server on Multi Theft Auto: San Andreas.",
+    "genre": ["Survival", "Sandbox", "Multiplayer"],
+    "gamePlatform": "PC",
+    "playMode": "MultiPlayer",
+    "inLanguage": ["en", "pt-BR"],
+    "sameAs": ["https://www.youtube.com/@havokrust"]
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20bb975847">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-in">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <a href="#/" class="brand">
+        <span class="brand-logo"><img src="logo.png" alt=""></span>
+        <span class="brand-txt"><b>HAVOK</b><small>RUST SURVIVAL</small></span>
+      </a>
+      <nav class="topnav"><a href="#/" data-nav="home" data-i18n="nav_home">Home</a><a href="#/wipe" data-nav="wipe" data-i18n="nav_wipe">Wipe</a><a href="#/ranking" data-nav="ranking" data-i18n="nav_ranking">Ranking</a><a href="#/wiki" data-nav="wiki" data-i18n="nav_wiki">Wiki</a><a href="#/badges" data-nav="badges" data-i18n="nav_badges">Badges</a><a href="#/store" data-nav="store" data-i18n="nav_store">Store</a><a href="play/" data-i18n="nav_play">Play</a></nav>
+      <button class="search-btn" id="searchBtn" type="button" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <a class="discord-btn" data-discord target="_blank" rel="noopener" aria-label="Discord"><svg viewBox="0 0 24 24"><path d="M8 12h.01M16 12h.01M7.5 7.5c3-1 6-1 9 0M7 16.5c3.3 1.3 6.7 1.3 10 0M15.5 17l1 2c2-.6 3.9-1.6 5.5-3 .4-4.6-.8-8.6-3-12-1.3-.6-2.7-1-4-1.3L14.5 4M8.5 17l-1 2c-2-.6-3.9-1.6-5.5-3-.4-4.6.8-8.6 3-12 1.3-.6 2.7-1 4-1.3L9.5 4"/></svg><span>Discord</span></a>
+      <div class="lang" id="lang">
+        <button data-lang="en">EN</button><button data-lang="pt">PT</button>
+      </div>
+      <div class="acct-wrap"><a class="acct-btn" id="acctBtn" href="#/perfil" hidden></a></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" autocomplete="off" spellcheck="false">
+        <kbd>Ctrl K</kbd>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+      <nav id="sideNav"></nav>
+    </aside>
+    <main class="main" id="main"></main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-in">
+      <div class="footer-brand">
+        <div class="brand"><span class="brand-logo"><img src="logo.png" alt=""></span><span class="brand-txt"><b>HAVOK</b><small>RUST SURVIVAL</small></span></div>
+        <p data-i18n="footer_desc"></p>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer_wiki"></h4>
+        <a href="#/wiki">Wiki</a>
+        <a href="#/items" data-i18n="all_items"></a>
+        <a href="#/guides" data-i18n="all_guides"></a>
+        <a href="#/faq">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h4>COMMUNITY</h4>
+        <a data-discord target="_blank" rel="noopener">Discord ↗</a>
+        <a href="#/store" data-i18n="nav_store"></a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer_server"></h4>
+        <span class="muted">PVP · RAID · CRAFT · BASES</span>
+      </div>
+    </div>
+    <div class="footer-bottom" data-i18n="footer_copy"></div>
+  </footer>
+
+  <script src="config.js?v=d9104cadcf"></script>
+  <script src="news.js?v=c7da2e7496"></script>
+  <script src="data.js?v=b1deb6af9f"></script>
+  <script src="app.js?v=9f0d17cac8"></script>
+</body>
+</html>
