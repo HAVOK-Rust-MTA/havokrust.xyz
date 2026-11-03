@@ -1,0 +1,27 @@
+name = "havok-site"
+main = "index.js"
+compatibility_date = "2026-10-01"
+# sem workers.dev: o Worker só existe nas rotas abaixo
+workers_dev = false
+
+# SÓ as páginas do site. Assets (/media, /img, /icons, /badges/*, /play/, *.js, *.css, og-data.json, index.html...)
+# não estão aqui e vão direto ao GitHub Pages. /mapa, /ranking, /wipe, /loja, /badges e /perfil são exatas (sem *):
+# a pasta /badges/ tem as imagens das badges e não deve passar pelo Worker.
+# O registro www precisa existir no DNS da Cloudflare com a nuvem laranja (proxied) para o 301 funcionar.
+routes = [
+  { pattern = "havokrust.xyz/", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/wiki*", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/mapa", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/ranking", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/wipe", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/loja", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/badges", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/perfil", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/grupo/*", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/jogador/*", zone_name = "havokrust.xyz" },
+  { pattern = "havokrust.xyz/ac/*", zone_name = "havokrust.xyz" },
+  { pattern = "www.havokrust.xyz/*", zone_name = "havokrust.xyz" },
+]
+
+# [vars]
+# ORIGIN = "https://havokrust.xyz"   # de onde vêm index.html e og-data.json (padrão: o próprio site, caminho fora das rotas)
