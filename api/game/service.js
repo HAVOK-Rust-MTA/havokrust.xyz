@@ -8,7 +8,7 @@
 //   GET  /api/groups          público: grupos do wipe (sem membros)
 //   GET  /api/group/<slug>    público: o grupo com os membros (nick, cargo, números, foto do Discord ou null)
 //   GET  /api/player/<pid>    público: perfil (nick, números, grupo, badges, foto do Discord ou null)
-//   GET  /api/ranking/players?by=kills|level|hours   público: top 50 jogadores do wipe (com foto ou null e o grupo)
+//   GET  /api/ranking/players?scope=wipe|all&by=kills|level|hours|kd   público: top 50 do wipe ou de sempre (ver README)
 //
 // A conta (serial) nunca sai daqui: fora do servidor o jogador é o pid.
 import { json, nowS, verifyServer, siteCors, clean, int, ts, account, avatarUrl } from '../lib/util.js';
@@ -17,6 +17,11 @@ const MAX_SYNC_BYTES = 512 * 1024;
 const PID_ALPHABET = 'abcdefghijkmnpqrstuvwxyz23456789';
 const PID_RE = /^[a-km-np-z2-9]{10}$/;
 const ROLES = new Set(['Leader', 'Staff', 'Sub', 'Member']);
+
+// K/D: abates / mortes (morte zero conta como 1); só entra no ranking de K/D quem tem 10+ abates
+const KD_MIN_KILLS = 10;
+const KD = (t) => `(${t}.kills * 1.0 / MAX(${t}.deaths, 1))`;
+const kd = (kills, deaths) => Math.round((kills / Math.max(deaths, 1)) * 100) / 100;
 
 const newPid = () => [...crypto.getRandomValues(new Uint8Array(10))].map((b) => PID_ALPHABET[b & 31]).join('');
 const color = (c) => (/^#[0-9a-fA-F]{6}$/.test(String(c)) ? String(c) : null);
@@ -210,15 +215,44 @@ async function publicRoute(db, path, url) {
   }
 
   if (path === '/api/ranking/players') {
-    const col = { kills: 'g.kills', level: 'g.level', hours: 'g.play_minutes' }[url.searchParams.get('by') || 'kills'];
-    if (!col) return json({ error: 'bad_sort' }, 400, h);
-    // só quem jogou neste wipe (o wipe zera os números)
-    const { results } = await db.prepare(`SELECT g.*, p.discord_id, p.avatar, gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color
-      FROM game_players g LEFT JOIN players p ON p.account = g.account LEFT JOIN game_groups gg ON gg.name = g.group_name
-      WHERE g.kills > 0 OR g.play_minutes > 0 ORDER BY ${col} DESC, g.level DESC, g.kills DESC LIMIT 50`).all();
-    return json({ players: results.map((r, i) => ({
-      rank: i + 1, ...publicPlayer(r), group: r.g_slug ? { name: r.group_name, slug: r.g_slug, tag: r.g_tag, color: r.g_color } : null,
-      badges: (() => { try { return Object.keys(JSON.parse(r.badges || '{}')); } catch { return []; } })(),
+    const by = url.searchParams.get('by') || 'kills';
+    const scope = url.searchParams.get('scope') || 'wipe';
+    // ordem e filtro saem só destes mapas fixos: o texto da URL nunca entra no SQL
+    const ORDER = {
+      wipe: { kills: 'g.kills DESC, g.level DESC', level: 'g.level DESC, g.kills DESC', hours: 'g.play_minutes DESC, g.level DESC, g.kills DESC', kd: `${KD('g')} DESC, g.kills DESC` },
+      all: { kills: 'a.kills DESC, a.play_minutes DESC', hours: 'a.play_minutes DESC, a.kills DESC', kd: `${KD('a')} DESC, a.kills DESC` },
+    };
+    const order = ORDER[scope] && ORDER[scope][by];
+    if (!order) return json({ error: 'bad_sort' }, 400, h);
+    const kdOnly = by === 'kd' ? ` AND ${scope === 'all' ? 'a' : 'g'}.kills >= ${KD_MIN_KILLS}` : '';
+    const group = (r) => (r.g_slug ? { name: r.group_name, slug: r.g_slug, tag: r.g_tag, color: r.g_color } : null);
+
+    if (scope === 'wipe') {
+      // só quem jogou neste wipe (o wipe zera os números)
+      const { results } = await db.prepare(`SELECT g.*, p.discord_id, p.avatar, gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color
+        FROM game_players g LEFT JOIN players p ON p.account = g.account LEFT JOIN game_groups gg ON gg.name = g.group_name
+        WHERE (g.kills > 0 OR g.play_minutes > 0)${kdOnly} ORDER BY ${order} LIMIT 50`).all();
+      return json({ scope, by, players: results.map((r, i) => ({
+        rank: i + 1, ...publicPlayer(r), kd: kd(r.kills, r.deaths), group: group(r),
+        badges: (() => { try { return Object.keys(JSON.parse(r.badges || '{}')); } catch { return []; } })(),
+      })) }, 200, h);
+    }
+
+    // de sempre = seasons fotografadas (menos a do ciclo atual: durante o wipe ela ainda está em game_players) + o wipe atual
+    const { results } = await db.prepare(`WITH s AS (
+        SELECT account, nick, kills, deaths, play_minutes, cycle_id AS c FROM player_seasons
+          WHERE cycle_id <> COALESCE((SELECT id FROM wipe_cycles WHERE is_current = 1), -1)
+        UNION ALL
+        SELECT account, nick, kills, deaths, play_minutes, 2147483647 FROM game_players WHERE kills > 0 OR play_minutes > 0),
+      a AS (SELECT account, SUM(kills) AS kills, SUM(deaths) AS deaths, SUM(play_minutes) AS play_minutes, COUNT(*) AS seasons FROM s GROUP BY account)
+      SELECT a.*, (SELECT nick FROM s WHERE s.account = a.account ORDER BY c DESC LIMIT 1) AS nick, i.pid, p.discord_id, p.avatar,
+        gp.group_name, gg.slug AS g_slug, gg.tag AS g_tag, gg.color AS g_color
+      FROM a JOIN player_ids i ON i.account = a.account LEFT JOIN players p ON p.account = a.account
+        LEFT JOIN game_players gp ON gp.account = a.account LEFT JOIN game_groups gg ON gg.name = gp.group_name
+      WHERE 1${kdOnly} ORDER BY ${order} LIMIT 50`).all();
+    return json({ scope, by, players: results.map((r, i) => ({
+      rank: i + 1, pid: r.pid, nick: r.nick, kills: r.kills, deaths: r.deaths, playMinutes: r.play_minutes, kd: kd(r.kills, r.deaths), seasons: r.seasons,
+      linked: !!r.discord_id, avatarUrl: avatarUrl(r.discord_id, r.avatar), group: group(r), badges: [],
     })) }, 200, h);
   }
 

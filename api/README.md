@@ -11,6 +11,12 @@ Cuida do login com Discord, do vínculo com o jogo, dos perfis e dos grupos que 
   (vinculado) ou avatar cinza (não vinculado).
 - **Vínculo**: o jogo mostra a tela com QR/COPIAR LINK; `/v/<código>` cai direto no "Autorizar" do Discord. Vinculou,
   o histórico que já existia (números, grupo, badges) aparece no perfil com a foto do Discord.
+- **pid para sempre** (`player_ids`): a conta volta depois do wipe com o mesmo pid, então o link do perfil não quebra.
+- **Ranking** `GET /api/ranking/players?scope=wipe|all&by=kills|hours|kd|level` (top 50, cache 60 s):
+  - `scope=wipe` (padrão): só o wipe atual. `scope=all`: de sempre = seasons guardadas (`player_seasons`, foto tirada pelo
+    havok-waitlist no `wipe_started`) + o wipe atual, sem contar a season que está sendo wipada duas vezes.
+  - `by=kd`: abates / mortes (morte zero conta como 1), só quem tem 10+ abates. `by=level` só no `scope=wipe`.
+  - Resposta: `{scope, by, players: [{rank, pid, nick, kills, deaths, playMinutes, kd, seasons?, linked, avatarUrl, group, badges}]}`.
 
 ```
 jogo --(assinado)--> POST /api/link/mta/code | status | lookup     vínculo (tela do jogo)

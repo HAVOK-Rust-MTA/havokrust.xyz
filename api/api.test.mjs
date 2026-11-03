@@ -438,3 +438,56 @@ test('lastSeen não é cortado em 1e9', async () => {
   const pid = env.DB.row("SELECT pid FROM game_players WHERE account = 'SERIAL-A'").pid;
   assert.equal((await pub(`/api/player/${pid}`)).json.lastSeen, 1793712469);
 });
+
+// ciclo de wipe direto no banco (o calendário é testado em worker/)
+const cycle = (id, current) => env.DB.db.prepare(`INSERT INTO wipe_cycles (id, started_at, scheduled_wipe_at, status, is_current, created_by, created_at, updated_at)
+  VALUES (?, 1, 2, ?, ?, 'teste', 1, 1)`).run(id, current ? 'active' : 'completed', current ? 1 : null);
+const season = (c, acc, nick, kills, deaths, minutes) => env.DB.db.prepare(`INSERT INTO player_seasons (cycle_id, account, nick, level, kills, deaths, play_minutes, saved_at)
+  VALUES (?, ?, ?, 1, ?, ?, ?, 1)`).run(c, acc, nick, kills, deaths, minutes);
+
+test('de sempre sem season fotografada = wipe atual', async () => {
+  cycle(1, true);
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', kills: 10, playMinutes: 60 }, { account: 'SERIAL-B', nick: 'Bravo', kills: 5, playMinutes: 30 }]);
+  const r = await pub('/api/ranking/players?scope=all');
+  assert.equal(r.status, 200);
+  assert.equal(r.json.scope, 'all');
+  assert.deepEqual(r.json.players.map((p) => [p.nick, p.kills, p.seasons]), [['Alfa', 10, 1], ['Bravo', 5, 1]]);
+  assert.ok(!JSON.stringify(r.json).includes('SERIAL'));
+});
+
+test('de sempre soma seasons passadas e a atual sem contar duas vezes', async () => {
+  cycle(1, true);
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', kills: 10, deaths: 2, playMinutes: 60 }, { account: 'SERIAL-B', nick: 'Bravo', kills: 5, playMinutes: 30 }]);
+  const pidB = env.DB.row("SELECT pid FROM game_players WHERE account = 'SERIAL-B'").pid;
+  // foto tirada no wipe_started, com o ciclo 1 ainda atual e game_players ainda cheio
+  season(1, 'SERIAL-A', 'Alfa', 10, 2, 60);
+  season(1, 'SERIAL-B', 'Bravo', 5, 0, 30);
+  assert.deepEqual((await pub('/api/ranking/players?scope=all')).json.players.map((p) => [p.nick, p.kills]), [['Alfa', 10], ['Bravo', 5]]);
+  // wipe_done: ciclo 2 vira o atual, game_players zera
+  env.DB.db.exec("UPDATE wipe_cycles SET is_current = NULL, status = 'completed' WHERE id = 1");
+  cycle(2, true);
+  env.DB.db.exec('DELETE FROM game_players');
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa2', kills: 3, deaths: 1, playMinutes: 10 }, { account: 'SERIAL-C', nick: 'Charlie', kills: 7, playMinutes: 5 }]);
+  const all = (await pub('/api/ranking/players?scope=all')).json.players;
+  assert.deepEqual(all.map((p) => [p.nick, p.kills, p.deaths, p.playMinutes, p.seasons]), [['Alfa2', 13, 3, 70, 2], ['Charlie', 7, 0, 5, 1], ['Bravo', 5, 0, 30, 1]]);
+  assert.equal(all[2].pid, pidB, 'quem só jogou antes mantém o pid');
+  assert.equal(all[2].group, null);
+  assert.deepEqual((await pub('/api/ranking/players?scope=all&by=hours')).json.players.map((p) => p.nick), ['Alfa2', 'Bravo', 'Charlie']);
+});
+
+test('K/D: só quem tem 10+ abates; morte zero conta como 1', async () => {
+  cycle(1, true);
+  await syncGame([
+    { account: 'SERIAL-A', nick: 'A', kills: 12, deaths: 0 },
+    { account: 'SERIAL-B', nick: 'B', kills: 30, deaths: 10 },
+    { account: 'SERIAL-C', nick: 'C', kills: 9, deaths: 1 },
+  ]);
+  for (const scope of ['wipe', 'all']) {
+    const r = (await pub(`/api/ranking/players?scope=${scope}&by=kd`)).json.players;
+    assert.deepEqual(r.map((p) => [p.nick, p.kd]), [['A', 12], ['B', 3]], scope);
+  }
+});
+
+test('scope e by inválidos dão 400', async () => {
+  for (const q of ['scope=xpto', 'by=kd;drop', 'scope=all&by=level']) assert.equal((await pub(`/api/ranking/players?${q}`)).status, 400, q);
+});
