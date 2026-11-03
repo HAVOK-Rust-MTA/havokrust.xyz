@@ -11,7 +11,7 @@
 //   GET  /api/ranking/players?by=kills|level|hours   público: top 50 jogadores do wipe (com foto ou null e o grupo)
 //
 // A conta (serial) nunca sai daqui: fora do servidor o jogador é o pid.
-import { json, nowS, verifyServer, siteCors, clean, int, account, avatarUrl } from '../lib/util.js';
+import { json, nowS, verifyServer, siteCors, clean, int, ts, account, avatarUrl } from '../lib/util.js';
 
 const MAX_SYNC_BYTES = 512 * 1024;
 const PID_ALPHABET = 'abcdefghijkmnpqrstuvwxyz23456789';
@@ -75,14 +75,15 @@ async function sync(request, env) {
     const acc = account(p && p.account);
     const nick = clean(p && p.nick);
     if (!acc || !nick) continue;
-    // pid só nasce no primeiro registro; depois não muda nunca (é o link do perfil)
+    // pid só nasce no primeiro registro da conta e fica em player_ids para sempre (o wipe não apaga): é o link do perfil
+    stmts.push(db.prepare('INSERT OR IGNORE INTO player_ids (account, pid) VALUES (?, ?)').bind(acc, newPid()));
     stmts.push(db.prepare(`INSERT INTO game_players (account, pid, nick, level, kills, deaths, play_minutes, group_name, badges, first_seen, last_seen, updated_at)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           VALUES (?, (SELECT pid FROM player_ids WHERE account = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                            ON CONFLICT (account) DO UPDATE SET nick = excluded.nick, level = excluded.level, kills = excluded.kills, deaths = excluded.deaths,
                              play_minutes = excluded.play_minutes, group_name = excluded.group_name, badges = excluded.badges,
                              last_seen = MAX(game_players.last_seen, excluded.last_seen), updated_at = excluded.updated_at`)
-      .bind(acc, newPid(), nick, int(p.level), int(p.kills), int(p.deaths), int(p.playMinutes), clean(p.group) || null,
-        JSON.stringify(sanitizeBadges(p.badges)), t, int(p.lastSeen) || t, t));
+      .bind(acc, acc, nick, int(p.level), int(p.kills), int(p.deaths), int(p.playMinutes), clean(p.group) || null,
+        JSON.stringify(sanitizeBadges(p.badges)), t, ts(p.lastSeen) || t, t));
   }
 
   let groups = null;

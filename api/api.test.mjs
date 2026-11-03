@@ -423,3 +423,18 @@ test('ac: denúncia de morte gera código de 14 dias, a gravação aponta pra el
   advance(7 * 86400);
   assert.equal((await server('/api/ac/mine', { account: 'SERIAL-V' })).json.reports.length, 0);
 });
+
+test('pid sobrevive ao wipe: mesma conta volta com o mesmo pid', async () => {
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', level: 5, kills: 3 }]);
+  const pid = env.DB.row("SELECT pid FROM game_players WHERE account = 'SERIAL-A'").pid;
+  env.DB.db.exec('DELETE FROM game_players'); // o que o wipe_done faz
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', level: 1 }]);
+  assert.equal(env.DB.row("SELECT pid FROM game_players WHERE account = 'SERIAL-A'").pid, pid);
+  assert.equal((await pub(`/api/player/${pid}`)).status, 200);
+});
+
+test('lastSeen não é cortado em 1e9', async () => {
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', level: 5, lastSeen: 1793712469 }]);
+  const pid = env.DB.row("SELECT pid FROM game_players WHERE account = 'SERIAL-A'").pid;
+  assert.equal((await pub(`/api/player/${pid}`)).json.lastSeen, 1793712469);
+});

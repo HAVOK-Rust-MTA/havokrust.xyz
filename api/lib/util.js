@@ -41,6 +41,8 @@ export function siteCors(request, env, credentials = false) {
 
 export const clean = (s, max = 32) => String(s ?? '').replace(/#[0-9a-fA-F]{6}/g, '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 export const int = (n) => Math.max(0, Math.min(1e9, Math.floor(Number(n) || 0)));
+// horário unix (o int() acima corta em 1e9, que é 2001): vale até 2100
+export const ts = (n) => Math.max(0, Math.min(4102444800, Math.floor(Number(n) || 0)));
 export const account = (a) => (typeof a === 'string' && a.length >= 1 && a.length <= 64 && !/[\u0000-\u001f]/.test(a) ? a : null);
 
 // foto do Discord de quem vinculou; sem vínculo = null (o site mostra o avatar cinza)
