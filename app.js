@@ -1180,7 +1180,7 @@
   // O relógio do site é corrigido pela hora do Worker; o contador anda a cada segundo aqui mesmo e o site só pergunta
   // de novo a cada minuto (ou quando a aba volta a ficar visível). Sem resposta por 5 min: avisa que está sem conexão.
   const WIPE_REFRESH_MS = 60000, WIPE_STALE_MS = 5 * 60000, PVP_MS = 24 * 3600000;
-  let cdTimer = null, wipeData = null, wipeAt = 0, wipeOffset = 0, wipeLoading = null;
+  let wipeData = null, wipeAt = 0, wipeOffset = 0, wipeLoading = null;
   function loadWipe(force) {
     const api = ((window.HAVOK || {}).wipe || {}).api;
     if (!api) return Promise.resolve(null);
@@ -1201,58 +1201,614 @@
     return wipeLoading;
   }
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && $('#cdBox')) loadWipe(true).then(paintWipe);
+    if (!document.hidden && $('#wx')) loadWipe(true).then(() => { wxTried = true; wxPaint(); });
   });
 
   const p2 = (n) => String(n).padStart(2, '0');
-  function paintWipe() {
-    const box = $('#cdBox');
-    if (!box) { clearInterval(cdTimer); cdTimer = null; return; }
-    const d = wipeData;
-    if (!d || !d.scheduledWipeAt || d.status === 'NONE') { box.hidden = true; return; }
-    box.hidden = false;
-    const now = Date.now() + wipeOffset;
-    const at = Date.parse(d.scheduledWipeAt), start = Date.parse(d.startedAt);
-    const left = Math.max(0, at - now);
-    const pending = d.status === 'WIPE_PENDING' || d.status === 'FAILED' || left === 0;
-    const pvp = !pending && left <= PVP_MS;
-    box.className = `cd${box.dataset.big ? ' cd-big' : ''}${pvp ? ' pvp' : ''}${pending ? ' pending' : ''}${Date.now() - wipeAt > WIPE_STALE_MS ? ' stale' : ''}`;
-    let s = Math.floor(left / 1000);
-    const dd = Math.floor(s / 86400); s %= 86400;
-    const h = Math.floor(s / 3600); s %= 3600;
-    $('#cdLeft').innerHTML = pending ? `<b>${lt(d.status === 'FAILED' ? 'cd_failed' : 'cd_pending')}</b>`
-      : `<b>${dd}</b><i>d</i><b>${p2(h)}</b><i>h</i><b>${p2(Math.floor(s / 60))}</b><i>m</i><b>${p2(s % 60)}</b><i>s</i>`;
-    const pct = Math.min(100, Math.max(0, ((now - start) / (at - start)) * 100));
-    $('#cdBar').style.transform = `scaleX(${pending ? 1 : (pct / 100).toFixed(4)})`;
-    if ($('#cdPct')) $('#cdPct').textContent = pending ? '100%' : `${Math.floor(pct)}%`;
-    const when = new Date(at).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
-    $('#cdNote').textContent = Date.now() - wipeAt > WIPE_STALE_MS ? lt('cd_stale')
-      : pvp ? lt('cd_pvp') : `${lt('cd_at', { d: when })} · ${lt('cd_every', { n: Math.round((d.durationSeconds || 1296000) / 86400) })}`;
+
+  // //=================== B2: ranking, wipe, grupo e jogador ===================\\
+  // Textos destas páginas (PT/EN). Os dados vêm de api.havokrust.xyz (ranking, grupos, jogador, /api/seasons) e do
+  // calendário do wipe (havok-waitlist /api/wipe/status). O que reseta/fica e o kit saem do guia "Wipe e Kit" do data.js.
+  const RT = {
+    en: {
+      rk_title: 'Ranking', rk_sub_wipe: 'Who stands out this season. Resets at the next wipe.', rk_sub_wipe_n: 'Season {n}: who stands out so far. Resets at the wipe on {d}.',
+      rk_sub_all: 'Every season added up. It never resets: it keeps counting wipe after wipe.', rk_sub_hof: 'The champions of every season. They stay here for good.',
+      tabs: { jogadores: 'Players', grupos: 'Groups' }, scope: { wipe: 'This wipe', all: 'All time' },
+      by: { kills: 'Kills', hours: 'Play time', kd: 'K/D', level: 'Level' },
+      kd_note: 'K/D = kills ÷ deaths. Only players with 10 or more kills are ranked.',
+      col: { player: 'Player', group: 'Group', kills: 'Kills', deaths: 'Deaths', kd: 'K/D', hours: 'Time', level: 'Level', seasons: 'Seasons', members: 'Members', xp: 'XP' },
+      unit: { kills: 'kills', hours: 'played', kd: 'K/D', level: 'level', xp: 'XP' },
+      open_slot: 'Open spot', open_slot_sub: 'Still time to get here.',
+      empty_wipe: 'Nobody has scored this season yet. The first kills and hours played show up here.',
+      empty_all: 'The all-time ranking is still empty. It adds up every season from the first wipe on.',
+      empty_kd: 'Nobody has 10 kills yet. K/D shows up here as soon as someone gets there.',
+      rk_err: 'The ranking did not answer right now. Try again in a moment.', retry: 'Try again', how_play: 'How to play',
+      g_empty: 'No groups this season yet. In game, press F2 to create yours and bring your crew.',
+      member: 'member', members: 'members', kills_l: 'kills',
+      prize_short: '{h} h of VIP Survivor',
+      prize_note: 'The top 3 groups when the wipe closes win VIP Survivor for every member next season (8 h, 6 h and 4 h of play) and the Wipe Champion and Podium badges.',
+      hof_h: 'Hall of fame', hof_wait: 'No champions yet', hof_empty: 'The first season ends on {d}. The winning group and the top killer stay here for good.',
+      hof_empty_nodate: 'The first season has not ended yet. The winning group and the top killer stay here for good.',
+      hof_err: 'The hall of fame did not load right now.', hof_top: 'Most kills', hof_nogroups: 'No groups this season',
+      wx_title: 'Season {n}', wx_title_none: 'Wipe',
+      wx_sub: 'When the timer hits zero the server starts over: bases, items, level and groups. Whoever is on top takes a prize.',
+      units: { d: ['day', 'days'], h: ['hour', 'hours'], m: ['min', 'min'], s: ['sec', 'sec'] },
+      wx_when: '{d}, your time', wx_started: 'Started {d}', wx_pvp_mark: 'Insane PvP',
+      wx_pending: 'Wipe in progress', wx_pending_sub: 'The server is resetting right now. It is back in a few minutes with a fresh season.',
+      wx_failed: 'Wipe delayed', wx_failed_sub: 'Something went wrong with the wipe and the staff is on it. The new date goes out on Discord.',
+      wx_none: 'No wipe date yet', wx_none_sub: 'It is announced on Discord as soon as it is set.',
+      wx_err: 'No connection to the wipe calendar', wx_err_sub: 'Trying again by itself. The date is also on Discord.',
+      wx_stale: 'No connection to the calendar right now; trying again…', wx_pvp_now: 'Insane PvP is on until the wipe',
+      reset_h: 'What resets', keep_h: 'What stays',
+      prizes_h: 'Prizes for the top 3 groups', prizes_sub: 'VIP Survivor for every member next season, counting only while they play.',
+      place: ['1st place', '2nd place', '3rd place'], vip_h: '{h} h', vip_l: 'of VIP Survivor', badge_l: 'badge',
+      holding: 'Holding it now', nobody: 'Open spot',
+      pvp_h: 'Last 24 hours: insane PvP', pvp_at: 'Starts {d}', pvp_on: 'On now, until the wipe',
+      kit_h: 'Wipe kit', kit_note: 'Type it in chat. Once per account, per wipe.', kit_normal: 'Regular kit', kit_vip: 'VIP kit', kit_vip_note: 'VIPs get the VIP kit instead of the regular one.',
+      copy: 'Copy', copied: 'Copied', guide_link: 'Full wipe guide', see_groups: 'Group ranking',
+      jx_in: 'Playing this season', jx_out: 'Has not played this season', jx_seen: 'seen {t}', jx_linked: 'Discord linked', jx_anon: 'Discord not linked',
+      jx_wipe_h: 'This wipe', jx_last_h: 'Season {n}', jx_last_note: 'the last one played', jx_all_h: 'All time', jx_seasons: '{n} seasons', jx_season1: '1 season',
+      jx_all_empty: 'All-time numbers start adding up once the first season closes.',
+      jx_was_in: 'Played for {g} in season {n}',
+      jx_notfound: 'Player not found', jx_notfound_sub: 'The link may be wrong. Look for the nick in the ranking.', jx_err: 'Could not load this profile right now.',
+      st: { level: 'Level', kills: 'Kills', deaths: 'Deaths', kd: 'K/D', hours: 'Time', seasons: 'Seasons', members: 'Members', xp: 'XP' },
+      badges: 'Badges', nobadges: 'No badges yet.', see_ranking: 'See the ranking',
+      gx_rank: '#{n} this season', gx_members_h: 'Members', gx_prize: 'If it closes like this: {h} h of VIP Survivor for each member',
+      gx_notfound: 'Group not found', gx_notfound_sub: 'Groups reset every wipe. This one may be gone or renamed.', gx_err: 'Could not load this group right now.', gx_nomembers: 'No members have shown up in the game yet.',
+      roles: { Leader: 'Leader', Staff: 'Officer', Sub: 'Co-leader', Member: 'Member' },
+    },
+    pt: {
+      rk_title: 'Ranking', rk_sub_wipe: 'Quem mais se destaca nesta season. Zera no próximo wipe.', rk_sub_wipe_n: 'Season {n}: quem mais se destaca até agora. Zera no wipe de {d}.',
+      rk_sub_all: 'A soma de todas as seasons. Não zera: continua contando wipe após wipe.', rk_sub_hof: 'Os campeões de cada season. Ficam aqui para sempre.',
+      tabs: { jogadores: 'Jogadores', grupos: 'Grupos' }, scope: { wipe: 'Este wipe', all: 'De sempre' },
+      by: { kills: 'Abates', hours: 'Tempo de jogo', kd: 'K/D', level: 'Level' },
+      kd_note: 'K/D = abates ÷ mortes. Só entra quem tem 10 abates ou mais.',
+      col: { player: 'Jogador', group: 'Grupo', kills: 'Abates', deaths: 'Mortes', kd: 'K/D', hours: 'Tempo', level: 'Level', seasons: 'Seasons', members: 'Membros', xp: 'XP' },
+      unit: { kills: 'abates', hours: 'de jogo', kd: 'K/D', level: 'level', xp: 'XP' },
+      open_slot: 'Vaga aberta', open_slot_sub: 'Ainda dá tempo de chegar aqui.',
+      empty_wipe: 'Ninguém pontuou nesta season ainda. Os primeiros abates e horas de jogo aparecem aqui.',
+      empty_all: 'O ranking de sempre ainda está vazio. Ele soma cada season a partir do primeiro wipe.',
+      empty_kd: 'Ninguém chegou a 10 abates ainda. O K/D aparece aqui assim que alguém chegar.',
+      rk_err: 'O ranking não respondeu agora. Tente de novo em instantes.', retry: 'Tentar de novo', how_play: 'Como jogar',
+      g_empty: 'Nenhum grupo nesta season ainda. No jogo, aperte F2 para criar o seu e chamar a galera.',
+      member: 'membro', members: 'membros', kills_l: 'abates',
+      prize_short: '{h} h de VIP Survivor',
+      prize_note: 'Os 3 primeiros grupos quando o wipe fecha levam VIP Survivor para todos os membros na season seguinte (8 h, 6 h e 4 h de jogo) e as badges Wipe Champion e Podium.',
+      hof_h: 'Hall da fama', hof_wait: 'Ainda sem campeões', hof_empty: 'A primeira temporada termina em {d}. O grupo campeão e quem mais abateu ficam aqui para sempre.',
+      hof_empty_nodate: 'A primeira temporada ainda não terminou. O grupo campeão e quem mais abateu ficam aqui para sempre.',
+      hof_err: 'O hall da fama não carregou agora.', hof_top: 'Mais abates', hof_nogroups: 'Sem grupos nesta season',
+      wx_title: 'Season {n}', wx_title_none: 'Wipe',
+      wx_sub: 'Quando o contador zerar, o servidor volta do zero: bases, itens, level e grupos. Quem estiver no topo leva prêmio.',
+      units: { d: ['dia', 'dias'], h: ['hora', 'horas'], m: ['min', 'min'], s: ['seg', 'seg'] },
+      wx_when: '{d}, no seu horário', wx_started: 'Começou {d}', wx_pvp_mark: 'PvP insano',
+      wx_pending: 'Wipe em andamento', wx_pending_sub: 'O servidor está zerando agora. Volta em poucos minutos, com uma season nova.',
+      wx_failed: 'Wipe adiado', wx_failed_sub: 'Deu um problema no wipe e a staff está resolvendo. A nova data sai no Discord.',
+      wx_none: 'A data do próximo wipe ainda não saiu', wx_none_sub: 'Ela é anunciada no Discord assim que for marcada.',
+      wx_err: 'Sem conexão com o calendário do wipe', wx_err_sub: 'Tentando de novo sozinho. A data também está no Discord.',
+      wx_stale: 'Sem conexão com o calendário agora; tentando de novo…', wx_pvp_now: 'PvP insano rolando até o wipe',
+      reset_h: 'O que reseta', keep_h: 'O que fica',
+      prizes_h: 'Prêmios do top 3 de grupos', prizes_sub: 'VIP Survivor para todos os membros na season seguinte, contando só enquanto jogam.',
+      place: ['1º lugar', '2º lugar', '3º lugar'], vip_h: '{h} h', vip_l: 'de VIP Survivor', badge_l: 'badge',
+      holding: 'Levando agora', nobody: 'Vaga aberta',
+      pvp_h: 'Últimas 24 horas: PvP insano', pvp_at: 'Começa {d}', pvp_on: 'Rolando agora, até o wipe',
+      kit_h: 'Kit do wipe', kit_note: 'Digite no chat. Uma vez por conta, por wipe.', kit_normal: 'Kit normal', kit_vip: 'Kit VIP', kit_vip_note: 'Quem é VIP recebe o kit VIP no lugar do normal.',
+      copy: 'Copiar', copied: 'Copiado', guide_link: 'Guia completo do wipe', see_groups: 'Ranking de grupos',
+      jx_in: 'Jogando nesta season', jx_out: 'Não jogou nesta season', jx_seen: 'visto {t}', jx_linked: 'Discord vinculado', jx_anon: 'Discord não vinculado',
+      jx_wipe_h: 'Este wipe', jx_last_h: 'Season {n}', jx_last_note: 'a última que jogou', jx_all_h: 'De sempre', jx_seasons: '{n} seasons', jx_season1: '1 season',
+      jx_all_empty: 'Os números de sempre começam a somar quando a primeira season fechar.',
+      jx_was_in: 'Jogou pelo {g} na season {n}',
+      jx_notfound: 'Jogador não encontrado', jx_notfound_sub: 'O link pode estar errado. Procure o nick no ranking.', jx_err: 'Não deu para carregar este perfil agora.',
+      st: { level: 'Level', kills: 'Abates', deaths: 'Mortes', kd: 'K/D', hours: 'Tempo', seasons: 'Seasons', members: 'Membros', xp: 'XP' },
+      badges: 'Badges', nobadges: 'Nenhuma badge ainda.', see_ranking: 'Ver o ranking',
+      gx_rank: '#{n} da season', gx_members_h: 'Membros', gx_prize: 'Se fechar assim: {h} h de VIP Survivor para cada membro',
+      gx_notfound: 'Grupo não encontrado', gx_notfound_sub: 'Os grupos zeram a cada wipe. Este pode ter acabado ou mudado de nome.', gx_err: 'Não deu para carregar este grupo agora.', gx_nomembers: 'Nenhum membro apareceu no jogo ainda.',
+      roles: { Leader: 'Líder', Staff: 'Oficial', Sub: 'Sub-líder', Member: 'Membro' },
+    },
+  };
+  const rt = (k, vars) => {
+    let s = RT[lang][k] ?? RT.en[k] ?? k;
+    if (vars && typeof s === 'string') for (const v in vars) s = s.split('{' + v + '}').join(vars[v]);
+    return s;
+  };
+
+  // //------------------- peças comuns -------------------\\
+  const kdTxt = (p) => Number(p.kd ?? (p.kills / Math.max(1, p.deaths))).toFixed(2);
+  const timeHtml = (m) => { m = m | 0; return m < 60 ? `${m}<small>min</small>` : `${num(Math.floor(m / 60))}<small>h</small>`; };
+  const dayTxt = (ms, long) => new Date(ms).toLocaleString(locale(), long ? { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' } : { day: '2-digit', month: 'short' });
+  const plural = (n, one, many) => `${num(n)} ${n === 1 ? one : many}`;
+  const emptyBox = (icon, text, extra = '') => `<div class="empty card">${svg(icon)}<p>${text}</p>${extra}</div>`;
+  const retryBtn = () => `<button type="button" class="btn btn-ghost sm" data-retry>${rt('retry')}</button>`;
+  // GET com o status (404 = não existe; null = API fora)
+  async function getStatus(url) {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 10000);
+    try {
+      const r = await fetch(url, { signal: ctrl.signal });
+      return { status: r.status, data: r.ok ? await r.json() : null };
+    } catch (e) {
+      return { status: 0, data: null };
+    } finally { clearTimeout(to); }
   }
-  function countdownBox(more) {
-    if (!((window.HAVOK || {}).wipe || {}).api) return '';
-    setTimeout(() => {
-      clearInterval(cdTimer);
-      let ticks = 0;
-      loadWipe(false).then(paintWipe);
-      cdTimer = setInterval(() => {
-        paintWipe();
-        if (++ticks % 60 === 0) loadWipe(false).then(paintWipe); // revalida a cada minuto, sem pedir a cada segundo
-      }, 1000);
+  // número que sobe até o valor (formatado), só na primeira vez que aparece
+  function countUp(root) {
+    root.querySelectorAll('[data-count]').forEach((el) => {
+      const to = Number(el.dataset.count) || 0;
+      if (reduced() || to < 4) return;
+      const t0 = performance.now(), ms = 800;
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / ms);
+        el.textContent = num(Math.round(to * (1 - Math.pow(1 - k, 3))));
+        if (k < 1 && el.isConnected) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     });
-    return `<div class="cd${more ? '' : ' cd-big'}" id="cdBox" ${more ? '' : 'data-big="1"'} hidden><span class="cd-label">${lt('cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
-      <span class="cd-bar"><span id="cdBar"></span><em class="cd-pct" id="cdPct"></em></span><small id="cdNote"></small>${more ? `<a class="cd-more" href="/wipe">${lt('cd_more')} ${svg('chevron')}</a>` : ''}</div>`;
+  }
+  const navMark = (nav) => document.querySelectorAll('.topnav a').forEach((x) => {
+    const on = x.dataset.nav === nav;
+    x.classList.toggle('on', on);
+    if (on) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
+  });
+
+  // hall da fama (/api/seasons), guardado 1 min
+  let seasonsP = null, seasonsAt = 0;
+  function getSeasons() {
+    if (!seasonsP || Date.now() - seasonsAt > 60000) {
+      seasonsAt = Date.now();
+      seasonsP = getJson(`${API()}/api/seasons`).then((d) => { if (!d) seasonsP = null; return d; });
+    }
+    return seasonsP;
+  }
+  const TROPHY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>';
+  function hofHtml(d, wipe) {
+    if (!d || !Array.isArray(d.seasons)) return emptyBox('award', rt('hof_err'), retryBtn());
+    if (!d.seasons.length) {
+      const at = wipe && wipe.scheduledWipeAt && wipe.status !== 'NONE' ? Date.parse(wipe.scheduledWipeAt) : 0;
+      return `<div class="hof-empty card"><span class="hof-cup">${TROPHY}</span><div><b>${rt('hof_wait')}</b>
+          <p>${at ? rt('hof_empty', { d: `<time>${esc(dayTxt(at, true))}</time>` }) : rt('hof_empty_nodate')}</p></div>
+          <ol class="hof-ghost" aria-hidden="true"><li></li><li></li><li></li></ol></div>`;
+    }
+    return `<ol class="hof">${d.seasons.map((s) => {
+      const dates = s.startedAt && s.endedAt ? `${dayTxt(s.startedAt * 1000)} – ${dayTxt(s.endedAt * 1000)}` : '';
+      const groups = (s.groups || []).slice(0, 3).map((g) => `<li class="hof-g r${g.rank}" style="--gc:${gColor(g.color)}"><i class="hof-pos">${g.rank}</i>${emblem(g, 'gp-emblem')}
+          <span><b>${esc(g.name)}${g.tag ? ` ${tagPill(g)}` : ''}</b><small>${plural(g.members, rt('member'), rt('members'))} · ${num(g.kills)} ${rt('kills_l')}</small></span></li>`).join('');
+      const top = s.top ? `<a class="hof-top" href="/jogador/${encodeURIComponent(s.top.pid)}">${avatar(s.top.avatarUrl, 'hof-av')}
+          <span><small>${rt('hof_top')}</small><b>${esc(s.top.nick)}</b></span><em>${num(s.top.kills)}<small>${rt('kills_l')}</small></em></a>` : '';
+      return `<li class="card hof-s"><header><b>${esc(rt('wx_title', { n: s.cycle }))}</b><span>${esc(dates)}</span></header>
+          <ol class="hof-gs">${groups || `<li class="hof-none">${rt('hof_nogroups')}</li>`}</ol>${top}</li>`;
+    }).join('')}</ol>`;
   }
 
+  // //------------------- RANKING (/ranking?tab=grupos&scope=all&by=kd) -------------------\\
+  // A aba, o escopo e o filtro moram na URL (o topo leva para ?tab=grupos e ?scope=all); trocar não recarrega.
+  const RK_BY = ['kills', 'hours', 'kd', 'level'];
+  let rk = { tab: 'jogadores', scope: 'wipe', by: 'kills' };
+  const rkCache = {};
+  function rkRead() {
+    const q = new URLSearchParams(location.search);
+    const tab = (q.get('tab') || q.get('aba')) === 'grupos' ? 'grupos' : 'jogadores';
+    const scope = q.get('scope') === 'all' ? 'all' : 'wipe';
+    let by = RK_BY.includes(q.get('by')) ? q.get('by') : 'kills';
+    if (by === 'level' && scope === 'all') by = 'kills';
+    return { tab, scope, by };
+  }
+  function rkWrite() {
+    const q = new URLSearchParams();
+    if (rk.tab === 'grupos') q.set('tab', 'grupos');
+    if (rk.scope === 'all') q.set('scope', 'all');
+    if (rk.tab === 'jogadores' && rk.by !== 'kills') q.set('by', rk.by);
+    const to = '/ranking' + (q.toString() ? `?${q}` : '');
+    if (to !== location.pathname + location.search) {
+      try { history.replaceState(history.state, '', to); } catch (e) { /* segue */ }
+      curKey = location.pathname + location.search; // o roteador não acha que é outra página (não volta ao topo)
+    }
+    navMark(rk.tab === 'grupos' ? 'groups' : 'ranking');
+  }
+  function rkControls() {
+    const on = (sel, key, val) => document.querySelectorAll(sel).forEach((b) => {
+      const yes = b.dataset[key] === val;
+      b.classList.toggle('on', yes);
+      b.setAttribute(b.getAttribute('role') === 'tab' ? 'aria-selected' : 'aria-pressed', yes);
+    });
+    on('#rxTabs button', 'tab', rk.tab);
+    on('#rxScope button', 'scope', rk.scope);
+    on('#rxBy button', 'by', rk.by);
+    const players = rk.tab === 'jogadores';
+    $('#rxBy').hidden = !players;
+    $('#rxBy [data-by="level"]').hidden = rk.scope === 'all';
+    $('#rxNote').hidden = !(players && rk.by === 'kd');
+    rkSub();
+  }
+  function rkSub() {
+    const el = $('#rxSub');
+    if (!el) return;
+    const d = wipeData;
+    if (rk.scope === 'all') { el.textContent = rt(rk.tab === 'grupos' ? 'rk_sub_hof' : 'rk_sub_all'); return; }
+    el.textContent = d && d.cycleId && d.scheduledWipeAt && d.status !== 'NONE'
+      ? rt('rk_sub_wipe_n', { n: d.cycleId, d: new Date(Date.parse(d.scheduledWipeAt)).toLocaleDateString(locale(), { day: 'numeric', month: 'long' }) }) : rt('rk_sub_wipe');
+  }
+  const rkKey = (s) => `${s.tab}:${s.scope}:${s.tab === 'grupos' ? '' : s.by}`;
+  async function rkLoad() {
+    const s = { ...rk }, key = rkKey(s), box = $('#rxBody');
+    if (!box) return;
+    const url = s.tab === 'grupos' ? (s.scope === 'all' ? null : `${API()}/api/groups`) : `${API()}/api/ranking/players?scope=${s.scope}&by=${s.by}`;
+    const hit = rkCache[key];
+    let d = hit && Date.now() - hit.at < 60000 ? hit.d : null;
+    if (!d) {
+      if (box.firstElementChild && !box.querySelector('.loading')) box.classList.add('busy');
+      d = url ? await getJson(url) : await getSeasons();
+      if (d) rkCache[key] = { d, at: Date.now() };
+    }
+    if (s.tab === 'grupos' && s.scope === 'all') await loadWipe(false);
+    if (!$('#rxBody') || key !== rkKey(rk)) return;
+    box.classList.remove('busy');
+    box.innerHTML = s.tab === 'grupos' ? (s.scope === 'all' ? `<h2 class="sec-h rx-h">${rt('hof_h')}</h2>${hofHtml(d, wipeData)}` : rkGroups(d)) : rkPlayers(d, s);
+    const r = box.querySelector('[data-retry]');
+    if (r) r.onclick = () => { delete rkCache[key]; seasonsP = null; box.innerHTML = spinner(); rkLoad(); };
+    fadeIn(box);
+    countUp(box);
+  }
+  const POD_ORDER = [1, 0, 2]; // na tela: 2º, 1º (maior, no meio), 3º
+  function podium(cards) {
+    return `<ol class="pod">${[0, 1, 2].map((i) => cards[i] || `<li class="pod-slot r${i + 1} open"><div class="pod-card"><span class="pod-medal">${i + 1}</span>
+        <span class="pod-av pod-ghost" aria-hidden="true">${svg('user')}</span><b class="pod-name">${rt('open_slot')}</b><span class="pod-meta">${rt('open_slot_sub')}</span></div>
+        <span class="pod-step" aria-hidden="true">${i + 1}</span></li>`).join('')}</ol>`;
+  }
+  const rkVal = (p, by) => (by === 'hours' ? timeHtml(p.playMinutes) : by === 'kd' ? kdTxt(p) : by === 'level' ? `<span data-count="${p.level | 0}">${num(p.level)}</span>` : `<span data-count="${p.kills | 0}">${num(p.kills)}</span>`);
+  function rkPlayers(d, s) {
+    if (!d || !Array.isArray(d.players)) return emptyBox('info', rt('rk_err'), retryBtn());
+    const list = d.players;
+    if (!list.length) return emptyBox(s.by === 'kd' ? 'crosshair' : 'skull', rt(s.by === 'kd' ? 'empty_kd' : s.scope === 'all' ? 'empty_all' : 'empty_wipe'), `<a class="btn btn-ghost sm" href="/play/">${rt('how_play')}</a>`);
+    const T = rt('col');
+    const meta = (p) => {
+      const parts = { kills: `${num(p.kills)} ${rt('kills_l')}`, kd: `K/D ${kdTxt(p)}`, hours: `${timeHtml(p.playMinutes).replace(/<\/?small>/g, ' ').trim()}`, deaths: `${num(p.deaths)} ${T.deaths.toLowerCase()}` };
+      const pick = { kills: ['kd', 'hours'], hours: ['kills', 'kd'], kd: ['kills', 'deaths'], level: ['kills', 'hours'] }[s.by];
+      return pick.map((k) => parts[k]).join(' · ');
+    };
+    const pods = list.slice(0, 3).map((p, i) => `<li class="pod-slot r${i + 1}"><a class="pod-card" href="/jogador/${encodeURIComponent(p.pid)}">
+        <span class="pod-medal">${i + 1}</span>${avatar(p.avatarUrl, 'pod-av')}
+        <b class="pod-name">${esc(p.nick)}</b>${p.group && p.group.tag ? tagPill(p.group) : ''}
+        <span class="pod-val"><b>${rkVal(p, s.by)}</b><small>${rt('unit')[s.by]}</small></span>
+        <span class="pod-meta">${meta(p)}</span></a><span class="pod-step" aria-hidden="true">${i + 1}</span></li>`);
+    const rest = list.slice(3);
+    const cols = ['kills', 'deaths', 'kd', 'hours', s.scope === 'all' ? 'seasons' : 'level'];
+    const cell = (p, c) => (c === 'kills' ? num(p.kills) : c === 'deaths' ? num(p.deaths) : c === 'kd' ? kdTxt(p) : c === 'hours' ? timeHtml(p.playMinutes) : c === 'level' ? num(p.level) : num(p.seasons));
+    const table = rest.length ? `<div class="rx-table" role="table" aria-label="${esc(rt('rk_title'))}">
+        <div class="rx-tr rx-th" role="row"><span role="columnheader">#</span><span role="columnheader">${T.player}</span>${cols.map((c) => `<span role="columnheader" class="c-${c}${c === s.by ? ' on' : ''}">${T[c]}</span>`).join('')}</div>
+        ${rest.map((p) => `<a class="rx-tr" role="row" href="/jogador/${encodeURIComponent(p.pid)}"><span class="rx-pos" role="cell">${p.rank}</span>
+          <span class="rx-who" role="cell">${avatar(p.avatarUrl, 'rx-av')}<span><b>${esc(p.nick)}</b>${p.group ? `<small>${p.group.tag ? tagPill(p.group) : esc(p.group.name)}</small>` : ''}</span></span>
+          ${cols.map((c) => `<span role="cell" class="c-${c}${c === s.by ? ' on' : ''}" data-l="${esc(T[c])}">${cell(p, c)}</span>`).join('')}</a>`).join('')}</div>` : '';
+    return podium(pods) + table;
+  }
+  function rkGroups(d) {
+    if (!d || !Array.isArray(d.groups)) return emptyBox('info', rt('rk_err'), retryBtn());
+    const list = d.groups;
+    if (!list.length) return emptyBox('users', rt('g_empty'), `<a class="btn btn-ghost sm" href="/wiki/guia/teams-and-groups">${lang === 'pt' ? 'Como funcionam os grupos' : 'How groups work'}</a>`);
+    const T = rt('col');
+    const pods = list.slice(0, 3).map((g, i) => `<li class="pod-slot r${i + 1}"><a class="pod-card pod-group" href="/grupo/${encodeURIComponent(g.slug)}" style="--gc:${gColor(g.color)}">
+        <span class="pod-medal">${i + 1}</span>${emblem(g, 'gp-emblem pod-av')}
+        <b class="pod-name">${esc(g.name)}</b>${tagPill(g)}
+        <span class="pod-val"><b><span data-count="${g.xp | 0}">${num(g.xp)}</span></b><small>XP</small></span>
+        <span class="pod-meta">${plural(g.members, rt('member'), rt('members'))} · ${num(g.kills)} ${rt('kills_l')}</span>
+        ${g.prize && g.prize.hours ? `<span class="pod-prize" title="${esc(rt('prize_short', { h: g.prize.hours }))}">${svg('gift')}${g.prize.hours | 0} h VIP<span class="pp-l"> Survivor</span></span>` : ''}</a><span class="pod-step" aria-hidden="true">${i + 1}</span></li>`);
+    const rest = list.slice(3);
+    const table = rest.length ? `<div class="rx-table rx-groups" role="table">
+        <div class="rx-tr rx-th" role="row"><span role="columnheader">#</span><span role="columnheader">${T.group}</span><span role="columnheader" class="c-members">${T.members}</span><span role="columnheader" class="c-kills">${T.kills}</span><span role="columnheader" class="c-xp on">${T.xp}</span></div>
+        ${rest.map((g) => `<a class="rx-tr" role="row" href="/grupo/${encodeURIComponent(g.slug)}" style="--gc:${gColor(g.color)}"><span class="rx-pos" role="cell">${g.rank}</span>
+          <span class="rx-who" role="cell">${emblem(g, 'gp-emblem rx-av')}<span><b>${esc(g.name)} ${tagPill(g)}</b>${g.description ? `<small>${esc(g.description)}</small>` : ''}</span></span>
+          <span role="cell" class="c-members" data-l="${esc(T.members)}">${num(g.members)}</span><span role="cell" class="c-kills" data-l="${esc(T.kills)}">${num(g.kills)}</span><span role="cell" class="c-xp on" data-l="XP">${num(g.xp)}</span></a>`).join('')}</div>` : '';
+    return podium(pods) + table + `<p class="rx-prize-note">${svg('gift')}<span>${rt('prize_note')}</span></p>`;
+  }
+  function pageRanking() {
+    rk = rkRead();
+    setTimeout(() => {
+      if (!$('#rxBody')) return;
+      rkWrite();
+      document.querySelectorAll('#rxTabs button, #rxScope button, #rxBy button').forEach((b) => b.onclick = () => {
+        const before = rkKey(rk);
+        if (b.dataset.tab) rk.tab = b.dataset.tab; else if (b.dataset.scope) rk.scope = b.dataset.scope; else rk.by = b.dataset.by;
+        if (rk.scope === 'all' && rk.by === 'level') rk.by = 'kills';
+        if (rkKey(rk) === before) return;
+        rkWrite(); rkControls(); rkLoad();
+      });
+      rkControls();
+      rkLoad();
+      loadWipe(false).then(rkSub);
+    });
+    const seg = (id, key, items, cls) => `<div class="${cls}" id="${id}" role="group">${Object.entries(items).map(([k, n]) => `<button type="button" data-${key}="${k}">${esc(n)}</button>`).join('')}</div>`;
+    return `<section class="rx">
+        <header class="rx-head"><div><h1 class="page-title">${rt('rk_title')}</h1><p class="page-sub" id="rxSub">${rt('rk_sub_wipe')}</p></div>
+          ${seg('rxScope', 'scope', rt('scope'), 'seg rx-scope')}</header>
+        <div class="tabs rx-tabs" role="tablist" id="rxTabs">${Object.entries(rt('tabs')).map(([k, n]) => `<button type="button" role="tab" data-tab="${k}">${svg(k === 'grupos' ? 'users' : 'user')}${esc(n)}</button>`).join('')}</div>
+        <div class="rx-filters">${seg('rxBy', 'by', rt('by'), 'seg seg-line rx-by')}<p class="rx-note" id="rxNote" hidden>${svg('info')}${rt('kd_note')}</p></div>
+        <div class="rx-body" id="rxBody" aria-live="polite">${spinner()}</div>
+      </section>`;
+  }
+
+  // //------------------- WIPE (/wipe) -------------------\\
+  // guia "Wipe e Kit" do data.js em partes: [O Wipe (tabela apaga/fica), PvP insano, Prêmio, Kit (tabela normal/VIP)]
+  function guideParts(slug) {
+    const g = W.guides.find((x) => x.slug === slug);
+    if (!g) return null;
+    const split = (body) => String(body || '').split(/^## /m).map((s) => s.trim()).filter(Boolean)
+      .map((sec) => { const [h, ...rest] = sec.split('\n'); return { h: h.trim(), body: rest.join('\n').trim() }; });
+    return { cur: split(L(g).body), en: split(g.en.body) };
+  }
+  const mdRows = (txt) => String(txt || '').split('\n').filter((l) => /^\|/.test(l.trim()) && !/^\|[\s|:-]+\|?$/.test(l.trim()))
+    .map((l) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim())).slice(1);
+  const mdParas = (txt) => String(txt || '').split(/\n{2,}/).map((p) => p.trim()).filter((p) => p && !p.startsWith('|')).map((p) => `<p>${inline(p)}</p>`).join('');
+  function kitList(rows, enRows, col) {
+    return rows.map((r, i) => {
+      const m = /^(\d+)\s+(.+)$/.exec(r[col] || '');
+      if (!m) return '';
+      const en = /^(\d+)\s+(.+)$/.exec(((enRows[i] || [])[col]) || '');
+      const id = (en && itemByName(en[2])) || itemByName(m[2]);
+      const it = id && byId[id];
+      const inner = `${iconOf(it, 'ic wx-ic')}<span>${esc(m[2])}</span><b>×${m[1]}</b>`;
+      return `<li>${it ? `<a href="/wiki/item/${it.id}">${inner}</a>` : `<div>${inner}</div>`}</li>`;
+    }).join('');
+  }
+  let wxTried = false;
+  function wxState() {
+    const d = wipeData;
+    if (!d) return wxTried ? 'err' : 'load';
+    if (!d.scheduledWipeAt || d.status === 'NONE') return 'none';
+    if (d.status === 'FAILED') return 'failed';
+    const left = Date.parse(d.scheduledWipeAt) - (Date.now() + wipeOffset);
+    if (d.status === 'WIPE_PENDING' || left <= 0) return 'pending';
+    return 'run';
+  }
+  function wxPaint() {
+    const box = $('#wx');
+    if (!box) return;
+    const d = wipeData, st = wxState();
+    const now = Date.now() + wipeOffset;
+    const at = d ? Date.parse(d.scheduledWipeAt) : 0, start = d ? Date.parse(d.startedAt) : 0;
+    const left = Math.max(0, at - now);
+    const pvp = st === 'run' && (d.pvpActive || left <= PVP_MS);
+    box.dataset.state = st;
+    box.classList.toggle('pvp', !!pvp);
+    box.classList.toggle('stale', !!(wipeAt && Date.now() - wipeAt > WIPE_STALE_MS));
+    const title = d && d.cycleId ? rt('wx_title', { n: d.cycleId }) : rt('wx_title_none');
+    if ($('#wxTitle').textContent !== title) $('#wxTitle').textContent = title;
+    const msg = { none: ['wx_none', 'wx_none_sub'], failed: ['wx_failed', 'wx_failed_sub'], pending: ['wx_pending', 'wx_pending_sub'], err: ['wx_err', 'wx_err_sub'] }[st];
+    $('#wxMsg').innerHTML = msg ? `<b>${rt(msg[0])}</b><span>${rt(msg[1])}</span>` : '';
+    if (st === 'run') {
+      let s = Math.floor(left / 1000);
+      const v = { d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60), s: s % 60 };
+      const U = rt('units');
+      for (const k of ['d', 'h', 'm', 's']) {
+        const el = $(`#wxN-${k}`), txt = k === 'd' ? String(v.d) : p2(v[k]);
+        if (el.dataset.v !== txt) {
+          const roll = el.dataset.v !== undefined && !reduced();
+          el.dataset.v = txt;
+          el.innerHTML = roll ? `<span class="roll">${txt}</span>` : txt;
+        }
+        el.nextElementSibling.textContent = U[k][v[k] === 1 ? 0 : 1];
+      }
+      const pct = Math.min(1, Math.max(0, (now - start) / (at - start)));
+      $('#wxFill').style.transform = `scaleX(${pct.toFixed(4)})`;
+      $('#wxZone').style.width = `${Math.min(100, (PVP_MS / Math.max(1, at - start)) * 100).toFixed(2)}%`;
+      $('#wxPct').textContent = `${Math.floor(pct * 100)}%`;
+      $('#wxStart').textContent = rt('wx_started', { d: dayTxt(start) });
+      $('#wxEnd').textContent = dayTxt(at);
+      $('#wxWhen').textContent = pvp ? rt('wx_pvp_now') : rt('wx_when', { d: dayTxt(at, true) });
+    } else {
+      $('#wxWhen').textContent = '';
+    }
+    if (box.classList.contains('stale') && st === 'run') $('#wxWhen').textContent = rt('wx_stale');
+    // faixa do PvP: quando começa
+    const pv = $('#wxPvpWhen');
+    if (pv) pv.textContent = st !== 'run' ? '' : pvp ? rt('pvp_on') : rt('pvp_at', { d: dayTxt(Date.parse(d.finalPvpStartsAt) || at - PVP_MS, true) });
+    const band = $('#wxPvp');
+    if (band) band.classList.toggle('on', !!pvp);
+  }
+  function wxHolders(d) {
+    const groups = d && Array.isArray(d.groups) ? d.groups : null;
+    [0, 1, 2].forEach((i) => {
+      const el = $(`#wxHold${i}`);
+      if (!el) return;
+      if (!groups) { el.hidden = true; return; }
+      const g = groups[i];
+      el.innerHTML = `<small>${rt('holding')}</small>${g ? `<a href="/grupo/${encodeURIComponent(g.slug)}" style="--gc:${gColor(g.color)}">${emblem(g, 'gp-emblem wx-gem')}<b>${esc(g.name)}</b>${tagPill(g)}</a>` : `<span class="wx-open">${rt('nobody')}</span>`}`;
+    });
+  }
   function pageWipe() {
-    return `<div class="wp">
-        <div class="wp-hero">
-        <p class="l-kicker">${lt('wp_kicker')}</p>
-        <h1 class="wp-title">${lt('wp_title')}</h1>
-        <p class="wp-sub">${lt('wp_sub')}</p>
-        ${countdownBox(false)}
+    const parts = guideParts('wipe-kit');
+    const sec = (i) => (parts && parts.cur[i]) || { h: '', body: '' };
+    const secEn = (i) => (parts && parts.en[i]) || { h: '', body: '' };
+    const resetRows = mdRows(sec(0).body);
+    const kitRows = mdRows(sec(3).body), kitEn = mdRows(secEn(3).body);
+    const kitText = sec(3).body.split(/\n{2,}/).filter((p) => !p.trim().startsWith('|'));
+    const HOURS = [8, 6, 4], BADGE = ['champion', 'podium', 'podium'];
+    setTimeout(() => {
+      if (!$('#wx')) return;
+      wxTried = !!wipeData;
+      wxPaint();
+      loadWipe(false).then(() => { wxTried = true; wxPaint(); });
+      const tick = setInterval(wxPaint, 1000);
+      const re = setInterval(() => { if (!document.hidden) loadWipe(false).then(() => { wxTried = true; wxPaint(); }); }, WIPE_REFRESH_MS);
+      onLeave(() => { clearInterval(tick); clearInterval(re); });
+      getJson(`${API()}/api/groups`).then(wxHolders);
+      const hof = () => Promise.all([getSeasons(), loadWipe(false)]).then(([d]) => {
+        const b = $('#wxHof');
+        if (!b) return;
+        b.innerHTML = hofHtml(d, wipeData);
+        const r = b.querySelector('[data-retry]');
+        if (r) r.onclick = () => { seasonsP = null; b.innerHTML = spinner(); hof(); };
+      });
+      hof();
+      const copy = $('#wxCopy');
+      if (copy) copy.onclick = () => {
+        if (!navigator.clipboard) return;
+        navigator.clipboard.writeText('/kit wipe').then(() => {
+          copy.classList.add('ok'); copy.querySelector('span').textContent = rt('copied');
+          setTimeout(() => { if (copy.isConnected) { copy.classList.remove('ok'); copy.querySelector('span').textContent = rt('copy'); } }, 1600);
+        }, () => {});
+      };
+      // vídeo do PvP: só baixa e toca quando aparece (e nunca com "menos movimento")
+      const v = $('#wxPvpVid');
+      if (v && !reduced()) whenVisible(v, () => { v.querySelectorAll('source').forEach((s) => { s.src = s.dataset.src; }); v.load(); v.play().catch(() => {}); }, '100px');
+    });
+    const U = rt('units');
+    const list = (col, ok) => resetRows.map((r) => r[col]).filter(Boolean).map((x) => `<li>${svg(ok ? 'shield' : 'recycle')}<span>${inline(x)}</span></li>`).join('');
+    return `<div class="wxp">
+      <section class="wx card" id="wx" data-state="load" aria-labelledby="wxTitle">
+        <img class="wx-bg" src="/media/hero.webp" alt="" aria-hidden="true" decoding="async">
+        <div class="wx-in">
+          <h1 class="wx-title" id="wxTitle">${rt('wx_title_none')}</h1>
+          <p class="wx-sub">${rt('wx_sub')}</p>
+          <div class="wx-cd" role="timer" aria-live="off">${['d', 'h', 'm', 's'].map((k) => `<span class="wx-u"><b class="wx-n" id="wxN-${k}">--</b><small>${U[k][1]}</small></span>`).join('')}</div>
+          <div class="wx-msg" id="wxMsg" aria-live="polite"></div>
+          <div class="wx-load">${spinner()}</div>
+          <div class="wx-track">
+            <div class="wx-bar"><span class="wx-fill" id="wxFill"></span><i class="wx-zone" id="wxZone"><em>${rt('wx_pvp_mark')}</em></i></div>
+            <div class="wx-ends"><span id="wxStart"></span><b id="wxPct"></b><span id="wxEnd"></span></div>
+          </div>
+          <p class="wx-when" id="wxWhen"></p>
         </div>
-      </div>`;
+      </section>
+
+      <section class="wx-rk card" aria-label="${esc(rt('reset_h'))} / ${esc(rt('keep_h'))}">
+        <div class="wx-col reset"><h2>${svg('recycle')}${rt('reset_h')}</h2><ul>${list(0, false)}</ul></div>
+        <div class="wx-col keep"><h2>${svg('shield')}${rt('keep_h')}</h2><ul>${list(1, true)}</ul></div>
+      </section>
+
+      <section class="wx-sec" aria-labelledby="wxPrizeH">
+        <div class="sec-head"><h2 class="sec-h" id="wxPrizeH">${rt('prizes_h')}</h2><a class="card-link" href="/ranking?tab=grupos">${rt('see_groups')} ${svg('chevron')}</a></div>
+        <p class="wx-lead">${rt('prizes_sub')}</p>
+        <ol class="wx-prizes">${HOURS.map((h, i) => `<li class="card wx-prize r${i + 1}">
+            <span class="wx-place">${rt('place')[i]}</span>
+            <img class="wx-badge" src="${badgeImg(BADGE[i])}" alt="" loading="lazy" width="96" height="84">
+            <span class="wx-vip"><b>${rt('vip_h', { h })}</b><small>${rt('vip_l')}</small></span>
+            <span class="wx-bname">+ ${rt('badge_l')} ${esc((BADGE_LIST.find((x) => x[0] === BADGE[i]) || [])[1] || BADGE[i])}</span>
+            <div class="wx-hold" id="wxHold${i}"></div></li>`).join('')}</ol>
+      </section>
+
+      <section class="wx-pvp card" id="wxPvp" aria-labelledby="wxPvpH">
+        <div class="wx-pvp-media" aria-hidden="true"><video id="wxPvpVid" muted loop playsinline preload="none" poster="/media/hero.webp"><source data-src="/media/pvp.webm" type="video/webm"><source data-src="/media/pvp.mp4" type="video/mp4"></video></div>
+        <div class="wx-pvp-txt"><h2 id="wxPvpH">${svg('skull')}${rt('pvp_h')}</h2>${mdParas(sec(1).body)}<p class="wx-pvp-when" id="wxPvpWhen"></p></div>
+      </section>
+
+      <section class="wx-kit card" aria-labelledby="wxKitH">
+        <div class="wx-kit-head"><h2 class="sec-h" id="wxKitH">${rt('kit_h')}</h2>
+          <button type="button" class="wx-cmd" id="wxCopy" title="${esc(rt('copy'))}"><code>/kit wipe</code>${svg('copy')}<span>${rt('copy')}</span></button>
+          <p class="wx-kit-note">${rt('kit_note')}</p></div>
+        <div class="wx-kits">
+          <div class="wx-kitcol"><h3>${rt('kit_normal')}</h3><ul>${kitList(kitRows, kitEn, 0)}</ul></div>
+          <div class="wx-kitcol vip"><h3>${svg('star')}${rt('kit_vip')}</h3><ul>${kitList(kitRows, kitEn, 1)}</ul><p>${rt('kit_vip_note')}</p></div>
+        </div>
+        ${kitText.length > 2 ? `<div class="wx-kit-tip">${mdParas(kitText[kitText.length - 1])}</div>` : ''}
+      </section>
+
+      <section class="wx-sec" aria-labelledby="wxHofH">
+        <div class="sec-head"><h2 class="sec-h" id="wxHofH">${rt('hof_h')}</h2><a class="card-link" href="/wiki/guia/wipe-kit">${rt('guide_link')} ${svg('chevron')}</a></div>
+        <div id="wxHof">${spinner()}</div>
+      </section>
+    </div>`;
+  }
+
+  // //------------------- JOGADOR (/jogador/<pid>) -------------------\\
+  const RORD = ['mythic', 'legendary', 'epic', 'rare', 'common'];
+  function badgeWall(badges) {
+    const list = Object.entries(badges || {}).map(([id, c]) => [badgeInfo(id), c]).filter(([b]) => b).sort((x, y) => RORD.indexOf(x[0].rar) - RORD.indexOf(y[0].rar));
+    if (!list.length) return `<p class="muted jx-none">${rt('nobadges')}</p>`;
+    return `<div class="jx-badges">${list.map(([b, c]) => `<div class="jx-badge" style="--rc:${BRAR[b.rar][1]}" title="${esc(b.name)}"><img src="${b.img}" alt="" loading="lazy">
+        <b>${esc(b.name)}${c > 1 ? ` <small>×${c}</small>` : ''}</b><span>${BRAR[b.rar][0]}</span></div>`).join('')}</div>`;
+  }
+  const statGrid = (cells) => `<dl class="jx-grid">${cells.map(([k, v, hot]) => `<div class="${hot ? 'hot' : ''}"><dt>${rt('st')[k]}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
+  function pageJogador(pid) {
+    setTimeout(async () => {
+      const [res] = await Promise.all([getStatus(`${API()}/api/player/${encodeURIComponent(pid)}`), loadWipe(false)]);
+      const box = $('#jxBox');
+      if (!box) return;
+      const p = res.data;
+      if (!p) {
+        box.innerHTML = res.status === 404
+          ? emptyBox('user', `<b class="empty-h">${rt('jx_notfound')}</b>${rt('jx_notfound_sub')}`, `<a class="btn btn-ghost sm" href="/ranking">${rt('see_ranking')}</a>`)
+          : emptyBox('info', rt('jx_err'), retryBtn());
+        const r = box.querySelector('[data-retry]');
+        if (r) r.onclick = () => go(location.pathname, { replace: true, force: true });
+        return;
+      }
+      document.title = `${p.nick} — HAVOK`;
+      const inWipe = p.inWipe !== false;
+      const g = p.group;
+      const so = p.social || {};
+      const cycle = wipeData && wipeData.cycleId;
+      const seen = p.lastSeen > 1.6e9 ? rt('jx_seen', { t: relTime(new Date(p.lastSeen * 1000).toISOString()) }) : '';
+      const links = [so.youtube ? `<a class="pf-link yt" href="${esc(so.youtube)}" target="_blank" rel="noopener nofollow">${svg('youtube')}YouTube</a>` : '',
+        so.tiktok ? `<a class="pf-link tt" href="${esc(so.tiktok)}" target="_blank" rel="noopener nofollow">${svg('tiktok')}TikTok</a>` : ''].join('');
+      const ls = p.lastSeason;
+      const groupBox = g ? `<a class="jx-group" href="/grupo/${encodeURIComponent(g.slug)}" style="--gc:${gColor(g.color)}">${emblem(g)}
+          <span><b>${esc(g.name)} ${tagPill(g)}</b><small>${esc(rt('roles')[g.role] || g.role)} · ${rt('gx_rank', { n: g.rank })} · ${plural(g.members, rt('member'), rt('members'))}</small></span>${svg('chevron')}</a>`
+        : !inWipe && ls && ls.group ? `<p class="jx-was">${svg('users')}${esc(rt('jx_was_in', { g: ls.group, n: ls.cycle }))}</p>` : '';
+      const wipeCells = [['level', num(p.level)], ['kills', `<span data-count="${p.kills | 0}">${num(p.kills)}</span>`, true], ['deaths', num(p.deaths)], ['kd', kdTxt(p)], ['hours', timeHtml(p.playMinutes)]];
+      const a = p.allTime;
+      const allCells = a ? [['kills', `<span data-count="${a.kills | 0}">${num(a.kills)}</span>`, true], ['deaths', num(a.deaths)], ['kd', kdTxt(a)], ['hours', timeHtml(a.playMinutes)], ['seasons', num(a.seasons)]] : null;
+      box.innerHTML = `<header class="jx-hero card">
+          ${avatar(p.avatarUrl, `jx-av${p.linked ? ' linked' : ''}`)}
+          <div class="jx-id">
+            <h1 class="jx-nick">${esc(p.nick)}${g && g.tag ? ` ${tagPill(g)}` : ''}</h1>
+            <p class="jx-tags"><span class="jx-chip ${inWipe ? 'live' : ''}"><i></i>${inWipe ? rt('jx_in') : rt('jx_out')}</span>
+              <span class="jx-chip">${svg('discord')}${p.linked ? rt('jx_linked') : rt('jx_anon')}</span>${seen ? `<span class="jx-seen">${esc(seen)}</span>` : ''}</p>
+            ${so.bio ? `<p class="jx-bio">${esc(so.bio)}</p>` : ''}
+            ${links ? `<div class="pf-links">${links}</div>` : ''}
+          </div>
+          ${groupBox ? `<div class="jx-side">${groupBox}</div>` : ''}
+        </header>
+        <div class="jx-cols">
+          <section class="card jx-block now"><header><h2>${inWipe ? rt('jx_wipe_h') : rt('jx_last_h', { n: ls ? ls.cycle : '?' })}</h2>
+            <span>${inWipe ? (cycle ? esc(rt('wx_title', { n: cycle })) : '') : esc(rt('jx_last_note'))}</span></header>${statGrid(wipeCells)}</section>
+          <section class="card jx-block all"><header><h2>${rt('jx_all_h')}</h2><span>${a ? esc(a.seasons === 1 ? rt('jx_season1') : rt('jx_seasons', { n: a.seasons })) : ''}</span></header>
+            ${allCells ? statGrid(allCells) : `<p class="jx-none">${rt('jx_all_empty')}</p>`}</section>
+        </div>
+        <section class="jx-sec"><h2 class="sec-h">${rt('badges')}</h2>${badgeWall(p.badges)}</section>`;
+      countUp(box);
+      fadeIn(box);
+    });
+    return `<div class="jx" id="jxBox">${spinner()}</div>`;
+  }
+
+  // //------------------- GRUPO (/grupo/<slug>) -------------------\\
+  function pageGrupo(slug) {
+    setTimeout(async () => {
+      const res = await getStatus(`${API()}/api/group/${encodeURIComponent(slug)}`);
+      const box = $('#gxBox');
+      if (!box) return;
+      navMark('groups');
+      const g = res.data;
+      if (!g) {
+        box.innerHTML = res.status === 404
+          ? emptyBox('users', `<b class="empty-h">${rt('gx_notfound')}</b>${rt('gx_notfound_sub')}`, `<a class="btn btn-ghost sm" href="/ranking?tab=grupos">${rt('see_groups')}</a>`)
+          : emptyBox('info', rt('gx_err'), retryBtn());
+        const r = box.querySelector('[data-retry]');
+        if (r) r.onclick = () => go(location.pathname, { replace: true, force: true });
+        return;
+      }
+      document.title = `${g.name} — HAVOK`;
+      const ms = g.members || [];
+      const role = (r) => esc(rt('roles')[r] || r);
+      const members = ms.map((m) => `<a class="gx-m${m.role === 'Leader' ? ' lead' : ''}" href="/jogador/${encodeURIComponent(m.pid)}">${avatar(m.avatarUrl, 'gx-av')}
+          <span class="gx-mid"><b>${esc(m.nick)}</b><small><em class="gx-role r-${esc(m.role)}">${role(m.role)}</em> · Lv ${num(m.level)}</small></span>
+          <span class="gx-k"><b>${num(m.kills)}</b><small>${rt('kills_l')}</small></span>
+          <span class="gx-kd"><b>${kdTxt(m)}</b><small>K/D</small></span></a>`).join('');
+      const stat = (k, v, hot) => `<div class="${hot ? 'hot' : ''}"><dt>${rt('st')[k]}</dt><dd>${v}</dd></div>`;
+      box.innerHTML = `<header class="gx-hero card" style="--gc:${gColor(g.color)}">
+          ${emblem(g, 'gp-emblem gx-em')}
+          <div class="gx-id">
+            <p class="gx-rank${g.rank <= 3 ? ` top r${g.rank}` : ''}">${g.rank <= 3 ? svg('award') : ''}${esc(rt('gx_rank', { n: g.rank }))}</p>
+            <h1 class="gx-name">${esc(g.name)} ${tagPill(g)}</h1>
+            ${g.description ? `<p class="gx-desc">${esc(g.description)}</p>` : ''}
+            ${g.prize && g.prize.hours ? `<p class="gx-prize">${svg('gift')}${esc(rt('gx_prize', { h: g.prize.hours }))}</p>` : ''}
+          </div>
+          <dl class="jx-grid gx-stats">${stat('members', num(ms.length))}${stat('kills', `<span data-count="${g.kills | 0}">${num(g.kills)}</span>`, true)}${stat('deaths', num(g.deaths))}${stat('kd', kdTxt(g))}${stat('xp', `<span data-count="${g.xp | 0}">${num(g.xp)}</span>`)}</dl>
+        </header>
+        <section class="gx-sec"><div class="sec-head"><h2 class="sec-h">${rt('gx_members_h')}</h2><a class="card-link" href="/ranking?tab=grupos">${rt('see_groups')} ${svg('chevron')}</a></div>
+          ${members ? `<div class="gx-list">${members}</div>` : `<p class="muted">${rt('gx_nomembers')}</p>`}</section>`;
+      countUp(box);
+      fadeIn(box);
+    });
+    return `<div class="gx" id="gxBox">${spinner()}</div>`;
   }
 
 
@@ -1446,91 +2002,6 @@
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker}</p><h1 class="page-title">${P.title}</h1><p class="page-sub">${P.sub}</p></section>${note}<div id="pfBox" class="pf">${spinner()}</div>`;
   }
 
-  // perfil público (/jogador/<pid>): com ou sem Discord
-  function pageJogador(pid) {
-    const P = PF[lang];
-    setTimeout(async () => {
-      let p = null;
-      try { const r = await fetch(`${pfApi()}/api/player/${encodeURIComponent(pid)}`); p = r.ok ? await r.json() : null; } catch (e) { p = null; }
-      const box = $('#pfBox');
-      if (!box) return;
-      box.innerHTML = p ? playerCard(p) : `<p class="muted">${P.notfound}</p>`;
-      if (p) document.title = `${p.nick} — HAVOK`;
-    });
-    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_player}</p></section><div id="pfBox" class="pf">${spinner()}</div>`;
-  }
-
-  // ranking completo do wipe (/ranking): grupos com emblema/cor/descrição e jogadores com foto ou avatar cinza
-  let rkBy = 'kills';
-  function pageRanking() {
-    const P = PF[lang];
-    const api = pfApi();
-    setTimeout(async () => {
-      document.querySelectorAll('.rkp-sort button').forEach((b) => b.onclick = () => { rkBy = b.dataset.by; route(); });
-      const get = async (u) => { try { const r = await fetch(u); return r.ok ? await r.json() : null; } catch (e) { return null; } };
-      // cada lista aparece assim que a sua resposta chega (uma não espera a outra)
-      const plP = get(`${api}/api/ranking/players?by=${rkBy}`);
-      const gr = await get(`${api}/api/groups`);
-      const gBox = $('#rkpGroups');
-      if (!gBox) return;
-      const MEDAL = ['gold', 'silver', 'bronze'];
-      const CREATOR_BADGES = ['youtuber', 'tiktoker', 'creator'];
-      const ico = (n) => `<span class="rkp-ic">${svg(n)}</span>`;
-      gBox.innerHTML = !gr ? `<p class="muted">${P.down}</p>` : gr.groups.map((g) => {
-        const medal = MEDAL[g.rank - 1];
-        return `<a class="rkp-group${medal ? ` podium ${medal}` : ''}" href="/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
-          <span class="rkp-pos">${medal ? svg('award') : ''}${String(g.rank).padStart(2, '0')}</span>${emblem(g)}
-          <div class="rkp-gtxt"><b>${esc(g.name)} ${tagPill(g)}</b>${g.description ? `<p>${esc(g.description)}</p>` : ''}
-            <span class="rkp-stats">${ico('users')}${num(g.members)} <em>${g.members === 1 ? P.member : P.members}</em>${ico('skull')}${num(g.kills)} <em>${P.kills_l}</em>${ico('star')}${num(g.xp)} <em>XP</em></span>
-            ${medal && g.prize ? `<span class="rkp-prize">${svg('gift')}${esc(P.prize(g.prize))}</span>` : ''}</div></a>`;
-      }).join('') || `<p class="muted">${P.nogroups}</p>`;
-      if (gr && gr.groups.some((g) => g.prize)) gBox.insertAdjacentHTML('beforeend', `<p class="rkp-note">${svg('gift')}${P.prize_note}</p>`);
-      const pl = await plP;
-      const pBox = $('#rkpPlayers');
-      if (!pBox) return;
-      // o número da direita diz o que é: caveira = kills, divisas = level, relógio = horas
-      const val = (p) => (rkBy === 'level' ? `${svg('chevrons')}<b>${num(p.level)}</b><em>LEVEL</em>`
-        : rkBy === 'hours' ? `${svg('clock')}<b>${num(Math.floor(p.playMinutes / 60))}<small>h</small></b><em>${P.hours_l}</em>`
-          : `${svg('skull')}<b>${num(p.kills)}</b><em>${P.kills_l}</em>`);
-      pBox.innerHTML = !pl ? `<p class="muted">${P.down}</p>` : pl.players.map((p) => {
-        const medal = MEDAL[p.rank - 1];
-        return `<a class="rkp-player${medal ? ` podium ${medal}` : ''}" href="/jogador/${esc(p.pid)}">
-          <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
-          <div><b>${esc(p.nick)}${p.group && p.group.tag ? ` ${tagPill(p.group)}` : ''}${(p.badges || []).filter((id) => CREATOR_BADGES.includes(id)).map((id) => `<img class="rkp-badge" src="${badgeImg(id)}" alt="${esc(id)}" title="${esc((BADGE_LIST.find((x) => x[0] === id) || [])[1] || id)}">`).join('')}</b><span class="rkp-stats">${p.group && !p.group.tag ? `<i>${esc(p.group.name)}</i>` : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
-          <span class="rkp-val">${val(p)}</span></a>`;
-      }).join('') || `<p class="muted">${P.noplayers}</p>`;
-    });
-    const SORT_ICON = { kills: 'skull', level: 'chevrons', hours: 'clock' };
-    const sort = Object.entries(P.by).map(([k, n]) => `<button type="button" class="chip ${rkBy === k ? 'on' : ''}" data-by="${k}">${svg(SORT_ICON[k])}${n}</button>`).join('');
-    return `<section class="bd-hero"><p class="l-kicker">${P.rk_kicker}</p><h1 class="page-title">${P.rk_title}</h1><p class="page-sub">${P.rk_sub}</p></section>
-      <div class="rkp">
-        <section class="rkp-col"><h3>${P.rk_groups}</h3><div id="rkpGroups">${spinner()}</div></section>
-        <section class="rkp-col"><div class="rkp-colhead"><h3>${P.rk_players}</h3><div class="rkp-sort">${sort}</div></div><div id="rkpPlayers">${spinner()}</div></section>
-      </div>`;
-  }
-
-  // grupo (/grupo/<slug>): todos os membros; quem não vinculou o Discord aparece com o nick e o avatar cinza
-  function pageGrupo(slug) {
-    const P = PF[lang];
-    setTimeout(async () => {
-      let g = null;
-      try { const r = await fetch(`${pfApi()}/api/group/${encodeURIComponent(slug)}`); g = r.ok ? await r.json() : null; } catch (e) { g = null; }
-      const box = $('#pfBox');
-      if (!box) return;
-      if (!g) { box.innerHTML = `<p class="muted">${P.notfound_group}</p>`; return; }
-      document.title = `${g.name} — HAVOK`;
-      const members = g.members.map((m) => `<a class="gp-member" href="/jogador/${esc(m.pid)}">${avatar(m.avatarUrl, 'gp-avatar')}
-          <div><b>${esc(m.nick)}</b><small>${ROLE[lang][m.role] || m.role} · Lv ${num(m.level)}</small></div>
-          <span class="gp-k"><b>${num(m.kills)}</b><small>${P.kills}</small></span></a>`).join('');
-      box.innerHTML = `<div class="pf-card">
-          <header class="gp-head">${emblem(g, 'gp-emblem big')}<div><h2><span class="gp-rank">#${g.rank}</span> ${esc(g.name)} ${tagPill(g)}</h2>
-            ${g.description ? `<p class="gp-desc">${esc(g.description)}</p>` : ''}
-            <p class="muted">${num(g.members.length)} ${g.members.length === 1 ? P.member : P.members} · ${num(g.kills)} ${P.kills.toLowerCase()} · ${num(g.deaths)} ${P.deaths.toLowerCase()} · ${num(g.xp)} ${P.xp}</p></div></header>
-          <div class="gp-list">${members || `<p class="muted">${P.nomembers}</p>`}</div></div>`;
-    });
-    return `<section class="bd-hero"><p class="l-kicker">${P.kicker_group}</p></section><div id="pfBox" class="pf">${spinner()}</div>`;
-  }
-
   // ---------------------------------------------------------------- anti-cheat: gravação (link só no canal de staff)
   function pageAc(id) {
     const pt = lang === 'pt';
@@ -1593,7 +2064,6 @@
   let curKey = null;
   function route(opts = {}) {
     leaveFns.splice(0).forEach((f) => { try { f(); } catch (e) { /* segue */ } });
-    clearInterval(cdTimer); cdTimer = null;
     const r = HavokRoutes.parse(location.pathname);
     const query = location.search.slice(1);
     const key = location.pathname + location.search;
