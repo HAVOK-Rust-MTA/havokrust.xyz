@@ -187,7 +187,8 @@
     });
 
     var mapEl = root.querySelector('.hvm-map');
-    var Z = D.maxNativeZoom; // 4: z4 = pixel do map.png
+    var Z = D.maxNativeZoom; // 4: z4 = pixel do map.png (projeção dos pontos)
+    var TZ = D.tileMaxZoom || Z; // último zoom com tiles (5 = satélite do continente, mais nítido)
     var map = L.map(mapEl, {
       crs: L.CRS.Simple,
       zoomControl: false,
@@ -219,9 +220,9 @@
         noWrap: true,
         bounds: full,
         minNativeZoom: 0,
-        maxNativeZoom: Z,
+        maxNativeZoom: TZ,
         minZoom: -2,
-        maxZoom: Z + 2,
+        maxZoom: TZ + 1,
         keepBuffer: 4,
         className: 'hvm-base',
       }).addTo(map);
@@ -239,7 +240,7 @@
     map.setMaxBounds(full.pad(0.3)); // folga para o painel/cartão não esconderem a borda do mapa
     fitView(false);
     map.setMinZoom(Math.max(map.getBoundsZoom(land) - 1, -2));
-    map.setMaxZoom(Z + 2);
+    map.setMaxZoom(TZ + 1);
     map.on('resize', function () {
       var fz = map.getBoundsZoom(land);
       map.setMinZoom(Math.max(fz - 1, -2));

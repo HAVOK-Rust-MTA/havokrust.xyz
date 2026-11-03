@@ -21,7 +21,7 @@
   min-height: 460px;
   overflow: hidden;
   isolation: isolate;
-  background: #5e758a; /* oceano do map.png depois do filtro abaixo */
+  background: rgb(20, 34, 46); /* mar do mapa de satélite */
   color: var(--hvm-text);
   font: 15px/1.5 var(--hvm-font);
   border-radius: inherit;
@@ -39,9 +39,9 @@
 
 /* ---------------------------------------------------------------- mapa */
 .hvm-map { position: absolute; inset: 0; background: transparent; outline: 0; }
-.hvm .leaflet-container { background: #5e758a; font: inherit; }
+.hvm .leaflet-container { background: rgb(20, 34, 46); font: inherit; }
 /* o mapa do jogo é claro e pastel: escurece e aquece um pouco para morar no site escuro */
-.hvm .hvm-base { filter: saturate(.78) brightness(.74) contrast(1.06) sepia(.12); }
+.hvm .hvm-base { filter: contrast(1.04); } /* satélite já é escuro: sem escurecer mais */
 /* vinheta: funde a borda do mapa com a página */
 .hvm-map::after {
   content: ''; position: absolute; inset: 0; z-index: 450; pointer-events: none;
@@ -92,7 +92,8 @@
 .hvm .hvm-lbl span {
   position: absolute; left: 0; top: 0; transform: translate(-50%, -50%);
   white-space: nowrap; color: #f4efe9;
-  text-shadow: 0 0 2px rgba(10, 8, 6, .95), 0 0 6px rgba(10, 8, 6, .8), 0 1px 1px #000;
+  text-shadow: 0 0 2px #000, 0 0 3px rgba(0, 0, 0, .95), 0 0 8px rgba(0, 0, 0, .85), 0 1px 1px #000;
+  -webkit-text-stroke: .35px rgba(0, 0, 0, .7);
   transition: opacity .3s var(--hvm-ease);
 }
 .hvm .hvm-lbl.t1 span { font: 600 15px/1 var(--hvm-title); letter-spacing: .2em; text-transform: uppercase; opacity: .92; }

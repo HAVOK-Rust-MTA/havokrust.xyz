@@ -66,6 +66,13 @@ def still(name):
     return Image.open(p).convert('RGB') if p.is_file() else None
 
 
+def sat_map():
+    """Fundo do mapa de satélite (o mesmo do jogo); sem o arquivo grande, a miniatura do site."""
+    big = pathlib.Path.home() / 'MTA-Server/build/mapafoto/para-site/havok-mapa-satelite-4096.png'
+    im = Image.open(big if big.is_file() else ROOT / 'mapa' / 'preview.webp').convert('RGB')
+    return im.resize((2400, 2400), Image.LANCZOS)
+
+
 def crop_frac(im, box):
     """Recorta por frações (x0, y0, x1, y1) da imagem."""
     if im is None:
@@ -265,7 +272,7 @@ def sections():
                      kicker='WIPE · TODO MUNDO DO ZERO',
                      lines=[[('O MAPA', 0)], [('ZERA.', 1)]], size=124,
                      sub='Quando o próximo ciclo começa, a corrida vale desde o primeiro minuto.'),
-        'mapa': dict(bg=crop_frac(video_frame('gather-tools', 0.5), (0.1, 0.08, 0.92, 0.8)), x0=430, darken=0.85,
+        'mapa': dict(bg=crop_frac(sat_map(), (0.2, 0.18, 0.92, 0.72)), x0=430, darken=0.6,
                      kicker='MAPA INTERATIVO',
                      lines=[[('CONHEÇA O', 0)], [('TERRENO.', 1)]], size=116,
                      sub='Monumentos, radiação, base militar e onde cai o airdrop.'),

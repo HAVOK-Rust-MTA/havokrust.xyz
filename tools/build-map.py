@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Gera o mapa interativo do site a partir dos arquivos do servidor MTA:
-#   mapa/tiles/{z}/{x}/{y}.webp   tiles 256 px para Leaflet CRS.Simple (zoom 0–4; z4 = map.png em 4096 px)
+#   mapa/tiles/{z}/{x}/{y}.webp   tiles 256 px para Leaflet CRS.Simple (zoom 0–4 do map.png; z5 nítido do continente)
 #   mapa/preview.webp             miniatura (~800 px) para a prévia da home
 #   mapa/icons/*.png              blips do jogo usados pelo site (só os usados)
 #   mapa/map-data.js              pontos, áreas e rótulos (coordenadas já em pixel do map.png)
@@ -21,7 +21,10 @@ MAP_PNG = SRV / 'havok_map/assets/map.png'
 BLIPS = SRV / 'havok_map/assets/blips'
 
 TILE = 256
-MAX_Z = 4  # 256 · 2^4 = 4096
+MAX_Z = 4  # 256 · 2^4 = 4096 (projeção dos pontos: px do map.png)
+# zoom 5 mais nítido: foto de satélite do continente, 1 px por metro (mundo −3000..+3000 = px 1096..7096 no z5)
+CONT_PNG = pathlib.Path.home() / 'MTA-Server/build/mapafoto/para-site/havok-mapa-satelite-6000-continente.png'
+TILE_Z = 5 if CONT_PNG.exists() else MAX_Z
 
 
 def to_px(x, y):
@@ -518,7 +521,7 @@ def build_data():
 
     data = {
         'version': 1,
-        'image': 4096, 'tile': TILE, 'maxNativeZoom': MAX_Z,
+        'image': 4096, 'tile': TILE, 'maxNativeZoom': MAX_Z, 'tileMaxZoom': TILE_Z,
         'world': {'min': -4096, 'max': 4096, 'note': 'px = (x + 4096) / 2, py = (4096 - y) / 2'},
         'categories': [{'id': c, 'name': {'pt': pt, 'en': en}, 'icon': ic, 'color': col, 'count': counts.get(c, 0)}
                        for c, pt, en, ic, col in CATEGORIES],
@@ -562,6 +565,23 @@ def build_tiles():
             for ty in range(2 ** z):
                 level.crop((tx * TILE, ty * TILE, (tx + 1) * TILE, (ty + 1) * TILE)).save(d / f'{ty}.webp', 'WEBP', quality=82, method=6)
                 n += 1
+    if TILE_Z > MAX_Z:
+        # z5 = map.png ampliado 2× (mar e ilhas) com o continente nítido colado por cima
+        Image.MAX_IMAGE_PIXELS = None
+        size = TILE * 2 ** TILE_Z
+        level = img.resize((size, size), Image.LANCZOS)
+        cont = Image.open(CONT_PNG).convert('RGB')
+        if cont.size != (6000, 6000):
+            sys.exit(f'continente com tamanho inesperado: {cont.size}')
+        level.paste(cont, (1096, 1096))
+        cont.close()
+        for tx in range(2 ** TILE_Z):
+            d = tiles_dir / str(TILE_Z) / str(tx)
+            d.mkdir(parents=True, exist_ok=True)
+            for ty in range(2 ** TILE_Z):
+                level.crop((tx * TILE, ty * TILE, (tx + 1) * TILE, (ty + 1) * TILE)).save(d / f'{ty}.webp', 'WEBP', quality=80, method=6)
+                n += 1
+        level = None
     img.resize((800, 800), Image.LANCZOS).save(OUT / 'preview.webp', 'WEBP', quality=80, method=6)
     total = sum(f.stat().st_size for f in tiles_dir.rglob('*.webp'))
     print(f'tiles: {n} arquivos, {total / 1024 / 1024:.1f} MB; preview.webp {(OUT / "preview.webp").stat().st_size // 1024} KB')
