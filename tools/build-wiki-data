@@ -1,0 +1,642 @@
+#!/usr/bin/env python3
+"""Gera o data.js da wiki a partir do código do jogo (HAVOK, MTA) + tools/wiki-texts.json.
+
+    tools/build-wiki-data                 # lê ~/MTA-Server, escreve data.js e copia ícones novos para icons/
+    tools/build-wiki-data --check         # só confere (não escreve nada) e lista o que mudou/falta
+    tools/build-wiki-data --havok <pasta [HAVOK]> --deploy <pasta build/deploy-heavyhost>
+
+Precisa de: python3, lua5.1 (ou luajit) e Pillow (para copiar os ícones). Ver tools/WIKI-DATA.md.
+Os números (receitas, dano, pilha, loot, loja, missões, veículos...) vêm SEMPRE do jogo; os textos (nomes, descrições,
+guias, FAQ) vêm do wiki-texts.json. Nada do anticheat/staff é lido nem publicado.
+"""
+import argparse
+import glob
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import unicodedata
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SITE = os.path.dirname(HERE)
+HOME = os.path.expanduser('~')
+DEF_HAVOK = os.path.join(HOME, 'MTA-Server/mods/deathmatch/resources/[HAVOK]')
+DEF_DEPLOY = os.path.join(HOME, 'MTA-Server/build/deploy-heavyhost')
+
+ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+ap.add_argument('--havok', default=DEF_HAVOK, help='pasta resources/[HAVOK] do servidor local')
+ap.add_argument('--deploy', default=DEF_DEPLOY, help='pasta build/deploy-heavyhost (o que já subiu para o oficial)')
+ap.add_argument('--texts', default=os.path.join(HERE, 'wiki-texts.json'))
+ap.add_argument('--out', default=os.path.join(SITE, 'data.js'))
+ap.add_argument('--check', action='store_true', help='não escreve nada')
+args = ap.parse_args()
+
+report = {'warn': [], 'icons_copied': [], 'icons_missing': [], 'new_items': []}
+
+
+def warn(msg):
+    report['warn'].append(msg)
+
+
+# ------------------------------------------------------------------ 1. lê o jogo (Lua)
+def run_dump():
+    lua = shutil.which('lua5.1') or shutil.which('luajit') or shutil.which('lua')
+    if not lua:
+        sys.exit('preciso do lua5.1 (ou luajit) no PATH')
+    r = subprocess.run([lua, os.path.join(HERE, 'wiki-dump.lua'), args.havok], capture_output=True)
+    if r.returncode != 0:
+        sys.exit('wiki-dump.lua falhou:\n' + r.stderr.decode(errors='replace'))
+    d = json.loads(r.stdout.decode('utf-8'))
+    for w in (d.get('warnings') or []):
+        warn('lua: ' + w)
+    return d
+
+
+G = run_dump()
+T = json.load(open(args.texts, encoding='utf-8'))
+DEP = os.path.join(args.havok, '[dependencies]')
+GM_IMG = os.path.join(args.havok, 'gamemode/files/images')
+
+# configs simples do servidor (só as chaves públicas; o arquivo tem senha, que NÃO entra)
+SETTINGS_PUBLIC = ['Minutos a cada airdrop', 'Minutos a cada heli atirador', 'horas decay', 'Dano Decay',
+                   'Minutos para nascer na cama', 'Minutos para respawnar farm', 'Minutos para respawnar veiculos',
+                   'Limite de itens no mesmo spawn']
+settings = {}
+try:
+    raw = json.load(open(os.path.join(DEP, 'havok_settings/serverSettings.json'), encoding='utf-8'))
+    raw = raw[0] if isinstance(raw, list) else raw
+    settings = {k: raw[k] for k in SETTINGS_PUBLIC if k in raw}
+except Exception as e:  # noqa
+    warn('serverSettings.json: %s' % e)
+
+# ------------------------------------------------------------------ 2. o que já está no oficial
+# Scripts do oficial vão compilados/cifrados (não dá nem se deve ler). A comparação usa o que é aberto:
+#  - quais resources existem no pacote do HeavyHost (deathmatch/ + atualizacao-*/LISTA.txt);
+#  - quais imagens de item existem no gamemode que subiu;
+#  - a lista manual T['soon'] (o que mudou dentro de scripts e ainda não subiu).
+official_res = set()
+official_img = set()
+mirror = os.path.join(args.deploy, 'deathmatch/resources/[HAVOK]')
+for sub in ['[dependencies]', '[dependencies]/[havok_maps]']:
+    d = os.path.join(mirror, sub)
+    if os.path.isdir(d):
+        official_res.update(os.listdir(d))
+for lista in glob.glob(os.path.join(glob.escape(args.deploy), 'atualizacao-*', 'LISTA.txt')):
+    for line in open(lista, encoding='utf-8'):
+        line = line.strip().rstrip('/')
+        if line:
+            official_res.add(line.split('/')[-1])
+for base in [mirror] + sorted(glob.glob(os.path.join(glob.escape(args.deploy), 'atualizacao-*', 'resources', '[[]HAVOK]'))):
+    imgdir = os.path.join(base, 'gamemode/files/images')
+    for dp, _, fs in os.walk(imgdir):
+        for f in fs:
+            official_img.add(os.path.relpath(os.path.join(dp, f), imgdir))
+local_res = set(os.listdir(DEP))
+local_only_res = sorted(r for r in local_res - official_res if r.startswith('havok_'))
+if not official_res:
+    warn('não achei o pacote do oficial em %s: nada vai receber "em breve" automático' % args.deploy)
+
+SOON = T.get('soon', {})
+soon_items = set(SOON.get('items', []))
+
+
+def icon_is_local_only(icon):
+    if not icon or not official_img:
+        return False
+    if icon.startswith(':'):
+        res = icon[1:].split('/')[0]
+        return res in local_only_res
+    return icon not in official_img and icon.replace(' ', '_') not in official_img
+
+
+# ------------------------------------------------------------------ 3. ajudas
+def slug(s):
+    s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode()
+    return re.sub(r'[^a-z0-9]+', '-', s.lower()).strip('-')
+
+
+ITEMS = G['items']
+OBJS = G['objects']
+TR = G['translations']
+TI = T['items']
+CLOTHES = G['clothes']
+
+MENU = {}  # item -> categoria do menu de blueprints
+for cat in G['blueprints']:
+    for k in cat['items']:
+        MENU[k] = cat['category']
+BENCH_CATS = {'weapons', 'ammunition', 'explosives', 'misc2'}
+LOOT_BOXES = {'default-barrel', 'industrial-barrel', 'flammable-barrel', 'default-box', 'military-box', 'military-barrel'}
+PIECES = {'Fundação': 'foundation', 'Fundação Triangular': 'foundation-triangular', 'Meia Fundação': 'foundation-div',
+          'Parede': 'wall', 'Meia Parede': 'wall-div', 'Parede para Porta': 'wallport', 'Janela': 'window',
+          'Escadas': 'stairs', 'Portão': 'gate', 'Porta': 'door', 'Teto': 'ceiling', 'Meio Teto': 'ceiling-div',
+          'Teto Triangular': 'ceiling-triangular', 'Floorport': 'ceiling-stairs'}
+
+PIECES_CI = {k.lower(): v for k, v in PIECES.items()}
+TIER_WORDS = ['palito', 'madeira', 'pedra', 'ferro', 'blindad']
+
+# chave do jogo -> id da wiki (itens e construções)
+KEYS = [k for k in ITEMS if ':BLUEPRINT' not in k and k not in CLOTHES]
+KEYS += [k for k in OBJS if k not in LOOT_BOXES]
+KEYS = sorted(set(KEYS))
+id_of = {}
+for k in KEYS:
+    if k in TI and TI[k].get('id'):
+        id_of[k] = TI[k]['id']
+    else:
+        en = (TR.get(k) or {}).get('name', {}).get('en') or k
+        id_of[k] = slug(en)
+        report['new_items'].append(k)
+dupes = {}
+for k, i in id_of.items():
+    dupes.setdefault(i, []).append(k)
+for i, ks in dupes.items():
+    if len(ks) > 1:
+        sys.exit('id repetido %s: %s (ajuste em wiki-texts.json)' % (i, ks))
+cos_slug = {k: slug((c.get('name') or {}).get('en') or k) for k, c in CLOTHES.items()}
+
+
+def ref(name, qty=None):
+    """item do jogo -> {id, qty} (aceita 'Item:BLUEPRINT' e roupas do personagem)"""
+    out = {}
+    if name.endswith(':BLUEPRINT'):
+        base = name[:-len(':BLUEPRINT')]
+        if base in id_of:
+            out = {'id': id_of[base], 'bp': True}
+    elif name in id_of:
+        out = {'id': id_of[name]}
+    elif name in CLOTHES:
+        out = {'cosmetic': cos_slug[name]}
+    if not out:
+        warn('item desconhecido nas configs: %r' % name)
+        out = {'name': name}
+    if qty is not None:
+        out['qty'] = qty
+    return out
+
+
+def cost(lst):
+    rec, lvl = [], None
+    for name, n in (lst or []):
+        if name == 'Level':
+            lvl = n
+        else:
+            r = ref(name, n)
+            if 'id' in r:
+                rec.append({'id': r['id'], 'qty': n})
+    return rec, lvl
+
+
+# ------------------------------------------------------------------ 4. de onde sai cada item
+sources = {}       # chave -> [fonte]
+bp_sources = {}    # chave -> [fonte] (blueprint que cai pronta)
+
+
+def add_src(item, src):
+    if item.endswith(':BLUEPRINT'):
+        base = item[:-len(':BLUEPRINT')]
+        bp_sources.setdefault(base, [])
+        if src not in bp_sources[base]:
+            bp_sources[base].append(src)
+        return
+    sources.setdefault(item, [])
+    if src not in sources[item]:
+        sources[item].append(src)
+
+
+for box in ['default-barrel', 'industrial-barrel', 'flammable-barrel', 'default-box', 'military-box', 'military-barrel']:
+    for e in (G['loot'] or {}).get(box, []):
+        if e[1] and e[1] > 0:
+            add_src(e[0], box)
+for e in (G['helicopter'] or []):
+    if e[1] and e[1] > 0:
+        add_src(e[0], 'helicopter')
+for e in (G['airdrop'].get('loot') or []):
+    if e[1] and e[1] > 0:
+        add_src(e[0], 'airdrop')
+for e in (G['hospital'].get('loot') or []):
+    add_src(e[0], 'hospital')
+FARM_SRC = {'Tree': 'tree', 'Stone': 'rock', 'Iron': 'iron-rock', 'Sulphur': 'sulfur-rock'}
+for kind, f in G['farms'].items():
+    for it in f['items']:
+        add_src(it, FARM_SRC.get(kind, kind.lower()))
+for name in list(sources) + list(bp_sources):
+    if name not in ITEMS and name not in OBJS and name not in CLOTHES:
+        warn('item que não existe no jogo numa tabela de loot: %r (erro de digitação na config?)' % name)
+        sources.pop(name, None)
+        bp_sources.pop(name, None)
+SRC_ORDER = ['tree', 'rock', 'iron-rock', 'sulfur-rock', 'planter', 'fill', 'cook', 'default-barrel', 'industrial-barrel',
+             'flammable-barrel', 'default-box', 'military-box', 'military-barrel', 'hospital', 'helicopter', 'airdrop']
+
+
+def order_src(lst):
+    return sorted(set(lst), key=lambda s: SRC_ORDER.index(s) if s in SRC_ORDER else 99)
+
+
+# loja
+shop_of = {}
+shop_cats = []
+SHOP_CAT = T.get('shopCategories', {})
+for cat in G['shop'] or []:
+    cid = slug(cat['Categoria'])
+    entries = []
+    for it in cat['Itens']:
+        r = ref(it['Nome'])
+        e = dict(r, price=it['Valor'], qty=it['Quantidade'])
+        if it.get('Roupa'):
+            e['tier'] = it.get('Tier')
+        entries.append(e)
+        if it['Nome'] in id_of:
+            shop_of[it['Nome']] = {'price': it['Valor'], 'qty': it['Quantidade'], 'cat': cid}
+    shop_cats.append({'id': cid, 'name': SHOP_CAT.get(cid, {'en': cat['Categoria'].title(), 'pt': cat['Categoria'].title()}),
+                      'items': entries})
+
+# missões
+missions = []
+reward_of = {}
+bp_reward_of = {}
+need_of = {}
+MT = T.get('missions', {})
+for idx, m in enumerate(G['missions']['list'] or [], 1):
+    mt = MT.get(str(idx), {})
+    name_pt = re.sub(r'^\[Lvl \d+\]\s*', '', m.get('name', ''))
+    req = [ref(k, v) for k, v in sorted((m.get('requiredItems') or {}).items())]
+    rew = [ref(k, v) for k, v in sorted((m.get('rewardItems') or {}).items())]
+    missions.append({'id': idx, 'name': {'pt': mt.get('pt', name_pt), 'en': mt.get('en', name_pt)},
+                     'level': m.get('levelRequired') or None, 'xp': m.get('xpBonus', 0),
+                     'disabled': bool(m.get('Disabled')), 'requires': req, 'rewards': rew})
+    if not m.get('Disabled'):
+        for k in (m.get('rewardItems') or {}):
+            if k.endswith(':BLUEPRINT'):
+                bp_reward_of.setdefault(k[:-len(':BLUEPRINT')], []).append(idx)
+            else:
+                reward_of.setdefault(k, []).append(idx)
+        for k in (m.get('requiredItems') or {}):
+            need_of.setdefault(k, []).append(idx)
+
+# ------------------------------------------------------------------ 5. ícones
+ICON_DIR = os.path.join(SITE, 'icons')
+
+
+def game_icon_path(icon):
+    if not icon:
+        return None
+    if icon.startswith(':'):
+        res, rest = icon[1:].split('/', 1)
+        cands = [os.path.join(DEP, res, rest)]
+    else:
+        cands = [os.path.join(GM_IMG, icon), os.path.join(GM_IMG, icon.replace(' ', '_'))]
+    for c in cands:
+        if os.path.isfile(c):
+            return c
+    return None
+
+
+def copy_icon(src, dst):
+    if args.check:
+        return
+    try:
+        from PIL import Image
+        im = Image.open(src).convert('RGBA')
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        # paleta de 256 cores com transparência (igual aos ícones antigos): ~1/3 do tamanho, sem diferença a 128 px
+        im = im.quantize(colors=256, method=Image.Quantize.FASTOCTREE)
+        im.save(dst, optimize=True)
+    except ImportError:
+        shutil.copyfile(src, dst)
+
+
+def wiki_icon(key, iid, game_icon):
+    rel = 'icons/%s.png' % iid
+    if os.path.isfile(os.path.join(SITE, rel)):
+        return rel
+    if (TI.get(key) or {}).get('icon') is False:
+        return None
+    src = game_icon_path(game_icon)
+    if src:
+        copy_icon(src, os.path.join(SITE, rel))
+        report['icons_copied'].append('%s <- %s' % (rel, os.path.relpath(src, args.havok)))
+        return rel
+    report['icons_missing'].append(key)
+    return None
+
+
+# ------------------------------------------------------------------ 6. itens
+SPEED = lambda s: 'fast' if s <= 20 else 'medium' if s <= 40 else 'slow' if s <= 100 else 'very-slow'
+
+
+def limit_text(lim):
+    if lim is None:
+        return None
+    if isinstance(lim, (int, float)):
+        return {'en': str(int(lim)), 'pt': str(int(lim))}
+    a = lim[0]
+    # a cada quantos levels sobe e quanto
+    step = None
+    for every in (2, 4, 20):
+        if len(lim) > every and lim[every - 1] > a and all(lim[i] == lim[i - 1] for i in range(1, every - 1)):
+            step = every
+            break
+    if not step:
+        return {'en': str(a), 'pt': str(a)}
+    inc = lim[step - 1] - a
+    return {'en': '%d + %d every %d levels' % (a, inc, step), 'pt': '%d + %d a cada %d níveis' % (a, inc, step)}
+
+
+items = []
+by_key = {}
+for key in KEYS:
+    iid = id_of[key]
+    cur = TI.get(key, {})
+    gi = ITEMS.get(key)
+    ob = OBJS.get(key)
+    tr = TR.get(key) or {}
+    name = cur.get('name') or tr.get('name') or {'en': key, 'pt': key}
+    desc = cur.get('desc') or tr.get('desc') or {'en': '', 'pt': ''}
+    it = {'id': iid, 'key': key, 'cat': cur.get('cat') or 'components', 'type': cur.get('type') or 'Item',
+          'name': {'en': name.get('en') or key, 'pt': name.get('pt') or name.get('en') or key},
+          'desc': {'en': desc.get('en') or '', 'pt': desc.get('pt') or desc.get('en') or ''}}
+    if not cur:
+        warn('sem texto curado em wiki-texts.json: %s (usei o do jogo)' % key)
+    if ob and ob.get('baseItem'):
+        it['piece'] = PIECES_CI.get((ob.get('Type') or '').lower())
+        if not it['piece']:
+            warn('tipo de peça desconhecido: %s (%s)' % (ob.get('Type'), key))
+        # material pelo nome (o objLevel do jogo tem erro em algumas peças)
+        tier = next((i for i, m in enumerate(TIER_WORDS) if m in key.lower()), ob.get('objLevel'))
+        it['tier'] = tier
+        it['icon'] = None
+        rec, lvl = cost(ob.get('craftingCusto'))
+        it['recipe'] = rec
+        it['level'] = lvl
+        it['hp'] = ob.get('maxHealth')
+        evo = ob.get('evolutionTo')
+        if evo:
+            it['upgradeTo'] = id_of.get(evo[0] if isinstance(evo, list) else evo)
+    elif ob:
+        it['icon'] = wiki_icon(key, iid, ob.get('icon'))
+        it['stack'] = None
+        if key in MENU:
+            rec, lvl = cost(ob.get('craftingCusto'))
+            it['recipe'] = rec
+            it['level'] = lvl
+            it['bench'] = False
+        it['hp'] = ob.get('maxHealth')
+        if ob.get('maxSlots'):
+            it['slots'] = ob['maxSlots']
+        lim = limit_text(ob.get('limit') if ob.get('limit') is not None else ob.get('limitByLevel'))
+        if key == 'Cama':
+            lim = {'en': '1 (VIP: 2 to 4)', 'pt': '1 (VIP: 2 a 4)'}
+        if lim:
+            it['limit'] = lim
+        evo = ob.get('evolutionTo')
+        if isinstance(evo, str):
+            it['upgradeTo'] = id_of.get(evo)
+    else:
+        it['icon'] = wiki_icon(key, iid, gi.get('icon'))
+        it['stack'] = gi.get('maxStack')
+        if key in MENU:
+            rec, lvl = cost(gi.get('craft'))
+            it['recipe'] = rec
+            it['level'] = lvl
+            it['bench'] = MENU[key] in BENCH_CATS
+            if (key + ':BLUEPRINT') in ITEMS:
+                it['blueprint'] = gi.get('research') or 0
+        w = gi.get('weapon')
+        if w and w.get('damage'):
+            # dano em %% do sangue máximo (15 000) por acerto; explosivo de arremesso (dano gigante) fica sem número
+            dmg = w['damage']
+            am = gi.get('ammo') or {}
+            it['weapon'] = {'damage': round(dmg / 150) if dmg < 50000 else None, 'range': w['distance'],
+                            'mag': am.get('magSize'), 'ammo': id_of.get(am.get('name'))}
+        if gi.get('recycler'):
+            it['recycler'] = [r for r in (ref(n, q) for n, q in gi['recycler']) if 'id' in r]
+        if gi.get('receive') and gi['receive'] > 1 and it.get('recipe') is not None:
+            it['receive'] = gi['receive']
+        # armas que usam esta munição (lido da própria arma, não do texto 'ammoTo')
+        users = [k2 for k2 in TI if k2 in ITEMS and (ITEMS[k2].get('ammo') or {}).get('name') == key]
+        users += sorted(k2 for k2 in ITEMS if (ITEMS[k2].get('ammo') or {}).get('name') == key and k2 not in users)
+        if users:
+            it['ammoFor'] = [id_of[x] for x in users if x in id_of]
+        f = gi.get('furnace')
+        if f and f.get('receive'):
+            it['furnace'] = {'to': id_of.get(f['receive'][0]), 'speed': SPEED(f.get('speed') or 0)}
+        if gi.get('equipSlot'):
+            it['equip'] = gi['equipSlot']
+        if gi.get('backpackBonus'):
+            it['bonus'] = gi['backpackBonus']
+        if gi.get('durability'):
+            it['durability'] = gi['durability']
+    src = (sources.get(key) or []) + (cur.get('sources') or [])
+    if src:
+        it['sources'] = order_src(src)
+    if bp_sources.get(key):
+        it['bpSources'] = order_src(bp_sources[key])
+    if key in shop_of:
+        it['shop'] = shop_of[key]
+    if reward_of.get(key):
+        it['rewardOf'] = reward_of[key]
+    if bp_reward_of.get(key):
+        it['bpRewardOf'] = bp_reward_of[key]
+    if need_of.get(key):
+        it['neededBy'] = need_of[key]
+    soon = key in soon_items or icon_is_local_only((gi or ob or {}).get('icon'))
+    if soon:
+        it['soon'] = True
+    if cur.get('note'):
+        it['note'] = cur['note']
+    items.append(it)
+    by_key[key] = it
+
+# usado em (receitas que pedem o item)
+used = {}
+for it in items:
+    for r in it.get('recipe') or []:
+        used.setdefault(r['id'], []).append(it['id'])
+for it in items:
+    if used.get(it['id']):
+        it['usedIn'] = sorted(set(used[it['id']]))
+
+# ordem: a do texto curado (mantém a ordem antiga da wiki), novos no fim de cada categoria
+order = {k: i for i, k in enumerate(TI.keys())}
+CAT_ORDER = ['weapons', 'ammo', 'tools', 'resources', 'components', 'food-medical', 'armor-clothing', 'clothing',
+             'constructions', 'building']
+items.sort(key=lambda it: (CAT_ORDER.index(it['cat']) if it['cat'] in CAT_ORDER else 99, order.get(it['key'], 9999)))
+
+# ------------------------------------------------------------------ 7. cosméticos (roupas do personagem + mochilas)
+COS_CATS = [('shirts', 'torso'), ('pants', 'legs'), ('shoes', 'feet'), ('caps', 'head'), ('masks', 'mask'),
+            ('glasses', 'glasses')]
+apparel_price = {}
+for cat in G['shop'] or []:
+    for it in cat['Itens']:
+        if it.get('Roupa'):
+            apparel_price[it['Nome']] = it['Valor']
+air_clothes = {c[0] for c in (G['airdrop'].get('clothes') or [])}
+lc = G.get('lootClothing') or {}
+tier_boxes = {}
+for box, ch in (lc.get('chance') or {}).items():
+    if not ch:
+        continue
+    weights = (lc.get('tiers') or {}).get(box) or (lc.get('tiers') or {}).get('default') or {}
+    for tier, w in weights.items():
+        if w:
+            tier_boxes.setdefault(tier, []).append(box)
+custom_soon = 'havok_custom' in local_only_res
+cos_out = []
+COS_NAMES = T.get('cosmeticCategories', {})
+for cid, slot in COS_CATS:
+    entries = []
+    for k in G.get('clothesOrder') or sorted(CLOTHES):
+        c = CLOTHES.get(k)
+        if not c or c.get('slot') != slot:
+            continue
+        s = cos_slug[k]
+        where = []
+        if k in apparel_price:
+            where.append('shop')
+        if c.get('tier') in tier_boxes:
+            where.append('loot')
+        if k in air_clothes or c.get('tier') == 'rare':
+            where.append('airdrop')
+        e = {'id': s, 'key': k, 'name': {'pt': c['name'].get('pt') or k, 'en': c['name'].get('en') or k}, 'tier': c.get('tier'),
+             'where': where}
+        if k in apparel_price:
+            e['price'] = apparel_price[k]
+        if c.get('tier') in tier_boxes:
+            e['lootFrom'] = order_src(tier_boxes[c['tier']])
+        if not c.get('female'):
+            e['maleOnly'] = True
+        src = game_icon_path(c.get('icon'))
+        if src:
+            rel = 'icons/cosmetics/%s.png' % s
+            if not os.path.isfile(os.path.join(SITE, rel)):
+                copy_icon(src, os.path.join(SITE, rel))
+                report['icons_copied'].append(rel)
+            e['image'] = rel
+        if custom_soon:
+            e['soon'] = True
+        entries.append(e)
+    cos_out.append({'id': cid, 'name': COS_NAMES.get(cid, {'en': cid, 'pt': cid}), 'items': entries})
+bps = []
+for k, b in sorted((G.get('backpacks') or {}).items(), key=lambda kv: (kv[1].get('bonus', 0), kv[0])):
+    if k in by_key:
+        it = by_key[k]
+        e = {'id': it['id'], 'key': k, 'name': it['name'], 'bonus': b.get('bonus'), 'item': it['id'], 'image': it.get('icon'),
+             'where': [w for w in (['craft'] if it.get('recipe') else []) + (['loot'] if any(s in LOOT_BOXES for s in it.get('sources', [])) else [])
+                       + (['airdrop'] if 'airdrop' in it.get('sources', []) else [])]}
+        if it.get('soon'):
+            e['soon'] = True
+        bps.append(e)
+cos_out.append({'id': 'backpacks', 'name': COS_NAMES.get('backpacks', {'en': 'Backpacks', 'pt': 'Mochilas'}), 'items': bps})
+TIERS = T.get('cosmeticTiers', {})
+
+# ------------------------------------------------------------------ 8. veículos
+TV = T.get('vehicles', {})
+vehicles = []
+for vid, v in sorted(G['vehicles'].items(), key=lambda kv: (TV.get(kv[0], {}).get('name') or kv[0])):
+    tv = TV.get(vid)
+    if not tv:
+        warn('veículo %s sem nome/categoria em wiki-texts.json (ficou de fora)' % vid)
+        continue
+    st = v.get('spawnType')
+    st = ','.join(st) if isinstance(st, list) else st
+    mult = (G.get('vehicleArmor') or {}).get(vid)
+    vehicles.append({'id': int(vid), 'name': tv['name'], 'cat': tv['cat'], 'spawn': st, 'tires': v.get('maxTire', 0),
+                     'engine': v.get('maxEngine', 0), 'battery': v.get('maxBattery', 0), 'fuel': v.get('maxFuel', 0),
+                     'max': v.get('maxInServer', 0), 'slots': v.get('maxSlots', 0), 'armored': mult is not None,
+                     'armor': round((1 - mult) * 100) if mult is not None else 0})
+for vid in TV:
+    if vid not in G['vehicles']:
+        report['warn'].append('veículo %s está no wiki-texts.json mas não existe mais no jogo (saiu da wiki)' % vid)
+
+# ------------------------------------------------------------------ 9. sistemas (para guias/páginas novas)
+vip = []
+for i, t in enumerate(G.get('vipTiers') or [], 1):
+    vip.append({'tier': i, 'name': t['name'], 'xp': round(t['xp'] * 100), 'beds': t['beds'], 'bedWait': t['bedTime'],
+                'baseFloor': t['base'] or None, 'halfUpkeep': bool(t['upkeep']), 'spawnTools': bool(t['tools']),
+                'craftDiscount': round((1 - t['craft']) * 100), 'slots': G['equip'].get('vipSlots')})
+kit = {k: [ref(e['name'], e['quantity']) for e in v] for k, v in (G.get('kit') or {}).items()}
+wipe = G.get('wipe') or {}
+airdrop = {'every': settings.get('Minutos a cada airdrop'), 'points': G['airdrop'].get('points'),
+           'landSeconds': 270, 'slots': 21, 'mode': G['airdrop'].get('mode'),
+           'loot': [dict(ref(n), chance=c) for n, c in (G['airdrop'].get('loot') or [])],
+           'rareClothes': [cos_slug[n] for n, _ in (G['airdrop'].get('clothes') or []) if n in cos_slug]}
+systems = {
+    'inventory': {'base': G['equip'].get('baseSlots'), 'vip': G['equip'].get('vipSlots'), 'max': G['equip'].get('maxSlots'),
+                  'equipSlots': G['equip'].get('slotCount')},
+    'vip': vip,
+    'kit': kit,
+    'airdrop': airdrop,
+    'wipe': {'pvpHours': wipe.get('pvpHours'), 'everyDays': wipe.get('everyDays'),
+             'prizeHours': [p.get('hours') for p in (wipe.get('prize') or [])]},
+    'safezone': {'zones': len((G.get('safezone') or {}).get('zones') or []),
+                 'leaveSeconds': ((G.get('safezone') or {}).get('leaveMs') or 0) // 1000,
+                 'noBuild': (G.get('safezone') or {}).get('noBuild')},
+    'radiation': {'points': G.get('radiationPoints'), 'radius': 25},
+    'walkie': {'key': (G.get('walkie') or {}).get('KEY', 'b').upper(), 'talk': (G.get('walkie') or {}).get('PTT_KEY', 'x').upper(),
+               'freqMin': (G.get('walkie') or {}).get('FREQ_MIN'), 'freqMax': (G.get('walkie') or {}).get('FREQ_MAX'),
+               'freqDefault': (G.get('walkie') or {}).get('FREQ_DEFAULT'), 'text': '/' + (G.get('walkie') or {}).get('TEXT_CMD', 'r'),
+               'textMax': (G.get('walkie') or {}).get('TEXT_MAX')},
+    'missionNpcs': len(G['missions'].get('npcs') or []),
+    'baseLimit': G.get('baseLimit'),
+    'timers': {'airdropMinutes': settings.get('Minutos a cada airdrop'), 'heliMinutes': settings.get('Minutos a cada heli atirador'),
+               'decayHours': settings.get('horas decay'), 'decayDamage': settings.get('Dano Decay'),
+               'bedMinutes': settings.get('Minutos para nascer na cama'), 'farmRespawnMinutes': settings.get('Minutos para respawnar farm'),
+               'vehicleRespawnMinutes': settings.get('Minutos para respawnar veiculos'), 'lootPerContainer': settings.get('Limite de itens no mesmo spawn')},
+    'globalChat': G.get('globalChat'),
+    'soonFeatures': SOON.get('features', []),
+}
+
+# ------------------------------------------------------------------ 10. guias (marcam "em breve" pelo texto curado)
+guides = T['guides']
+faq = T['faq']
+media = T.get('media', [])
+keys = T.get('keys', [])
+
+WIKI = {
+    'meta': {'items': len(items), 'cosmetics': sum(len(c['items']) for c in cos_out),
+             'source': 'tools/build-wiki-data (jogo + tools/wiki-texts.json)'},
+    'items': items, 'guides': guides, 'faq': faq, 'media': media, 'vehicles': vehicles,
+    'categories': T.get('categories', []), 'types': T.get('types', {}), 'sourceNames': T.get('sourceNames', {}),
+    'cosmetics': cos_out, 'cosmeticTiers': TIERS, 'shop': shop_cats, 'missions': missions,
+    'missionNpcs': T.get('missionNpcs', []), 'keys': keys, 'systems': systems,
+}
+
+HEADER = '''// GERADO por tools/build-wiki-data (não edite à mão: mude tools/wiki-texts.json ou o jogo e rode de novo).
+// Formato (o app.js lê window.WIKI):
+//   items[]      id, key (nome no jogo), cat, type, name{en,pt}, desc{en,pt}, icon, stack, recipe[{id,qty}], level, bench,
+//                blueprint (custo na Mesa de Pesquisa; 0 = só achando), weapon{damage % do sangue,range,mag,ammo}, recycler[],
+//                sources[], usedIn[], receive, ammoFor[], furnace{to,speed}, hp, slots, limit{en,pt}, piece, tier, upgradeTo
+//     novos:     soon (true = só no servidor local, selo "em breve"), shop{price,qty,cat} (preço em Scrap Metal),
+//                rewardOf[] / bpRewardOf[] / neededBy[] (ids de missions), bpSources[] (onde a blueprint cai pronta), equip (espaço do
+//                corpo 1-10), bonus (espaços extras da mochila), durability (colete/capacete), note{en,pt}
+//   guides[], faq{en,pt}, media[], vehicles[] (iguais aos de antes)
+//   novos:       meta, categories[], types{}, sourceNames{}, cosmetics[{id,name,items[{id,key,name,tier,where[],price,lootFrom[],
+//                image,maleOnly,soon}]}], cosmeticTiers{}, shop[{id,name,items[{id|cosmetic,price,qty}]}],
+//                missions[{id,name,level,xp,disabled,requires[],rewards[]}], missionNpcs[], keys[], systems{}
+'''
+
+js = HEADER + 'window.WIKI = ' + json.dumps(WIKI, ensure_ascii=False, separators=(',', ':')) + ';\n'
+
+# ------------------------------------------------------------------ 11. saída
+old = None
+if os.path.isfile(args.out):
+    old = open(args.out, encoding='utf-8').read()
+if not args.check:
+    open(args.out, 'w', encoding='utf-8').write(js)
+
+print('itens: %d (%d em breve) · cosméticos: %d · missões: %d · veículos: %d · guias: %d' % (
+    len(items), sum(1 for i in items if i.get('soon')), WIKI['meta']['cosmetics'], len(missions), len(vehicles), len(guides)))
+print('resources só no local: %s' % ', '.join(local_only_res))
+if report['new_items']:
+    print('itens novos sem texto curado (escreva em wiki-texts.json):', ', '.join(report['new_items']))
+if report['icons_copied']:
+    print('ícones %s do jogo: %d' % ('a copiar' if args.check else 'copiados', len(report['icons_copied'])))
+if report['icons_missing']:
+    print('sem ícone no jogo (icon = null):', ', '.join(report['icons_missing']))
+for w in report['warn']:
+    print('AVISO:', w)
+if args.check:
+    print('(--check: nada foi escrito; data.js %s)' % ('igual' if old == js else 'MUDARIA'))
