@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mapa HAVOK — demo</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="mapa.css">
+  <style>
+    /* só a página de teste; o site real usa o layout do app.js */
+    body { min-height: 100dvh; }
+    .demo { max-width: 1440px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+    .demo-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 14px; color: var(--muted); }
+    .demo-bar b { font: 600 16px var(--title); letter-spacing: .08em; text-transform: uppercase; color: var(--text); margin-right: 6px; }
+    .demo-bar button {
+      background: var(--card); color: var(--text); border: 1px solid var(--line2); border-radius: 8px;
+      padding: 6px 11px; font: 600 13px var(--font); cursor: pointer;
+    }
+    .demo-bar button.on { border-color: var(--accent); color: var(--accent); }
+    .demo-full { height: min(78dvh, 820px); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+    .demo-row { display: grid; grid-template-columns: minmax(0, 420px) 1fr; gap: 16px; align-items: start; }
+    .demo-prev { height: 260px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+    .demo-note { font-size: 13px; color: var(--dim); margin: 0; }
+    @media (max-width: 720px) {
+      .demo { padding: 0 0 16px; gap: 12px; }
+      .demo-bar { padding: 10px 12px 0; }
+      .demo-full { height: 82dvh; border-radius: 0; border-left: 0; border-right: 0; }
+      .demo-row { grid-template-columns: 1fr; padding: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="demo">
+    <div class="demo-bar">
+      <b>Mapa · demo</b>
+      <span>Idioma</span>
+      <button type="button" data-lang="pt" class="on">PT</button>
+      <button type="button" data-lang="en">EN</button>
+      <span>Airdrop simulado</span>
+      <button type="button" data-air="falling" class="on">caindo</button>
+      <button type="button" data-air="landed">no chão</button>
+      <button type="button" data-air="opened">aberto</button>
+      <button type="button" data-air="none">sem airdrop</button>
+      <button type="button" data-air="move">mudar lugar</button>
+    </div>
+    <div id="full" class="demo-full"></div>
+    <div class="demo-row">
+      <div id="prev" class="demo-prev"></div>
+      <p class="demo-note">Prévia da home (<code>compact: true</code>): sem filtros nem busca; clicar leva para <code>/mapa</code>.
+        O airdrop aqui é falso: a página intercepta <code>fetch('demo:airdrop')</code> e responde no formato da API
+        (<code>{state, x, y, at, id}</code>, coordenadas do mundo), e o mapa consulta a cada 3 s em vez de 20 s.
+        Abra com <code>python3 -m http.server</code> na raiz do site e vá para <code>/mapa/demo.html</code>.</p>
+    </div>
+  </main>
+
+  <script>
+    // airdrop falso para a demo (a API real responde igual)
+    (function () {
+      var spots = [[-315, 1090], [1300, 300], [-2160, -2350], [220, 1850], [2300, 40], [-1480, 2580], [700, -560]];
+      var i = 0;
+      window.DEMO_AIR = { state: 'falling', x: spots[0][0], y: spots[0][1], at: Date.now() - 95000, id: 41 };
+      window.demoMove = function () {
+        i = (i + 1) % spots.length;
+        DEMO_AIR.x = spots[i][0]; DEMO_AIR.y = spots[i][1]; DEMO_AIR.at = Date.now(); DEMO_AIR.id++;
+      };
+      var real = window.fetch.bind(window);
+      window.fetch = function (url, opt) {
+        if (url === 'demo:airdrop') {
+          var body = DEMO_AIR.state === 'none' ? { state: 'none' } : DEMO_AIR;
+          return Promise.resolve(new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } }));
+        }
+        return real(url, opt);
+      };
+    })();
+  </script>
+  <script src="mapa.js"></script>
+  <script>
+    var opts = { lang: 'pt', airdropUrl: 'demo:airdrop', airdropEvery: 3000 };
+    var maps = [];
+    HavokMap.mount('#full', opts).then(function (m) { maps.push(m); window.fullMap = m; setTimeout(function(){ var mm=m.map; document.body.setAttribute("data-dbg", JSON.stringify({z:mm.getZoom(), size:mm.getSize(), fit:mm.getBoundsZoom(L.latLngBounds(mm.unproject([520,3620],4),mm.unproject([3720,520],4))), min:mm.getMinZoom(), el:document.getElementById("full").clientWidth})); }, 3000); });
+    HavokMap.mount('#prev', Object.assign({}, opts, { compact: true })).then(function (m) { maps.push(m); });
+
+    document.querySelectorAll('[data-lang]').forEach(function (b) {
+      b.onclick = function () {
+        document.querySelectorAll('[data-lang]').forEach(function (x) { x.classList.toggle('on', x === b); });
+        maps.forEach(function (m) { m.setLang(b.dataset.lang); });
+      };
+    });
+    document.querySelectorAll('[data-air]').forEach(function (b) {
+      b.onclick = function () {
+        if (b.dataset.air === 'move') demoMove();
+        else {
+          DEMO_AIR.state = b.dataset.air;
+          DEMO_AIR.at = Date.now();
+          document.querySelectorAll('[data-air]').forEach(function (x) { x.classList.toggle('on', x === b); });
+        }
+      };
+    });
+  </script>
+</body>
+</html>
