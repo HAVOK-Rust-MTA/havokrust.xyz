@@ -1,14 +1,13 @@
 // Configuração do site HAVOK. Edite aqui sem mexer no resto.
 window.HAVOK = {
-  // convite do Discord (botão do topo, da Store e do rodapé)
+  // convite do Discord (botão do topo, da loja e do rodapé)
   discord: 'https://discord.gg/WZqhuFb2w5',
-  // lista de espera: URL do Worker (worker/README.md). Vazio = o contador não aparece.
-  // ex.: api: 'https://havok-waitlist.SEU-USUARIO.workers.dev/waitlist'
-  waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist', goal: 30 },
+  // lista de espera (encerrada): só o mural dos 15 fundadores na página de badges lê /waitlist/first
+  waitlist: { api: 'https://havok-waitlist.havokrust.workers.dev/waitlist' },
   // wipe: calendário oficial do Worker (o mesmo do Discord e do servidor). Sem wipe agendado, o contador não aparece.
   wipe: { api: 'https://havok-waitlist.havokrust.workers.dev/api/wipe/status' },
-  // ranking do wipe atual (o servidor do jogo manda a cada 5 min). Vazio = a seção não aparece.
-  ranking: { api: 'https://havok-waitlist.havokrust.workers.dev/api/ranking' },
+  // feed do Discord na home (abas Anúncios/Atualizações/Mídia; canais escolhidos com /site feed no Discord)
+  feed: { api: 'https://havok-waitlist.havokrust.workers.dev/api/feed' },
   // perfil / login com Discord: o Worker no subdomínio do site (o cookie do login só funciona no mesmo domínio).
   // Vazio = a página de perfil avisa que o login ainda não está disponível.
   account: { api: 'https://api.havokrust.xyz' },
@@ -21,7 +20,7 @@ window.HAVOK = {
       legendary: { brl: 90.00, usd: 15.99 },
     },
   },
-  // endereço do servidor MTA para a página /play e o card da home. Vazio = página sem o botão.
+  // endereço do servidor MTA: JOGAR AGORA (mtasa://IP), card de status da home e a página /play/
   server: '177.54.146.12:22360',
   // jogadores online (o Worker lê a lista pública do MTA). Vazio = sem a contagem.
   serverStatus: { api: 'https://havok-waitlist.havokrust.workers.dev/api/server' },

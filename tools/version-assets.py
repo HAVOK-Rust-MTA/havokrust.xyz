@@ -10,7 +10,7 @@ html = index.read_text(encoding='utf-8')
 
 def stamp(match):
     attr, name = match.group(1), match.group(2)
-    f = root / name
+    f = root / name.lstrip('/')  # caminhos absolutos (/app.js): o site tem rotas como /wiki/item/x
     if not f.is_file():
         return match.group(0)
     h = hashlib.sha256(f.read_bytes()).hexdigest()[:10]
