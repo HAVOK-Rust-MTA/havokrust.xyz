@@ -12,7 +12,7 @@
 # NÃO publica loot (havok_pickups/*.map) nem os pontos de airdrop: o site só mostra o airdrop atual, ao vivo.
 import argparse, json, math, pathlib, re, shutil, sys
 
-from PIL import Image
+from PIL import Image, ImageChops, ImageFilter
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'mapa'
@@ -521,7 +521,7 @@ def build_data():
 
     data = {
         'version': 1,
-        'image': 4096, 'tile': TILE, 'maxNativeZoom': MAX_Z, 'tileMaxZoom': TILE_Z,
+        'image': 4096, 'tile': TILE, 'maxNativeZoom': MAX_Z, 'tileMaxZoom': TILE_Z, 'tileVer': fundo_ver(),
         'world': {'min': -4096, 'max': 4096, 'note': 'px = (x + 4096) / 2, py = (4096 - y) / 2'},
         'categories': [{'id': c, 'name': {'pt': pt, 'en': en}, 'icon': ic, 'color': col, 'count': counts.get(c, 0)}
                        for c, pt, en, ic, col in CATEGORIES],
@@ -546,6 +546,16 @@ def copy_icons(data):
         src = BLIPS / (name[1:] if name.startswith('b') else name)  # 'b22.png' ← blips/22.png
         shutil.copyfile(src, dst / name)
     print(f'icons: {len(used)} ({", ".join(sorted(used))})')
+
+
+def fundo_ver():
+    """Versão dos tiles/preview (?v=): muda quando o map.png ou o continente mudam -> sem cache velho misturado."""
+    import hashlib
+    h = hashlib.md5()
+    for f in (MAP_PNG, CONT_PNG):
+        if f.exists():
+            h.update(f.read_bytes())
+    return h.hexdigest()[:8]
 
 
 def build_tiles():
@@ -573,7 +583,15 @@ def build_tiles():
         cont = Image.open(CONT_PNG).convert('RGB')
         if cont.size != (6000, 6000):
             sys.exit(f'continente com tamanho inesperado: {cont.size}')
-        level.paste(cont, (1096, 1096))
+        # o 6000 pode estar atrás do map.png (refeito sem o texto ZONA FECHADA, ilha nova, áreas refeitas):
+        # onde os dois discordam, vale o map.png ampliado
+        novo = level.crop((1096, 1096, 7096, 7096))
+        meio = img.crop((548, 548, 3548, 3548))
+        dif = ImageChops.difference(meio, cont.resize((3000, 3000), Image.LANCZOS)).convert('L')
+        dif = dif.filter(ImageFilter.GaussianBlur(3)).point(lambda v: 255 if v > 15 else 0)
+        masc = dif.filter(ImageFilter.MaxFilter(9)).resize((6000, 6000), Image.BILINEAR).filter(ImageFilter.GaussianBlur(4))
+        print(f'z5: {dif.histogram()[255] / 9e6:.2%} do continente vem do map.png (6000 desatualizado ali)')
+        level.paste(Image.composite(novo, cont, masc), (1096, 1096))
         cont.close()
         for tx in range(2 ** TILE_Z):
             d = tiles_dir / str(TILE_Z) / str(tx)
@@ -584,6 +602,13 @@ def build_tiles():
         level = None
     img.resize((800, 800), Image.LANCZOS).save(OUT / 'preview.webp', 'WEBP', quality=80, method=6)
     total = sum(f.stat().st_size for f in tiles_dir.rglob('*.webp'))
+    # miniatura da home (app.js) com a mesma versão
+    app = ROOT / 'app.js'
+    if app.exists():
+        a = app.read_text()
+        b = re.sub(r'/mapa/preview\.webp(\?v=\w+)?', f'/mapa/preview.webp?v={fundo_ver()}', a)
+        if b != a:
+            app.write_text(b)
     print(f'tiles: {n} arquivos, {total / 1024 / 1024:.1f} MB; preview.webp {(OUT / "preview.webp").stat().st_size // 1024} KB')
 
 

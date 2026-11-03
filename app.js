@@ -1291,7 +1291,7 @@
     });
     return `<div class="card strip-card mc">
         <div class="card-row"><span class="card-h">${lt('map_h')}</span><a class="card-link" href="/mapa">${lt('map_open')} ${svg('chevron')}</a></div>
-        <div class="mc-view" id="mcView"><a class="mc-prev" href="/mapa" aria-label="${lt('map_open')}"><img src="/mapa/preview.webp" alt="" loading="lazy" width="800" height="800"></a></div>
+        <div class="mc-view" id="mcView"><a class="mc-prev" href="/mapa" aria-label="${lt('map_open')}"><img src="/mapa/preview.webp?v=9392c21b" alt="" loading="lazy" width="800" height="800"></a></div>
         <span class="card-note">${lt('map_sub')}</span>
       </div>`;
   }

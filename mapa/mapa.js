@@ -189,6 +189,7 @@
     var mapEl = root.querySelector('.hvm-map');
     var Z = D.maxNativeZoom; // 4: z4 = pixel do map.png (projeção dos pontos)
     var TZ = D.tileMaxZoom || Z; // último zoom com tiles (5 = satélite do continente, mais nítido)
+    var TV = D.tileVer ? '?v=' + D.tileVer : ''; // muda quando o fundo muda (sem tile velho do cache)
     var map = L.map(mapEl, {
       crs: L.CRS.Simple,
       zoomControl: false,
@@ -213,9 +214,9 @@
     var land = L.latLngBounds(P([520, 3620]), P([3720, 520])); // continente + ilhas próximas
 
     if (o.compact) {
-      L.imageOverlay(BASE + 'preview.webp', full, { className: 'hvm-base' }).addTo(map);
+      L.imageOverlay(BASE + 'preview.webp' + TV, full, { className: 'hvm-base' }).addTo(map);
     } else {
-      L.tileLayer(BASE + 'tiles/{z}/{x}/{y}.webp', {
+      L.tileLayer(BASE + 'tiles/{z}/{x}/{y}.webp' + TV, {
         tileSize: D.tile,
         noWrap: true,
         bounds: full,
