@@ -8,7 +8,7 @@ import worker from './index.js';
 import { hmacHex } from './lib/util.js';
 import { sanitizeBadges, slugify } from './game/service.js';
 
-const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql', '0008_profile_social.sql', '0009_ac_clips.sql', '0010_ac_fps.sql', '0011_ac_reports.sql', '0012_ac_reports_close.sql']
+const MIGRATION = ['0001_recruitment.sql', '0002_bot_settings.sql', '0003_wipe.sql', '0004_link.sql', '0005_game.sql', '0006_group_style.sql', '0007_group_prize.sql', '0008_profile_social.sql', '0009_ac_clips.sql', '0010_ac_fps.sql', '0011_ac_reports.sql', '0012_ac_reports_close.sql', '0013_tickets.sql', '0014_seasons.sql']
   .map((f) => readFileSync(new URL(`../worker/migrations/${f}`, import.meta.url), 'utf8')).join('\n');
 class Stmt {
   constructor(db, sql, args = []) { this.db = db; this.sql = sql; this.args = args; }

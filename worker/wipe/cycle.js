@@ -98,6 +98,28 @@ export async function defineWipe(db, { at, actor, t = nowS() }) {
   return { ok: true, cycle: await getCycle(db, cur.id), created: false };
 }
 
+// //------------------- FOTO DA SEASON (ranking de sempre) -------------------\\
+// Copia jogadores e grupos do wipe para player_seasons/group_seasons. Roda no wipe_started, antes do jogo zerar
+// os dados; se o wipe falhar e for refeito, a foto é atualizada (não duplica). Falha aqui não segura o wipe.
+export async function snapshotSeason(db, cycleId, t = nowS()) {
+  try {
+    const [p, g] = await db.batch([
+      db.prepare(`INSERT INTO player_seasons (cycle_id, account, nick, level, kills, deaths, play_minutes, group_name, saved_at)
+                  SELECT ?, account, nick, level, kills, deaths, play_minutes, group_name, ? FROM game_players WHERE kills > 0 OR play_minutes > 0
+                  ON CONFLICT (cycle_id, account) DO UPDATE SET nick = excluded.nick, level = excluded.level, kills = excluded.kills,
+                    deaths = excluded.deaths, play_minutes = excluded.play_minutes, group_name = excluded.group_name, saved_at = excluded.saved_at`).bind(cycleId, t),
+      db.prepare(`INSERT INTO group_seasons (cycle_id, name, tag, color, emblem, rank, xp, kills, deaths, members_count, saved_at)
+                  SELECT ?, name, tag, color, emblem, rank, xp, kills, deaths, json_array_length(members), ? FROM game_groups WHERE true
+                  ON CONFLICT (cycle_id, name) DO UPDATE SET tag = excluded.tag, color = excluded.color, emblem = excluded.emblem, rank = excluded.rank,
+                    xp = excluded.xp, kills = excluded.kills, deaths = excluded.deaths, members_count = excluded.members_count, saved_at = excluded.saved_at`).bind(cycleId, t),
+    ]);
+    return { players: p.meta.changes, groups: g.meta.changes };
+  } catch (e) {
+    console.log('wipe: foto da season falhou', String(e));
+    return { players: 0, groups: 0 };
+  }
+}
+
 // //------------------- EVENTOS DO SERVIDOR MTA -------------------\\
 // Todos idempotentes: repetir o mesmo evento não muda nada nem duplica aviso.
 // Devolve { ok, status (HTTP), result, notify? }
@@ -120,6 +142,7 @@ export async function applyServerEvent(db, ev, { env, t = nowS() } = {}) {
       if (cycle.status === 'completed') return { ok: true, status: 200, result: 'already_completed' };
       if (t < cycle.scheduled_wipe_at - 120) return { ok: false, status: 409, result: 'too_early' };
       await db.prepare(`UPDATE wipe_cycles SET status = 'wiping', wipe_started_at = COALESCE(wipe_started_at, ?), updated_at = ? WHERE id = ? AND status IN ('active', 'failed')`).bind(t, t, id).run();
+      await snapshotSeason(db, id, t);
       const fresh = await logEvent(db, { cycleId: id, type: 'wipe_started', origin: 'mta', dedupe: `wipe_started:${id}` });
       return { ok: true, status: 200, result: 'wiping', notify: fresh ? 'started' : null };
     }
