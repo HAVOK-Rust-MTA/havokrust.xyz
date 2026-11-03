@@ -3,6 +3,7 @@
 //   POST /api/game/mta/sync   servidor MTA, assinado: {players: [...], groups: [...]?}
 //   POST /api/game/mta/live   servidor MTA, assinado: {players, max} — quantos estão online AGORA (vem a cada entrada/saída
 //                              e 1x por minuto). O site e a embed do Discord (havok-waitlist) leem daqui ('status.live').
+//                              Também grava a amostra do histórico (server_samples, ver live/service.js).
 //                              players = quem mudou (online, saiu, ou a carga completa quando o servidor liga)
 //                              groups  = a lista COMPLETA de grupos do wipe (substitui a anterior)
 //   GET  /api/groups          público: grupos do wipe (sem membros)
@@ -12,6 +13,7 @@
 //
 // A conta (serial) nunca sai daqui: fora do servidor o jogador é o pid.
 import { json, nowS, verifyServer, siteCors, clean, int, ts, account, avatarUrl } from '../lib/util.js';
+import { recordSample } from '../live/service.js';
 
 const MAX_SYNC_BYTES = 512 * 1024;
 const PID_ALPHABET = 'abcdefghijkmnpqrstuvwxyz23456789';
@@ -57,6 +59,8 @@ async function live(request, env) {
     `INSERT INTO bot_settings (key, value, updated_at) VALUES ('status.live', ?, ?)
      ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
   ).bind(value, nowS()).run();
+  // histórico do status (/api/status/history): no máximo uma amostra a cada 5 min, 7 dias
+  await recordSample(env.DB, players, max);
   return json({ ok: true });
 }
 

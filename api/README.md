@@ -40,3 +40,33 @@ npx wrangler deploy                            # já registra o domínio api.hav
 No Developer Portal → OAuth2 → **Redirects**: `https://api.havokrust.xyz/auth/discord/callback`.
 
 Testes: `node --test` nesta pasta (D1 = SQLite real, Discord simulado).
+
+## Site ao vivo (`live/`)
+
+Tabela `server_samples` na migration `0015_live.sql` (rodar antes do deploy).
+
+- **Histórico de jogadores** — o `POST /api/game/mta/live` (que o `havok_link` já manda a cada entrada/saída e 1x por
+  minuto) passa a gravar uma amostra em `server_samples(ts, online, max)` **no máximo a cada 5 min**, e apaga o que tem
+  mais de 7 dias. Não precisa mudar nada no MTA.
+
+  `GET /api/status/history?hours=24` (público, CORS do site, cache 60 s). `hours` vai de 1 a 168 (fora disso é cortado;
+  vazio ou inválido = 24).
+  ```json
+  { "hours": 24, "samples": [{ "t": 1793700000, "online": 12, "max": 85 }], "peak": 30, "avg": 13.5, "now": 7 }
+  ```
+  `t` = unix (s). `peak`/`avg` = pico e média de `online` nas amostras do período (sem amostra: 0). `now` = jogadores
+  agora pelo último `live` (null se o servidor não avisa há mais de 150 s: desligado ou reiniciando).
+
+- **Airdrop ao vivo** — `POST /api/game/mta/airdrop`, assinado igual ao `/api/game/mta/live` (`WIPE_SECRET`):
+  ```json
+  { "state": "falling", "x": 1125, "y": -875, "at": 1793700000, "id": 7, "landAt": 1793700270, "zone": "Flint County" }
+  ```
+  `state` = `falling` (avião/paraquedas) | `landed` (caixa no chão) | `opened` (alguém mexeu na caixa) | `none` (acabou).
+  `x`/`y` obrigatórios fora do `none`, entre −4096 e 4096. `landAt` e `zone` opcionais. Fica em `bot_settings`
+  (`airdrop.live`). Sem assinatura = 401; estado ou posição inválidos = 400.
+
+  `GET /api/airdrop` (público, CORS do site, cache 15 s):
+  `{ state, x, y, at, id, landAt, zone }`. Volta `state: "none"` (o resto null) quando não há airdrop, 15 min depois do
+  `opened`, ou se o último aviso tem mais de 2 h (servidor caiu sem mandar o `none`).
+  O `havok_link` manda a posição **arredondada** (centro de um quadrado de 250 m, `AIRDROP_SITE_GRID` no `s.main.lua`):
+  no jogo a posição exata é segredo da corneta da rádio. `AIRDROP_SITE_GRID = 0` manda a exata.

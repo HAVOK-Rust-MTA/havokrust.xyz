@@ -4,9 +4,11 @@
 //   link/  -> /v/<código>, /auth/discord*, /api/me, /api/logout, /api/link/mta/*
 //   game/  -> /api/game/mta/sync, /api/groups, /api/group/<slug>, /api/player/<pid>
 //   ac/    -> /api/ac/clip (gravações do anti-cheat)
+//   live/  -> /api/status/history, /api/airdrop, /api/game/mta/airdrop (site ao vivo)
 import { handleLinkHttp, isLinkPath, linkCron } from './link/service.js';
 import { handleGameHttp, isGamePath } from './game/service.js';
 import { handleAcHttp, isAcPath, acCron } from './ac/service.js';
+import { handleLiveHttp, isLivePath } from './live/service.js';
 import { json } from './lib/util.js';
 
 export default {
@@ -21,6 +23,7 @@ export default {
       if (isLinkPath(url.pathname)) return await handleLinkHttp(request, env, ctx, url);
       if (isGamePath(url.pathname)) return await handleGameHttp(request, env, url, ctx);
       if (isAcPath(url.pathname)) return await handleAcHttp(request, env, url);
+      if (isLivePath(url.pathname)) return await handleLiveHttp(request, env, url, ctx);
     } catch (e) {
       console.error('api:', url.pathname, e.message);
       return json({ error: 'internal' }, 500);

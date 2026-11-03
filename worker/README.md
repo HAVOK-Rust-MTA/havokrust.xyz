@@ -17,7 +17,8 @@ O Worker lê o Discord no máximo 1 vez a cada 30 segundos (cache compartilhado 
 2. Menu **Bot**:
    - **Reset Token** → copie o token e guarde (ele só aparece uma vez). **Nunca** cole em arquivo do site nem mande em chat.
    - Desligue **Public Bot** (só você pode adicionar).
-   - Nenhum "Privileged Gateway Intent" é necessário.
+   - Nenhum "Privileged Gateway Intent" é necessário para o contador. O **feed do site** (`/site feed`) precisa do
+     **Message Content Intent** ligado (sem ele o Discord manda o texto das mensagens vazio).
 3. Menu **OAuth2 → URL Generator**: marque `bot`. Em *Bot Permissions* não marque nada.
    Abra o link gerado e adicione o bot ao servidor do HAVOK.
 
@@ -268,3 +269,48 @@ Depois: reiniciar o servidor MTA (o `havok_wipe` passa a buscar o calendário), 
 ## Perfil, login com Discord, grupos
 
 Ficam em outro Worker, o `havok-api` (pasta `../api`), no mesmo banco D1. Veja `../api/README.md`.
+
+## Feed do Discord no site (`feed/`)
+
+As mensagens dos canais escolhidos viram o feed do site (abas Anúncios, Atualizações e Mídia). Tabela `discord_posts`
+na migration `0015_live.sql`. Precisa do **Message Content Intent** ligado (Developer Portal → Bot → Privileged Gateway
+Intents) e do bot com *Ver canal* + *Ler histórico de mensagens* em cada canal.
+
+### Comandos (só administração: mesmos cargos/IDs de `STAFF_ADMIN_ROLE_IDS` / `STAFF_ADMIN_USER_IDS`)
+
+| Comando | O que faz |
+|---|---|
+| `/site feed adicionar canal:<#canal> aba:<Anúncios\|Atualizações\|Mídia>` | põe o canal no feed (de novo com outra aba = troca a aba, inclusive das mensagens já salvas) |
+| `/site feed remover canal:<#canal>` | tira o canal; as mensagens dele somem do site na hora |
+| `/site feed listar` | canais, aba, última leitura; avisa canal sem acesso e mensagens vazias (intent desligado) |
+| `/site feed sincronizar` | relê todos os canais agora |
+
+Canais ficam em `bot_settings` (`feed.channels` = `[{id, tab}]`; estado do cron em `feed.state`). O comando é
+registrado sozinho pelo cron (como os outros); `register-commands.mjs` registra todos à mão, se precisar.
+
+### Cron (a cada 10 min, dentro do cron de 1 min)
+
+Para cada canal: `GET /channels/{id}/messages?limit=30`, grava/atualiza no D1 e apaga as mensagens desse canal que
+sumiram da janela lida (apagadas no Discord; mensagens mais velhas que as 30 últimas ficam). Reler renova as URLs dos
+anexos, que expiram. Só entram mensagens normais e respostas (entrou no servidor, fixou etc. ficam fora). Menção de
+usuário vira `@nome` (o id não vai para o site); de cargo vira `@cargo`.
+**429**: para na hora (não lê os outros canais nem apaga nada) e tenta de novo depois do `Retry-After` (mínimo 1 min).
+Canal sem acesso (403/404): aviso no `listar`, os outros seguem.
+
+### `GET /api/feed?tab=anuncios|atualizacoes|midia&limit=20`
+
+Público (CORS de `ALLOWED_ORIGINS`), cache de borda 60 s. `limit` de 1 a 50; aba inválida = 400.
+
+```json
+{ "tab": "anuncios", "posts": [{
+  "id": "1561...", "url": "https://discord.com/channels/<guild>/<canal>/<mensagem>",
+  "author": { "name": "Kapital", "avatar": "https://cdn.discordapp.com/avatars/.../....png?size=64" },
+  "content": "**markdown** do Discord",
+  "embeds": [{ "title": "...", "description": "...", "url": null, "image": "https://...", "color": "#ff6600" }],
+  "attachments": [{ "url": "https://cdn.discordapp.com/attachments/...", "type": "image|video|audio|file", "name": "print.png", "width": 800, "height": 600 }],
+  "reactions": [{ "emoji": "🔥", "url": null, "count": 7 }, { "emoji": "havok", "url": "https://cdn.discordapp.com/emojis/<id>.webp?size=48", "count": 2 }],
+  "createdAt": "2026-11-03T12:00:00.000Z", "editedAt": null
+}] }
+```
+Mais nova primeiro. Sem token, sem id de usuário. `content` mantém o markdown do Discord (`**negrito**`, `# título`,
+links, código, `<:emoji:id>` custom e `<#canal>`): o site renderiza.

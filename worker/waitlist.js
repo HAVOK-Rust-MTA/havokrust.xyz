@@ -4,6 +4,7 @@
 //   GET /waitlist  ->  { count, goal, updatedAt, stale }
 //   cron (1 min)   ->  edita os painéis da lista no canal do Discord: status (panel.js) e inscrição (waitlist/join.js)
 //   POST /interactions -> recrutamento da staff, lista de espera e /wipe pelo Discord (banco D1)
+//   /api/feed          -> feed do Discord no site (feed/): canais escolhidos com /site feed, relidos a cada 10 min
 //   /api/wipe/*        -> calendário de wipe: status público (site) e sincronização assinada com o servidor MTA (wipe/)
 //
 // O token do bot fica só no Secret DISCORD_BOT_TOKEN; GUILD_ID, ROLE_ID, GOAL e ALLOWED_ORIGINS
@@ -14,6 +15,7 @@ import { handleInteraction, recruitCron, serveBanner } from './recruit/interacti
 import { refreshWaitlist, readFirstWaitlist } from './waitlist/join.js';
 import { handleWipeHttp, wipeCron } from './wipe/service.js';
 import { statusCron, fetchServer, serverAddr } from './status/service.js';
+import { feedCron, handleFeedHttp } from './feed/service.js';
 
 const API = 'https://discord.com/api/v10';
 const FRESH_MS = 30_000;            // leitura nova no máximo a cada 30 s
@@ -139,6 +141,8 @@ export default {
     ctx.waitUntil(wipeCron(env).catch((e) => console.error('wipe cron:', e.message)));
     // status do servidor (IP e jogadores) no Discord, lido da lista pública do MTA
     ctx.waitUntil(statusCron(env).catch((e) => console.error('status cron:', e.message)));
+    // feed do site: relê os canais do /site feed (ele mesmo só vai ao Discord a cada 10 min)
+    ctx.waitUntil(feedCron(env).catch((e) => console.error('feed cron:', e.message)));
   },
 
   async fetch(request, env, ctx) {
@@ -146,6 +150,7 @@ export default {
 
     // recrutamento da staff: o Discord entrega cliques, formulários e comandos aqui (assinados, Ed25519)
     if (url.pathname === '/interactions') return handleInteraction(request, env, ctx);
+    if (url.pathname === '/api/feed') return handleFeedHttp(request, env, ctx, url);
     if (url.pathname.startsWith('/api/wipe/') || url.pathname === '/api/ranking') return handleWipeHttp(request, env, ctx, url);
     // banner do painel de recrutamento (o Discord baixa daqui)
     if (url.pathname.startsWith('/recruit/') && request.method === 'GET') return serveBanner(url.pathname.slice('/recruit/'.length));

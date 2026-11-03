@@ -1,4 +1,4 @@
-// O próprio Worker registra os comandos (/staff e /waitinglist) com o token que ele já tem: ninguém precisa rodar nada.
+// O próprio Worker registra os comandos (/staff, /waitinglist, /wipe, /site...) com o token que ele já tem: ninguém precisa rodar nada.
 // Roda no cron; só chama o Discord quando a definição do comando mudou (hash guardado no Cache API, 30 dias).
 import { discordRequest } from './discord.js';
 import { STAFF_COMMAND } from './commands.js';
@@ -7,8 +7,9 @@ import { WIPE_COMMAND } from '../wipe/service.js';
 import { REPORT_COMMAND } from '../reports/service.js';
 import { TICKET_COMMAND } from '../tickets/service.js';
 import { STATUS_COMMAND } from '../status/service.js';
+import { FEED_COMMAND } from '../feed/service.js';
 
-export const ALL_COMMANDS = [STAFF_COMMAND, WAITLIST_COMMAND, WIPE_COMMAND, REPORT_COMMAND, TICKET_COMMAND, STATUS_COMMAND];
+export const ALL_COMMANDS = [STAFF_COMMAND, WAITLIST_COMMAND, WIPE_COMMAND, REPORT_COMMAND, TICKET_COMMAND, STATUS_COMMAND, FEED_COMMAND];
 
 const SNOWFLAKE = /^\d{17,20}$/;
 let doneHash = null; // já conferido neste isolate
