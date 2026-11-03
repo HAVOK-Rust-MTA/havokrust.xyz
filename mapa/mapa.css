@@ -108,7 +108,7 @@
 
 /* ---------------------------------------------------------------- tooltip */
 .hvm .leaflet-tooltip.hvm-tip {
-  max-width: 260px; white-space: normal; padding: 9px 12px 10px;
+  width: max-content; max-width: 260px; white-space: normal; padding: 9px 12px 10px;
   background: rgba(21, 19, 17, .97); color: var(--hvm-text);
   border: 1px solid var(--hvm-line2); border-radius: 9px;
   box-shadow: var(--hvm-shadow);

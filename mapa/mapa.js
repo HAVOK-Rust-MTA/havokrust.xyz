@@ -316,7 +316,16 @@
             title: Lx(a.name),
             riseOnHover: true,
           });
-          if (hoverable) m.bindTooltip(tipHtml(a), { direction: 'top', className: 'hvm-tip', offset: [0, -16], opacity: 1 });
+          if (hoverable) {
+            m.bindTooltip(tipHtml(a), { direction: 'top', className: 'hvm-tip', offset: [0, -16], opacity: 1 });
+            // o pino fica dentro da área: uma caixa só (a do pino) quando o mouse está nele
+            m.on('tooltipopen', function () {
+              poly.closeTooltip();
+            });
+            poly.on('tooltipopen', function () {
+              if (m.isTooltipOpen()) poly.closeTooltip();
+            });
+          }
           m.on('click', function () {
             select(a.id, true);
           });
