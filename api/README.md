@@ -17,6 +17,13 @@ Cuida do login com Discord, do vínculo com o jogo, dos perfis e dos grupos que 
     havok-waitlist no `wipe_started`) + o wipe atual, sem contar a season que está sendo wipada duas vezes.
   - `by=kd`: abates / mortes (morte zero conta como 1), só quem tem 10+ abates. `by=level` só no `scope=wipe`.
   - Resposta: `{scope, by, players: [{rank, pid, nick, kills, deaths, playMinutes, kd, seasons?, linked, avatarUrl, group, badges}]}`.
+- **Hall da fama** `GET /api/seasons` (cache 60 s): uma entrada por season que já fechou (a em andamento fica de fora),
+  da mais nova para a mais velha, até 20: `{seasons: [{cycle, startedAt, endedAt, groups: [{rank, name, tag, color, emblem,
+  kills, xp, members}] (top 3), top: {pid, nick, kills, deaths, kd, linked, avatarUrl} | null}]}`. Lê `group_seasons` e
+  `player_seasons`; sem nenhuma season fechada = `{seasons: []}`.
+- **Perfil** `GET /api/player/<pid>`: além dos números do wipe traz `inWipe`, `allTime` (`{seasons, kills, deaths,
+  playMinutes, kd}` ou `null`) e, para quem não jogou neste wipe, `inWipe: false` + `lastSeason` (`{cycle, level, kills,
+  deaths, playMinutes, group}`) com os números da última season no lugar dos do wipe (sem grupo nem badges).
 
 ```
 jogo --(assinado)--> POST /api/link/mta/code | status | lookup     vínculo (tela do jogo)

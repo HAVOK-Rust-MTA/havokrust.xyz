@@ -10,6 +10,7 @@
 //   GET  /api/group/<slug>    público: o grupo com os membros (nick, cargo, números, foto do Discord ou null)
 //   GET  /api/player/<pid>    público: perfil (nick, números, grupo, badges, foto do Discord ou null)
 //   GET  /api/ranking/players?scope=wipe|all&by=kills|level|hours|kd   público: top 50 do wipe ou de sempre (ver README)
+//   GET  /api/seasons         público: hall da fama (por season fechada: top 3 grupos e o top 1 de abates)
 //
 // A conta (serial) nunca sai daqui: fora do servidor o jogador é o pid.
 import { json, nowS, verifyServer, siteCors, clean, int, ts, account, avatarUrl } from '../lib/util.js';
@@ -176,7 +177,7 @@ async function cached(request, url, ctx, build) {
 }
 
 export function isGamePath(path) {
-  return path === '/api/game/mta/sync' || path === '/api/game/mta/live' || path === '/api/groups' || path.startsWith('/api/group/') || path.startsWith('/api/player/') || path === '/api/ranking/players';
+  return path === '/api/game/mta/sync' || path === '/api/game/mta/live' || path === '/api/groups' || path.startsWith('/api/group/') || path.startsWith('/api/player/') || path === '/api/ranking/players' || path === '/api/seasons';
 }
 
 export async function handleGameHttp(request, env, url, ctx) {
@@ -262,11 +263,65 @@ async function publicRoute(db, path, url) {
     })) }, 200, h);
   }
 
+  if (path === '/api/seasons') return json({ seasons: await seasons(db) }, 200, h);
+
   if (path.startsWith('/api/player/')) {
     const pid = path.slice('/api/player/'.length);
-    const r = PID_RE.test(pid) && await db.prepare(`${PLAYER_SQL} WHERE g.pid = ?`).bind(pid).first();
-    if (!r) return json({ error: 'not_found' }, 404, h);
-    return json(playerView(r), 200, h);
+    if (!PID_RE.test(pid)) return json({ error: 'not_found' }, 404, h);
+    const r = await db.prepare(`${PLAYER_SQL} WHERE g.pid = ?`).bind(pid).first();
+    if (r) return json({ ...playerView(r), inWipe: true, lastSeason: null, allTime: await allTime(db, r.account) }, 200, h);
+    // não jogou neste wipe: a última season fotografada + o total de sempre (o pid de player_ids não muda com o wipe)
+    const old = await db.prepare(`SELECT s.*, p.discord_id, p.avatar, p.bio, p.youtube, p.tiktok
+      FROM player_ids i JOIN player_seasons s ON s.account = i.account LEFT JOIN players p ON p.account = i.account
+      WHERE i.pid = ? ORDER BY s.cycle_id DESC LIMIT 1`).bind(pid).first();
+    if (!old) return json({ error: 'not_found' }, 404, h);
+    return json({
+      pid, nick: old.nick, level: old.level, kills: old.kills, deaths: old.deaths, playMinutes: old.play_minutes,
+      linked: !!old.discord_id, avatarUrl: avatarUrl(old.discord_id, old.avatar), lastSeen: null, badges: {}, group: null,
+      social: old.discord_id ? { bio: old.bio || '', youtube: old.youtube || '', tiktok: old.tiktok || '' } : null,
+      inWipe: false,
+      lastSeason: { cycle: old.cycle_id, level: old.level, kills: old.kills, deaths: old.deaths, playMinutes: old.play_minutes, group: old.group_name || null },
+      allTime: await allTime(db, old.account),
+    }, 200, h);
   }
   return json({ error: 'not_found' }, 404, h);
+}
+
+// ciclo atual: a foto dele (tirada no wipe_started) não soma, porque os números ainda estão em game_players
+const CURRENT_CYCLE = 'COALESCE((SELECT id FROM wipe_cycles WHERE is_current = 1), -1)';
+
+// total de sempre de uma conta = seasons passadas + o wipe atual (mesma conta do ranking de sempre); nada jogado = null
+async function allTime(db, acc) {
+  const a = await db.prepare(`SELECT COUNT(*) AS seasons, SUM(kills) AS kills, SUM(deaths) AS deaths, SUM(play_minutes) AS play_minutes FROM (
+      SELECT kills, deaths, play_minutes FROM player_seasons WHERE account = ? AND cycle_id <> ${CURRENT_CYCLE}
+      UNION ALL
+      SELECT kills, deaths, play_minutes FROM game_players WHERE account = ? AND (kills > 0 OR play_minutes > 0))`).bind(acc, acc).first();
+  if (!a || !a.seasons) return null;
+  return { seasons: a.seasons, kills: a.kills, deaths: a.deaths, playMinutes: a.play_minutes, kd: kd(a.kills, a.deaths) };
+}
+
+// hall da fama: cada season que já fechou (a atual em andamento não), da mais nova para a mais velha,
+// com os 3 primeiros grupos (posição final) e quem mais abateu (pid; a conta nunca sai)
+async function seasons(db) {
+  const [cycles, groups, tops] = await Promise.all([
+    db.prepare(`SELECT c.cycle_id AS cycle, w.started_at, COALESCE(w.actual_wipe_at, w.wipe_started_at, w.scheduled_wipe_at) AS ended_at
+      FROM (SELECT cycle_id FROM group_seasons UNION SELECT cycle_id FROM player_seasons) c
+      LEFT JOIN wipe_cycles w ON w.id = c.cycle_id
+      WHERE NOT (w.is_current = 1 AND w.status = 'active') OR w.id IS NULL
+      ORDER BY c.cycle_id DESC LIMIT 20`),
+    db.prepare('SELECT cycle_id, rank, name, tag, color, emblem, kills, xp, members_count FROM group_seasons WHERE rank <= 3 ORDER BY cycle_id DESC, rank'),
+    db.prepare(`SELECT t.*, i.pid, p.discord_id, p.avatar FROM (
+        SELECT cycle_id, account, nick, kills, deaths, ROW_NUMBER() OVER (PARTITION BY cycle_id ORDER BY kills DESC, deaths ASC, play_minutes DESC) AS n
+        FROM player_seasons WHERE kills > 0) t
+      JOIN player_ids i ON i.account = t.account LEFT JOIN players p ON p.account = t.account WHERE t.n = 1`),
+  ].map((s) => s.all()));
+  return (cycles.results || []).map((c) => {
+    const top = (tops.results || []).find((t) => t.cycle_id === c.cycle);
+    return {
+      cycle: c.cycle, startedAt: c.started_at ?? null, endedAt: c.ended_at ?? null,
+      groups: (groups.results || []).filter((g) => g.cycle_id === c.cycle)
+        .map((g) => ({ rank: g.rank, name: g.name, tag: g.tag, color: g.color, emblem: g.emblem, kills: g.kills, xp: g.xp, members: g.members_count })),
+      top: top ? { pid: top.pid, nick: top.nick, kills: top.kills, deaths: top.deaths, kd: kd(top.kills, top.deaths), linked: !!top.discord_id, avatarUrl: avatarUrl(top.discord_id, top.avatar) } : null,
+    };
+  });
 }

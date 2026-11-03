@@ -500,3 +500,92 @@ test('deploy fora de ordem: conta que já estava em game_players sem player_ids 
   assert.equal(env.DB.row("SELECT pid FROM player_ids WHERE account = 'SERIAL-Z'").pid, 'zzzzzzzzzz');
   assert.equal(env.DB.row("SELECT pid FROM game_players WHERE account = 'SERIAL-Z'").pid, 'zzzzzzzzzz');
 });
+
+// //------------------- hall da fama (/api/seasons) e perfil de quem só jogou antes -------------------\\
+const groupSeason = (c, name, rank, extra = {}) => env.DB.db.prepare(`INSERT INTO group_seasons (cycle_id, name, tag, color, emblem, rank, xp, kills, deaths, members_count, saved_at)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 1)`).run(c, name, extra.tag ?? null, extra.color ?? null, extra.emblem ?? null, rank, extra.xp ?? 0, extra.kills ?? 0, extra.members ?? 1);
+
+test('seasons: sem nenhuma season fechada a lista vem vazia', async () => {
+  cycle(1, true);
+  const r = await pub('/api/seasons');
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.json, { seasons: [] });
+  assert.ok(r.headers.get('Access-Control-Allow-Origin'));
+});
+
+test('seasons: por ciclo, top 3 grupos e o top 1 de abates (pid, nunca a conta); a season em andamento fica de fora', async () => {
+  cycle(1, false);
+  cycle(2, false);
+  cycle(3, true);
+  env.DB.db.exec('UPDATE wipe_cycles SET started_at = 1000, scheduled_wipe_at = 2000, actual_wipe_at = 2100 WHERE id = 1');
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', kills: 1 }, { account: 'SERIAL-B', nick: 'Bravo', kills: 1 }]);
+  const pidA = env.DB.row("SELECT pid FROM player_ids WHERE account = 'SERIAL-A'").pid;
+  const pidB = env.DB.row("SELECT pid FROM player_ids WHERE account = 'SERIAL-B'").pid;
+  ['Quarto', 'Primeiro', 'Terceiro', 'Segundo'].forEach((n, i) => groupSeason(1, n, [4, 1, 3, 2][i], { tag: n.slice(0, 3).toUpperCase(), color: '#112233', emblem: '05', kills: 10 - i, members: 3 }));
+  season(1, 'SERIAL-A', 'AlfaVelho', 40, 10, 300);
+  season(1, 'SERIAL-B', 'Bravo', 12, 1, 900);
+  season(2, 'SERIAL-B', 'Bravo', 7, 2, 50);
+  // foto da season 3 já tirada (wipe_started) mas o ciclo ainda está ativo: não entra
+  groupSeason(3, 'Agora', 1);
+  season(3, 'SERIAL-A', 'Alfa', 99, 0, 10);
+  const r = await pub('/api/seasons');
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.json.seasons.map((s) => s.cycle), [2, 1]);
+  const s1 = r.json.seasons[1];
+  assert.equal(s1.startedAt, 1000);
+  assert.equal(s1.endedAt, 2100);
+  assert.deepEqual(s1.groups.map((g) => [g.rank, g.name, g.tag]), [[1, 'Primeiro', 'PRI'], [2, 'Segundo', 'SEG'], [3, 'Terceiro', 'TER']]);
+  assert.deepEqual(Object.keys(s1.groups[0]).sort(), ['color', 'emblem', 'kills', 'members', 'name', 'rank', 'tag', 'xp']);
+  assert.deepEqual([s1.top.pid, s1.top.nick, s1.top.kills, s1.top.deaths, s1.top.kd], [pidA, 'AlfaVelho', 40, 10, 4]);
+  const s2 = r.json.seasons[0];
+  assert.deepEqual(s2.groups, []);
+  assert.equal(s2.top.pid, pidB);
+  assert.ok(!JSON.stringify(r.json).includes('SERIAL'), 'conta não sai');
+});
+
+test('seasons: season sem nenhum abate não tem top 1', async () => {
+  cycle(1, false);
+  cycle(2, true);
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', playMinutes: 5 }]);
+  season(1, 'SERIAL-A', 'Alfa', 0, 0, 5);
+  const r = await pub('/api/seasons');
+  assert.deepEqual(r.json.seasons.map((s) => [s.cycle, s.top]), [[1, null]]);
+});
+
+test('jogador que só jogou em seasons passadas: perfil com a última season e o total de sempre', async () => {
+  cycle(1, false);
+  cycle(2, false);
+  cycle(3, true);
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', kills: 1 }]);
+  const pid = env.DB.row("SELECT pid FROM player_ids WHERE account = 'SERIAL-A'").pid;
+  season(1, 'SERIAL-A', 'AlfaAntigo', 10, 5, 100);
+  season(2, 'SERIAL-A', 'Alfa', 4, 3, 60);
+  env.DB.db.exec("UPDATE player_seasons SET level = 17, group_name = 'Os Brábo' WHERE cycle_id = 2");
+  env.DB.db.exec('DELETE FROM game_players'); // wipe da season 3: ainda não voltou
+  const r = await pub(`/api/player/${pid}`);
+  assert.equal(r.status, 200);
+  assert.equal(r.json.pid, pid);
+  assert.equal(r.json.nick, 'Alfa');
+  assert.equal(r.json.inWipe, false);
+  assert.deepEqual(r.json.lastSeason, { cycle: 2, level: 17, kills: 4, deaths: 3, playMinutes: 60, group: 'Os Brábo' });
+  assert.deepEqual(r.json.allTime, { seasons: 2, kills: 14, deaths: 8, playMinutes: 160, kd: 1.75 });
+  assert.equal(r.json.group, null);
+  assert.deepEqual(r.json.badges, {});
+  assert.ok(!JSON.stringify(r.json).includes('SERIAL'));
+});
+
+test('jogador do wipe atual: números do wipe + total de sempre (sem contar a season atual duas vezes)', async () => {
+  cycle(1, false);
+  cycle(2, true);
+  await syncGame([{ account: 'SERIAL-A', nick: 'Alfa', level: 9, kills: 3, deaths: 1, playMinutes: 30 }]);
+  const pid = env.DB.row("SELECT pid FROM player_ids WHERE account = 'SERIAL-A'").pid;
+  let r = await pub(`/api/player/${pid}`);
+  assert.equal(r.json.inWipe, true);
+  assert.deepEqual(r.json.allTime, { seasons: 1, kills: 3, deaths: 1, playMinutes: 30, kd: 3 });
+  season(1, 'SERIAL-A', 'Alfa', 10, 4, 100);
+  season(2, 'SERIAL-A', 'Alfa', 3, 1, 30); // foto da season atual (wipe_started) não soma de novo
+  r = await pub(`/api/player/${pid}?v=2`);
+  assert.equal(r.json.kills, 3);
+  assert.deepEqual(r.json.allTime, { seasons: 2, kills: 13, deaths: 5, playMinutes: 130, kd: 2.6 });
+  assert.equal((await pub('/api/player/aaaaaaaaaa')).status, 404);
+});
