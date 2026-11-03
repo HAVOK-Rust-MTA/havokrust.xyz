@@ -116,7 +116,7 @@ export async function snapshotSeason(db, cycleId, t = nowS()) {
     return { players: p.meta.changes, groups: g.meta.changes };
   } catch (e) {
     console.log('wipe: foto da season falhou', String(e));
-    return { players: 0, groups: 0 };
+    return null;
   }
 }
 
@@ -163,6 +163,13 @@ export async function applyServerEvent(db, ev, { env, t = nowS() } = {}) {
       }
       if (t < cycle.scheduled_wipe_at - 120 && cycle.status !== 'wiping') return { ok: false, status: 409, result: 'too_early' };
       const duration = cycleSeconds(env || {});
+      // foto de novo aqui (upsert): cobre wipe_done sem wipe_started e abates que entraram entre os dois
+      const snap = await snapshotSeason(db, id, t);
+      // o ranking do site zera junto com o jogo (jogadores e grupos são "deste wipe"), no MESMO lote que fecha o ciclo:
+      // se o reset falhar, o ciclo não fecha (senão a season contaria duas vezes no ranking de sempre). Sem foto
+      // (tabelas ausentes), o site não zera: os números ficam até o próximo sync. Vínculos e logins não são apagados.
+      const done = 'WHERE (SELECT wipe_confirmed_at FROM wipe_cycles WHERE id = ?) = ?';
+      const reset = snap ? [db.prepare(`DELETE FROM game_players ${done}`).bind(id, t), db.prepare(`DELETE FROM game_groups ${done}`).bind(id, t)] : [];
       const [closed] = await db.batch([
         db.prepare(`UPDATE wipe_cycles SET status = 'completed', is_current = NULL, actual_wipe_at = ?, wipe_confirmed_at = ?, updated_at = ?
                      WHERE id = ? AND status IN ('active', 'wiping', 'failed')`).bind(at, t, t, id),
@@ -170,13 +177,8 @@ export async function applyServerEvent(db, ev, { env, t = nowS() } = {}) {
                     SELECT ?, ?, 'active', 1, ?, 'mta', ?, ? WHERE changes() = 1`).bind(at, at + duration, id, t, t),
         db.prepare(`INSERT OR IGNORE INTO wipe_events (cycle_id, event_type, event_at, origin, metadata, dedupe_key, created_at)
                     VALUES (?, 'wipe_done', ?, 'mta', NULL, ?, ?)`).bind(id, at, `wipe_done:${id}`, t),
+        ...reset,
       ]);
-      if (closed.meta.changes === 1) {
-        // o ranking do site zera junto com o jogo (jogadores e grupos são "deste wipe").
-        // Os vínculos com o Discord (players) e os logins do site NÃO: o vínculo é permanente.
-        const reset = [db.prepare('DELETE FROM game_players'), db.prepare('DELETE FROM game_groups')];
-        try { await db.batch(reset); } catch (e) { console.log('wipe: reset do site falhou', String(e)); }
-      }
       const created = await db.prepare('SELECT * FROM wipe_cycles WHERE previous_cycle_id = ?').bind(id).first();
       return { ok: true, status: 200, result: closed.meta.changes === 1 ? 'completed' : 'already_completed', nextCycleId: created ? created.id : null, notify: closed.meta.changes === 1 ? 'done' : null };
     }

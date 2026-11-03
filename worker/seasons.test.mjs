@@ -110,3 +110,33 @@ test('wipe_done ainda apaga game_players, mas player_ids e as seasons ficam', as
   assert.equal(env.DB.row('SELECT COUNT(*) n FROM player_seasons').n, 2);
   assert.equal(env.DB.row('SELECT COUNT(*) n FROM group_seasons').n, 2);
 });
+
+test('wipe_done sem wipe_started antes ainda guarda a season', async () => {
+  seed();
+  const c = await cycleAtWipe();
+  assert.equal((await event({ cycleId: c.id, type: 'wipe_done', at: nowS() })).result, 'completed');
+  assert.equal(env.DB.row('SELECT COUNT(*) n FROM player_seasons WHERE cycle_id = ?', c.id).n, 2);
+  assert.equal(env.DB.row('SELECT COUNT(*) n FROM group_seasons WHERE cycle_id = ?', c.id).n, 2);
+});
+
+test('abates entre wipe_started e wipe_done entram na foto', async () => {
+  seed();
+  const c = await cycleAtWipe();
+  await event({ cycleId: c.id, type: 'wipe_started' });
+  env.DB.exec("UPDATE game_players SET kills = 31 WHERE account = 'SERIAL-A'");
+  advance(60);
+  await event({ cycleId: c.id, type: 'wipe_done', at: nowS() });
+  assert.equal(env.DB.row("SELECT kills FROM player_seasons WHERE account = 'SERIAL-A'").kills, 31);
+});
+
+test('se o reset falha, o ciclo não fecha (nada de season contada duas vezes)', async () => {
+  seed();
+  const c = await cycleAtWipe();
+  await event({ cycleId: c.id, type: 'wipe_started' });
+  // reset quebrado: um gatilho impede apagar game_players
+  env.DB.exec("CREATE TRIGGER no_del BEFORE DELETE ON game_players BEGIN SELECT RAISE(ABORT, 'falhou'); END;");
+  await event({ cycleId: c.id, type: 'wipe_done', at: nowS() }).catch(() => {});
+  const cur = env.DB.row('SELECT id, status FROM wipe_cycles WHERE is_current = 1');
+  assert.equal(cur.id, c.id, 'o ciclo velho continua o atual');
+  assert.notEqual(cur.status, 'completed');
+});

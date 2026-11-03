@@ -81,6 +81,8 @@ async function sync(request, env) {
     const nick = clean(p && p.nick);
     if (!acc || !nick) continue;
     // pid só nasce no primeiro registro da conta e fica em player_ids para sempre (o wipe não apaga): é o link do perfil
+    // quem já estava em game_players sem player_ids (sync da API antiga depois da migration) fica com o pid que tinha
+    stmts.push(db.prepare('INSERT OR IGNORE INTO player_ids (account, pid) SELECT account, pid FROM game_players WHERE account = ?').bind(acc));
     stmts.push(db.prepare('INSERT OR IGNORE INTO player_ids (account, pid) VALUES (?, ?)').bind(acc, newPid()));
     stmts.push(db.prepare(`INSERT INTO game_players (account, pid, nick, level, kills, deaths, play_minutes, group_name, badges, first_seen, last_seen, updated_at)
                            VALUES (?, (SELECT pid FROM player_ids WHERE account = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

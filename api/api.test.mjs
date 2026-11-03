@@ -491,3 +491,12 @@ test('K/D: só quem tem 10+ abates; morte zero conta como 1', async () => {
 test('scope e by inválidos dão 400', async () => {
   for (const q of ['scope=xpto', 'by=kd;drop', 'scope=all&by=level']) assert.equal((await pub(`/api/ranking/players?${q}`)).status, 400, q);
 });
+
+test('deploy fora de ordem: conta que já estava em game_players sem player_ids mantém o pid', async () => {
+  const t = nowS();
+  env.DB.db.prepare(`INSERT INTO game_players (account, pid, nick, level, kills, deaths, play_minutes, badges, first_seen, last_seen, updated_at)
+    VALUES ('SERIAL-Z', 'zzzzzzzzzz', 'Zulu', 1, 1, 0, 1, '{}', ?, ?, ?)`).run(t, t, t);
+  await syncGame([{ account: 'SERIAL-Z', nick: 'Zulu', kills: 2 }]);
+  assert.equal(env.DB.row("SELECT pid FROM player_ids WHERE account = 'SERIAL-Z'").pid, 'zzzzzzzzzz');
+  assert.equal(env.DB.row("SELECT pid FROM game_players WHERE account = 'SERIAL-Z'").pid, 'zzzzzzzzzz');
+});
