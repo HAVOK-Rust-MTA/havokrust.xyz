@@ -29,7 +29,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVER', footer_copy: '© 2026 HAVOK — Rust Survival. Not affiliated with Facepunch Studios.',
       bp_badge: 'Blueprint: {n} Scrap', loot_badge: 'Loot only', bench_badge: 'Workbench', bp_tip: 'Needs a blueprint: you must learn this recipe before you can craft it.', bench_tip: 'Needs a Workbench nearby to craft.', bp_explain: 'You must learn this blueprint before crafting. Put the item and Scrap in a Research Table to get the blueprint, or find one in airdrops and the patrol helicopter, then right click it → Learn. Learning is permanent.', bp_explain_loot: 'This blueprint cannot be researched. Find it in loot, then right click it → Learn. Learning is permanent.', bp_how: 'How blueprints work', legend_bp: 'needs a blueprint (learn the recipe first)', legend_bench: 'needs a Workbench',
       speeds: { fast: 'Fast', medium: 'Medium', slow: 'Slow', 'very-slow': 'Very slow' },
-      nav_store: 'Store', nav_badges: 'Badges', nav_play: 'Play', nav_wipe: 'Wipe', nav_profile: 'Profile', nav_ranking: 'Ranking', rk_full: 'See the full ranking',
+      nav_store: 'VIP Store', nav_badges: 'Badges', nav_play: 'Play', nav_wipe: 'Wipe', nav_profile: 'Profile', nav_ranking: 'Ranking', rk_full: 'See the full ranking',
      
       store_h1a: 'PLAY WITH', store_h1b: 'PRESENCE.', store_sub: 'Three plans, from more XP to a legendary base — support HAVOK and survive in style.',
       store_t1: 'Tied to your account', store_t2: 'Activated by the staff', store_t3: 'Monthly price; other periods on Discord',
@@ -42,6 +42,7 @@
       store_base_note: '* Without a Wardrobe the limit is 15 pieces for everyone, VIP included. With a Wardrobe it is 15 + your level, up to 50. Veteran gets 50 right away, Legendary 65.',
       store_cta: 'Get VIP on Discord', per_month: '/month', per_period: '/period', price_ask: 'Ask on Discord', currency: 'Currency', price: 'Price', free: 'Free', store_fine: 'Open a ticket on our Discord to buy. Type /vip in game to see how much time you have left. Being VIP does not exempt anyone from the rules.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD & interface', nav_home: 'Home',
+      nav_map: 'Map', nav_groups: 'Groups', nav_first: 'Never played MTA?', footer_community: 'COMMUNITY', wiki_home: 'Wiki home',
       tags: { new: 'New', fix: 'Fix', balance: 'Balance', event: 'Event' },
       media_title: 'Media checklist', media_desc: 'Every video and screenshot the guides are waiting for. Drop the file in media/ with the exact name.',
     },
@@ -63,7 +64,7 @@
       footer_wiki: 'WIKI', footer_server: 'SERVIDOR', footer_copy: '© 2026 HAVOK — Rust Survival. Sem afiliação com a Facepunch Studios.',
       bp_badge: 'Blueprint: {n} de Sucata', loot_badge: 'Só no loot', bench_badge: 'Bancada', bp_tip: 'Precisa de blueprint: você tem que aprender esta receita antes de craftar.', bench_tip: 'Precisa de uma Bancada perto para craftar.', bp_explain: 'Você precisa aprender esta blueprint antes de craftar. Coloque o item e Sucata na Mesa de Pesquisa para ganhar a blueprint, ou ache uma no airdrop e no helicóptero de patrulha. Depois clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_explain_loot: 'Esta blueprint não dá para pesquisar. Ache no loot e clique com o botão direito nela → Aprender. Aprender é para sempre.', bp_how: 'Como funcionam as blueprints', legend_bp: 'precisa de blueprint (aprender a receita antes)', legend_bench: 'precisa de Bancada',
       speeds: { fast: 'Rápida', medium: 'Média', slow: 'Lenta', 'very-slow': 'Muito lenta' },
-      nav_store: 'Loja', nav_badges: 'Badges', nav_play: 'Jogar', nav_wipe: 'Wipe', nav_profile: 'Perfil', nav_ranking: 'Ranking', rk_full: 'Ver o ranking completo',
+      nav_store: 'Loja VIP', nav_badges: 'Badges', nav_play: 'Jogar', nav_wipe: 'Wipe', nav_profile: 'Perfil', nav_ranking: 'Ranking', rk_full: 'Ver o ranking completo',
      
       store_h1a: 'JOGUE COM', store_h1b: 'PRESENÇA.', store_sub: 'Três planos, de mais XP até uma base lendária — apoie o HAVOK e sobreviva com estilo.',
       store_t1: 'Vinculado à sua conta', store_t2: 'Ativado pela staff', store_t3: 'Preço por mês; outros períodos no Discord',
@@ -76,6 +77,7 @@
       store_base_note: '* Sem Armário o limite é 15 peças para todo mundo, VIP incluso. Com Armário é 15 + o seu level, até 50. Veteran já começa com 50, Legendary com 65.',
       store_cta: 'Pegar VIP no Discord', per_month: '/mês', per_period: '/período', price_ask: 'Consulte no Discord', currency: 'Moeda', price: 'Preço', free: 'Grátis', store_fine: 'Abra um ticket no nosso Discord para comprar. Digite /vip no jogo para ver quanto tempo falta. Ser VIP não livra ninguém das regras.',
       discord: 'Discord', featured: 'Tutorial #1 — HUD e interface', nav_home: 'Início',
+      nav_map: 'Mapa', nav_groups: 'Grupos', nav_first: 'Nunca jogou MTA?', footer_community: 'COMUNIDADE', wiki_home: 'Início da wiki',
       tags: { new: 'Novo', fix: 'Correção', balance: 'Ajuste', event: 'Evento' },
       media_title: 'Checklist de mídias', media_desc: 'Todos os vídeos e prints que os guias estão esperando. Coloque o arquivo em media/ com o nome exato.',
     },
@@ -164,6 +166,8 @@
     tiktok: '<path d="M16 3c.4 2.6 2 4.2 4.5 4.4v3.2c-1.6 0-3.1-.5-4.5-1.4V15a6 6 0 1 1-6-6v3.3A2.7 2.7 0 1 0 12.7 15V3Z"/>',
     instagram: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
     play: '<path d="M7 4v16l13-8Z"/>',
+    copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>',
+    external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     discord: '<path d="M8 12h.01M16 12h.01M7.5 7.5c3-1 6-1 9 0M7 16.5c3.3 1.3 6.7 1.3 10 0M15.5 17l1 2c2-.6 3.9-1.6 5.5-3 .4-4.6-.8-8.6-3-12-1.3-.6-2.7-1-4-1.3L14.5 4M8.5 17l-1 2c-2-.6-3.9-1.6-5.5-3-.4-4.6.8-8.6 3-12 1.3-.6 2.7-1 4-1.3L9.5 4"/>',
   };
   const svg = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${P[n] || P.box}</svg>`;
@@ -182,9 +186,11 @@
     'ceiling-div': '<path d="M2 10l10-5 5 2.5-10 5z"/><path d="M2 10v2l5 2.5v-2"/>', 'ceiling-triangular': '<path d="M3 15 12 5l9 10z"/><path d="M3 15v2h18v-2"/>',
     'ceiling-stairs': '<path d="M2 10l10-5 10 5-10 5z"/><path d="M8 10l4-2 4 2-4 2z"/>',
   };
+  // caminhos do data.js são relativos (icons/x.png): com rotas como /wiki/item/x precisam começar na raiz
+  const abs = (u) => (!u || /^(https?:|data:|\/)/.test(u) ? u : '/' + u);
   const iconOf = (it, cls = 'ic') => {
     if (!it) return `<span class="${cls}">${svg('box')}</span>`;
-    if (it.icon) return `<span class="${cls}"><img src="${it.icon}" alt="" loading="lazy"></span>`;
+    if (it.icon) return `<span class="${cls}"><img src="${abs(it.icon)}" alt="" loading="lazy"></span>`;
     if (it.piece) return `<span class="${cls}" style="color:${TIER_COL[it.tier]}"><svg viewBox="0 0 24 24">${PIECE_SVG[it.piece] || P.box}</svg></span>`;
     return `<span class="${cls}">${svg('box')}</span>`;
   };
@@ -194,33 +200,32 @@
   const sortByName = (a, b) => name(a).localeCompare(name(b), lang === 'pt' ? 'pt-BR' : 'en');
 
   // ---------------------------------------------------------------- sidebar
-  function renderSide(route) {
-    const cur = '#' + route;
-    const a = (href, icon, label) => `<a href="${href}" class="${cur === href ? 'on' : ''}">${svg(icon)}<span>${esc(label)}</span></a>`;
+  function renderSide(cur) {
+    const a = (href, icon, label) => `<a href="${href}" class="${cur === href ? 'on' : ''}"${cur === href ? ' aria-current="page"' : ''}>${svg(icon)}<span>${esc(label)}</span></a>`;
     // no celular o menu do topo some: as páginas principais ficam aqui em cima
     $('#sideNav').innerHTML = `
-      <div class="nav-group"><h5>HAVOK</h5>
-        ${a('#/', 'rocket', t('nav_home'))}
-        ${a('#/wipe', 'clock', t('nav_wipe'))}
-        ${a('#/ranking', 'award', t('nav_ranking'))}
-        ${a('#/perfil', 'user', acct && acct.loggedIn ? t('nav_profile') : (lang === 'pt' ? 'Conectar Discord' : 'Connect Discord'))}
-        ${a('#/badges', 'shield', t('nav_badges'))}
-        ${a('#/store', 'crown', t('nav_store'))}
-        <a href="play/">${svg('play')}<span>${esc(t('nav_play'))}</span></a>
+      <div class="nav-group side-main"><h5>HAVOK</h5>
+        ${a('/', 'rocket', t('nav_home'))}
+        ${a('/mapa', 'map', t('nav_map'))}
+        ${a('/ranking', 'award', t('nav_ranking'))}
+        ${a('/ranking?tab=grupos', 'users', t('nav_groups'))}
+        ${a('/wipe', 'clock', t('nav_wipe'))}
+        ${a('/loja', 'crown', t('nav_store'))}
+        ${a('/badges', 'shield', t('nav_badges'))}
+        ${a('/perfil', 'user', acct && acct.loggedIn ? t('nav_profile') : (lang === 'pt' ? 'Conectar Discord' : 'Connect Discord'))}
+        <a href="/play/">${svg('play')}<span>${esc(t('nav_play'))}</span></a>
         <a href="${esc((window.HAVOK || {}).discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>Discord ↗</span></a>
       </div>
-      <div class="nav-group"><h5>${t('browse')}</h5>
-        ${a('#/items', 'grid', t('all_items'))}
-        ${CATS.map((c) => a('#/category/' + c.id, c.icon, c[lang])).join('')}
-        ${a('#/vehicles', 'car', lang === 'pt' ? 'Veículos' : 'Vehicles')}
-        ${a('#/faq', 'help', 'FAQ')}
+      <div class="nav-group"><h5>Wiki</h5>
+        ${a('/wiki', 'book', t('wiki_home'))}
+        ${a('/wiki/itens', 'grid', t('all_items'))}
+        ${CATS.map((c) => a('/wiki/categoria/' + c.id, c.icon, c[lang])).join('')}
+        ${a('/wiki/veiculos', 'car', lang === 'pt' ? 'Veículos' : 'Vehicles')}
+        ${a('/wiki/faq', 'help', 'FAQ')}
       </div>
       <div class="nav-group"><h5>${t('guides_h')}</h5>
-        ${a('#/guides', 'book', t('all_guides'))}
-        ${W.guides.map((g) => a('#/guides/' + g.slug, g.icon, L(g).title)).join('')}
-      </div>
-      <div class="nav-group"><h5>Wiki</h5>
-        ${a('#/wiki', 'book', 'Wiki')}
+        ${a('/wiki/guias', 'book', t('all_guides'))}
+        ${W.guides.map((g) => a('/wiki/guia/' + g.slug, g.icon, L(g).title)).join('')}
       </div>`;
   }
 
@@ -247,12 +252,12 @@
       </section>
       ${featuredVideo()}
       <div class="section-title">${t('categories')}</div>
-      <div class="w-cats">${CATS.map((c) => `<a class="w-cat" href="#/category/${c.id}"><span class="w-cat-ic">${svg(c.icon)}</span><b>${esc(c[lang])}</b><small>${t('items_count', { n: count(c.id) })}</small></a>`).join('')}
-        <a class="w-cat" href="#/vehicles"><span class="w-cat-ic">${svg('car')}</span><b>${lang === 'pt' ? 'Veículos' : 'Vehicles'}</b><small>${(W.vehicles || []).length} ${lang === 'pt' ? 'veículos' : 'vehicles'}</small></a>
-        <a class="w-cat" href="#/items"><span class="w-cat-ic">${svg('grid')}</span><b>${t('all_items')}</b><small>${t('items_count', { n: W.items.length })}</small></a></div>
+      <div class="w-cats">${CATS.map((c) => `<a class="w-cat" href="/wiki/categoria/${c.id}"><span class="w-cat-ic">${svg(c.icon)}</span><b>${esc(c[lang])}</b><small>${t('items_count', { n: count(c.id) })}</small></a>`).join('')}
+        <a class="w-cat" href="/wiki/veiculos"><span class="w-cat-ic">${svg('car')}</span><b>${lang === 'pt' ? 'Veículos' : 'Vehicles'}</b><small>${(W.vehicles || []).length} ${lang === 'pt' ? 'veículos' : 'vehicles'}</small></a>
+        <a class="w-cat" href="/wiki/itens"><span class="w-cat-ic">${svg('grid')}</span><b>${t('all_items')}</b><small>${t('items_count', { n: W.items.length })}</small></a></div>
       <div class="section-title">${t('guides')}</div>
-      <div class="w-guides">${W.guides.map((g, i) => `<a class="w-guide" href="#/guides/${g.slug}"><span class="w-guide-n">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}
-        <a class="w-guide" href="#/faq"><span class="w-guide-n">?</span><span><b>FAQ</b><small>${t('faq_desc')}</small></span></a></div>`;
+      <div class="w-guides">${W.guides.map((g, i) => `<a class="w-guide" href="/wiki/guia/${g.slug}"><span class="w-guide-n">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}
+        <a class="w-guide" href="/wiki/faq"><span class="w-guide-n">?</span><span><b>FAQ</b><small>${t('faq_desc')}</small></span></a></div>`;
   }
 
   const filt = { q: '', type: '', craft: false, bp: false, bench: false, sort: 'name' };
@@ -261,7 +266,7 @@
     const marks = [];
     if (it.blueprint !== undefined) marks.push(`<span class="m bp" title="${esc(t('bp_tip'))}">${svg('scroll')}BP</span>`);
     if (it.bench) marks.push(`<span class="m bench" title="${esc(t('bench_tip'))}">${svg('hammer')}</span>`);
-    return `<a class="item-card" href="#/items/${it.id}">${iconOf(it)}<span class="ic-txt"><b>${esc(name(it))}</b><small>${esc(typeName(it.type))}</small></span>${marks.length ? `<span class="tags">${marks.join('')}</span>` : ''}</a>`;
+    return `<a class="item-card" href="/wiki/item/${it.id}">${iconOf(it)}<span class="ic-txt"><b>${esc(name(it))}</b><small>${esc(typeName(it.type))}</small></span>${marks.length ? `<span class="tags">${marks.join('')}</span>` : ''}</a>`;
   }
   function pageList(catId) {
     const cat = CATS.find((c) => c.id === catId);
@@ -270,9 +275,9 @@
     if (filt.type && !types.includes(filt.type)) filt.type = '';
     const title = cat ? cat[lang] : t('items_title');
     const tab = (href, label, on) => `<a href="${href}" class="${on ? 'on' : ''}">${esc(label)}</a>`;
-    const html = `${crumbs(cat ? [['Wiki', '#/wiki'], [t('items_title'), '#/items'], [title]] : [['Wiki', '#/wiki'], [title]])}
+    const html = `${crumbs(cat ? [['Wiki', '/wiki'], [t('items_title'), '/wiki/itens'], [title]] : [['Wiki', '/wiki'], [title]])}
       <h1 class="page-title">${esc(title)}</h1>
-      <nav class="w-tabs" aria-label="${t('categories')}">${tab('#/items', t('all_items'), !catId)}${CATS.map((c) => tab('#/category/' + c.id, c[lang], c.id === catId)).join('')}</nav>
+      <nav class="w-tabs" aria-label="${t('categories')}">${tab('/wiki/itens', t('all_items'), !catId)}${CATS.map((c) => tab('/wiki/categoria/' + c.id, c[lang], c.id === catId)).join('')}</nav>
       <div class="w-filters">
         <label class="w-q">${svg('search')}<input type="search" id="fq" placeholder="${t('filter_here')}" value="${esc(filt.q)}" autocomplete="off"></label>
         <div class="w-toggles">
@@ -312,7 +317,7 @@
 
   function ingRow(id, qty, extra = '') {
     const it = byId[id];
-    return `<div class="ing">${iconOf(it)}<a href="#/items/${id}"><b>${esc(name(it))}</b></a>${extra}<span class="qty">x${qty}</span></div>`;
+    return `<div class="ing">${iconOf(it)}<a href="/wiki/item/${id}"><b>${esc(name(it))}</b></a>${extra}<span class="qty">x${qty}</span></div>`;
   }
   function pageItem(id) {
     const it = byId[id];
@@ -339,7 +344,7 @@
       if (it.level) foot.push(`<span>${svg('star')} ${t('level', { n: it.level })}</span><span class="vip">${t('vip_level', { n: Math.floor(it.level * 0.75) })}</span>`);
       if (it.receive) foot.push(`<span>${t('receive')}: <b>x${it.receive}</b></span>`);
       left.push(`<div class="section-title">${t('recipe')}</div><div class="box">${it.recipe.map((r) => ingRow(r.id, r.qty)).join('')}<div class="box-foot">${foot.join('')}</div></div>`);
-      if (it.blueprint !== undefined) left.push(`<div class="bp-note">${svg('scroll')}<div><b>Blueprint</b><p>${t(it.blueprint ? 'bp_explain' : 'bp_explain_loot')}</p><a href="#/guides/loot-crafting-and-blueprints">${t('bp_how')} ${svg('chevron')}</a></div></div>`);
+      if (it.blueprint !== undefined) left.push(`<div class="bp-note">${svg('scroll')}<div><b>Blueprint</b><p>${t(it.blueprint ? 'bp_explain' : 'bp_explain_loot')}</p><a href="/wiki/guia/loot-crafting-and-blueprints">${t('bp_how')} ${svg('chevron')}</a></div></div>`);
     }
     if (it.ammoFor) left.push(`<div class="section-title">${t('compatible')}</div><div class="item-grid">${it.ammoFor.map((x) => itemCard(byId[x])).join('')}</div>`);
     if (it.usedIn) left.push(`<div class="section-title">${t('used_in')}</div><div class="item-grid">${it.usedIn.map((x) => itemCard(byId[x])).filter(Boolean).join('')}</div>`);
@@ -352,12 +357,12 @@
     if (it.hp) props.push(`<div class="row"><span>${t('health')}</span><b>${it.hp}</b></div>`);
     if (it.slots) props.push(`<div class="row"><span>${t('slots')}</span><b>${it.slots}</b></div>`);
     if (it.limit) props.push(`<div class="row"><span>${t('limit')}</span><b>${esc(L(it.limit))}</b></div>`);
-    if (it.upgradeTo) props.push(`<div class="row"><span>${t('upgrade')}</span><b><a class="accent" href="#/items/${it.upgradeTo}">${esc(name(byId[it.upgradeTo]))}</a></b></div>`);
+    if (it.upgradeTo) props.push(`<div class="row"><span>${t('upgrade')}</span><b><a class="accent" href="/wiki/item/${it.upgradeTo}">${esc(name(byId[it.upgradeTo]))}</a></b></div>`);
     right.push(`<div class="box"><h3>${t('properties')}</h3>${props.join('')}</div>`);
 
     const ob = [];
     if (it.recipe) ob.push(`<div class="obtain">${svg('hammer')}${t('obtain_craft')}</div>`);
-    W.items.filter((x) => x.furnace && x.furnace.to === it.id).forEach((x) => ob.push(`<div class="obtain">${svg('flame')}${t('obtain_furnace')}: <a href="#/items/${x.id}"><b>${esc(name(x))}</b></a></div>`));
+    W.items.filter((x) => x.furnace && x.furnace.to === it.id).forEach((x) => ob.push(`<div class="obtain">${svg('flame')}${t('obtain_furnace')}: <a href="/wiki/item/${x.id}"><b>${esc(name(x))}</b></a></div>`));
     if (W.items.some((x) => (x.recycler || []).some((r) => r.id === it.id))) ob.push(`<div class="obtain">${svg('recycle')}${t('obtain_recycler')}</div>`);
     (it.sources || []).forEach((s) => ob.push(`<div class="obtain">${svg(SRC_ICON[s] || 'box')}${esc(SOURCES[s] ? SOURCES[s][lang === 'pt' ? 1 : 0] : s)}</div>`));
     if (ob.length) right.push(`<div class="box"><h3>${t('how_obtain')}</h3>${ob.join('')}</div>`);
@@ -366,7 +371,7 @@
 
     const related = W.items.filter((x) => x.id !== it.id && x.type === it.type && (!it.piece || x.piece === it.piece || x.tier === it.tier)).sort(sortByName).slice(0, 6);
 
-    return `${crumbs([['Wiki', '#/wiki'], [cat ? cat[lang] : t('items_title'), cat ? '#/category/' + cat.id : '#/items'], [name(it)]])}
+    return `${crumbs([['Wiki', '/wiki'], [cat ? cat[lang] : t('items_title'), cat ? '/wiki/categoria/' + cat.id : '/wiki/itens'], [name(it)]])}
       <div class="item-head">${iconOf(it)}<div><h1>${esc(name(it))}</h1><div class="badges">${badges.join('')}</div><p>${esc(L(it.desc))}</p></div></div>
       <div class="cols"><div>${left.join('') || ''}</div><div style="margin-top:34px">${right.join('')}</div></div>
       ${related.length ? `<div class="section-title" style="margin-top:44px">${t('related')}</div><div class="item-grid">${related.map(itemCard).join('')}</div>` : ''}`;
@@ -389,7 +394,7 @@
     return itemNames.get(k) || itemNames.get(k.replace(/(es|s)$/, '')) || itemNames.get(k.replace(/s$/, ''));
   }
   function inline(s) {
-    return esc(s).replace(/\*\*(.+?)\*\*/g, (m, txt) => { const id = itemByName(txt); return id ? `<a class="item-link" href="#/items/${id}"><strong>${txt}</strong></a>` : `<strong>${txt}</strong>`; }).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/`(.+?)`/g, '<code>$1</code>');
+    return esc(s).replace(/\*\*(.+?)\*\*/g, (m, txt) => { const id = itemByName(txt); return id ? `<a class="item-link" href="/wiki/item/${id}"><strong>${txt}</strong></a>` : `<strong>${txt}</strong>`; }).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/`(.+?)`/g, '<code>$1</code>');
   }
   // aceita o ID puro ou qualquer link do YouTube (watch, youtu.be, shorts, embed)
   function youtubeId(v) {
@@ -398,7 +403,7 @@
     return m ? m[1] : '';
   }
   function media(kind, id, caption) {
-    const soon = `<div class="soon"><div>${svg(kind === 'video' ? 'video' : 'image')}<b>${t(kind === 'video' ? 'soon_video' : 'soon_shot')}</b>${esc(caption)}<br><code>media/${id}.${kind === 'video' ? 'mp4' : 'webp'}</code></div></div>`;
+    const soon = `<div class="soon"><div>${svg(kind === 'video' ? 'video' : 'image')}<b>${t(kind === 'video' ? 'soon_video' : 'soon_shot')}</b>${esc(caption)}<br><code>/media/${id}.${kind === 'video' ? 'mp4' : 'webp'}</code></div></div>`;
     // vídeo no YouTube: o link vai em config.js (HAVOK.youtube), pelo nome da mídia (serve até no lugar de um print)
     const yt = youtubeId(((window.HAVOK || {}).youtube || {})[id]);
     if (yt) {
@@ -406,12 +411,12 @@
     }
     // "GIF": mp4 mudo, em loop, sem controles (no lugar de um print ou de um vídeo)
     if (((window.HAVOK || {}).loops || []).includes(id)) {
-      return `<figure class="media"><video class="loop" autoplay muted loop playsinline preload="auto" aria-label="${esc(caption)}"><source src="media/${id}.webm" type="video/webm"><source src="media/${id}.mp4" type="video/mp4"></video><figcaption>${esc(caption)}</figcaption></figure>`;
+      return `<figure class="media"><video class="loop" autoplay muted loop playsinline preload="auto" aria-label="${esc(caption)}"><source src="/media/${id}.webm" type="video/webm"><source src="/media/${id}.mp4" type="video/mp4"></video><figcaption>${esc(caption)}</figcaption></figure>`;
     }
     if (kind === 'video') {
-      return `<figure class="media"><video src="media/${id}.mp4" autoplay muted loop playsinline preload="metadata" onerror="this.outerHTML=this.nextElementSibling.innerHTML"></video><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
+      return `<figure class="media"><video src="/media/${id}.mp4" autoplay muted loop playsinline preload="metadata" onerror="this.outerHTML=this.nextElementSibling.innerHTML"></video><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
     }
-    return `<figure class="media shot"><img src="media/${id}.webp" alt="${esc(caption)}" loading="lazy" data-alt="png,jpg" onerror="havokImgFallback(this)"><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
+    return `<figure class="media shot"><img src="/media/${id}.webp" alt="${esc(caption)}" loading="lazy" data-alt="png,jpg" onerror="havokImgFallback(this)"><template>${soon}</template><figcaption>${esc(caption)}</figcaption></figure>`;
   }
   window.havokImgFallback = (img) => {
     const alts = (img.dataset.alt || '').split(',').filter(Boolean);
@@ -452,27 +457,23 @@
   }
 
   function pageGuides() {
-    return `${crumbs([['Wiki', '#/wiki'], [t('guides')]])}<h1 class="page-title">${t('guides')}</h1><p class="page-sub">${t('guides_desc')}</p>
-      <div class="grid">${W.guides.map((g) => `<a class="tile tall" href="#/guides/${g.slug}"><span class="tile-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}</div>`;
+    return `${crumbs([['Wiki', '/wiki'], [t('guides')]])}<h1 class="page-title">${t('guides')}</h1><p class="page-sub">${t('guides_desc')}</p>
+      <div class="grid">${W.guides.map((g) => `<a class="tile tall" href="/wiki/guia/${g.slug}"><span class="tile-ic">${svg(g.icon)}</span><span><b>${esc(L(g).title)}</b><small>${esc(L(g).description)}</small></span></a>`).join('')}</div>`;
   }
   function pageGuide(slug) {
     const i = W.guides.findIndex((g) => g.slug === slug);
     if (i < 0) return `<div class="empty-state">404</div>`;
     const g = W.guides[i], c = L(g), prev = W.guides[i - 1], next = W.guides[i + 1];
-    return `${crumbs([['Wiki', '#/wiki'], [t('guides'), '#/guides'], [c.title]])}
+    return `${crumbs([['Wiki', '/wiki'], [t('guides'), '/wiki/guias'], [c.title]])}
       <h1 class="page-title">${esc(c.title)}</h1><p class="page-sub">${esc(c.description)}</p>
       <article class="prose">${md(c.body)}</article>
-      <div class="pager">${prev ? `<a href="#/guides/${prev.slug}"><small>${t('prev')}</small><b>${esc(L(prev).title)}</b></a>` : '<span></span>'}
-      ${next ? `<a class="next" href="#/guides/${next.slug}"><small>${t('next')}</small><b>${esc(L(next).title)}</b></a>` : ''}</div>`;
+      <div class="pager">${prev ? `<a href="/wiki/guia/${prev.slug}"><small>${t('prev')}</small><b>${esc(L(prev).title)}</b></a>` : '<span></span>'}
+      ${next ? `<a class="next" href="/wiki/guia/${next.slug}"><small>${t('next')}</small><b>${esc(L(next).title)}</b></a>` : ''}</div>`;
   }
   function pageFaq() {
     const list = W.faq[lang] || W.faq.en;
-    return `${crumbs([['Wiki', '#/wiki'], ['FAQ']])}<h1 class="page-title">FAQ</h1><p class="page-sub">${t('faq_desc')}</p>
+    return `${crumbs([['Wiki', '/wiki'], ['FAQ']])}<h1 class="page-title">FAQ</h1><p class="page-sub">${t('faq_desc')}</p>
       <div class="faq">${list.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>`;
-  }
-  function pageMedia() {
-    return `${crumbs([['Wiki', '#/wiki'], [t('media_title')]])}<h1 class="page-title">${t('media_title')}</h1><p class="page-sub">${t('media_desc')}</p>
-      <div class="box">${W.media.map((m) => `<div class="obtain">${svg(m.kind === 'video' ? 'video' : 'image')}<code>media/${m.id}.${m.kind === 'video' ? 'mp4' : 'webp'}</code><span class="muted">— ${esc(m.caption)}</span><a href="#/guides/${m.guide}" style="margin-left:auto" class="muted">${esc(m.guide)}</a></div>`).join('')}</div>`;
   }
 
 
@@ -496,16 +497,16 @@
   function pageVehicles() {
     const V = VT[lang], list = (W.vehicles || []).filter((v) => !vCat || v.cat === vCat);
     const fmt = (str, n) => str.replace('{n}', n);
-    const part = (id, n) => (n > 0 && byId[id] ? `<a class="vh-part" href="#/items/${id}" title="${esc(name(byId[id]))}">${iconOf(byId[id], 'ic')}<b>×${n}</b></a>` : '');
+    const part = (id, n) => (n > 0 && byId[id] ? `<a class="vh-part" href="/wiki/item/${id}" title="${esc(name(byId[id]))}">${iconOf(byId[id], 'ic')}<b>×${n}</b></a>` : '');
     setTimeout(() => document.querySelectorAll('.vh-filter button').forEach((b) => b.onclick = () => { vCat = b.dataset.c; route(); }));
     const cats = Object.keys(VCATS).filter((c) => (W.vehicles || []).some((v) => v.cat === c));
-    return `${crumbs([['Wiki', '#/wiki'], [V.title]])}
+    return `${crumbs([['Wiki', '/wiki'], [V.title]])}
       <h1 class="page-title">${V.title}</h1><p class="page-sub">${V.sub}</p>
       <div class="vh-how">${svg('wrench')}<div><b>${V.how}</b><p>${V.howtxt}</p>
-        <div class="vh-how-items">${['engine', 'car-battery', 'tire', 'gas-can'].filter((id) => byId[id]).map((id) => `<a href="#/items/${id}">${iconOf(byId[id])}<span>${esc(name(byId[id]))}</span></a>`).join('')}</div></div></div>
+        <div class="vh-how-items">${['engine', 'car-battery', 'tire', 'gas-can'].filter((id) => byId[id]).map((id) => `<a href="/wiki/item/${id}">${iconOf(byId[id])}<span>${esc(name(byId[id]))}</span></a>`).join('')}</div></div></div>
       <div class="vh-filter">${[['', V.all], ...cats.map((c) => [c, VCATS[c][lang === 'pt' ? 1 : 0]])].map(([c, n]) => `<button type="button" class="chip ${vCat === c ? 'on' : ''}" data-c="${c}">${esc(n)}</button>`).join('')}</div>
       <div class="vh-grid">${list.map((v) => `<article class="vh-card${v.armored ? ' armored' : ''}">
-          <div class="vh-img"><img src="vehicles/${v.id}.webp" alt="${esc(v.name)}" loading="lazy" width="204" height="125">${v.armored ? `<span class="vh-badge">${svg('shield')}</span>` : ''}</div>
+          <div class="vh-img"><img src="/vehicles/${v.id}.webp" alt="${esc(v.name)}" loading="lazy" width="204" height="125">${v.armored ? `<span class="vh-badge">${svg('shield')}</span>` : ''}</div>
           <div class="vh-body"><b>${esc(v.name)}</b><small>${esc(VCATS[v.cat][lang === 'pt' ? 1 : 0])}</small>
             ${v.armored ? `<p class="vh-armor">${svg('shield')} ${v.armor === 30 ? V.armor30 : V.armor}</p>` : ''}
             <div class="vh-needs"><span>${V.needs}</span><div>${part('engine', v.engine)}${part('car-battery', v.battery)}${part('tire', v.tires)}</div></div>
@@ -518,7 +519,7 @@
   const BRAR = { common: ['Common', '#c9c2b6'], rare: ['Rare', '#4ea8ff'], epic: ['Epic', '#b07bff'], legendary: ['Legendary', '#ffae2e'], mythic: ['Mythic', '#ff3d52'] };
   // arte que só existe em PNG (gerada junto com a do jogo); o resto é SVG
   const BADGE_PNG = new Set(['youtuber', 'tiktoker', 'opening']);
-  const badgeImg = (id) => `badges/${id}.${BADGE_PNG.has(id) || /^newyear\d{4}$/.test(id) ? 'png' : 'svg'}`;
+  const badgeImg = (id) => `/badges/${id}.${BADGE_PNG.has(id) || /^newyear\d{4}$/.test(id) ? 'png' : 'svg'}`;
   const BADGE_LIST = [
     ['founder', 'Founder', 'mythic', 'team', 'Part of the team that built HAVOK.', 'Faz parte da equipe que construiu o HAVOK.'],
     ['vanguard', 'Vanguard', 'mythic', 'list', 'One of the first 5 on the waiting list.', 'Um dos 5 primeiros da lista de espera.'],
@@ -541,12 +542,12 @@
       ingame: 'In game, every badge you own shows next to your name and in the player list. Type /badges to see your collection.',
       wall: 'Waiting list founders', wall_sub: 'The first 15 on the waiting list get a badge for life, plus VIP Survivor days at launch.',
       tiers: [['vanguard', '#01–05', '30 days VIP Survivor'], ['pioneer', '#06–10', '15 days VIP Survivor'], ['early', '#11–15', '7 days VIP Survivor']],
-      open: 'Open spot', join: 'Join the waiting list', wall_err: 'Could not load the list right now.' },
+      open: 'Open spot', join: 'Join the Discord', wall_err: 'Could not load the list right now.' },
     pt: { title: 'BADGES', sub: 'Conquistadas no jogo, guardadas para sempre. O wipe zera tudo, menos a sua coleção de badges.', all: 'Todas', how: { auto: 'Automática no jogo', ticket: 'Peça por ticket no Discord', list: 'Prêmio da lista de espera', team: 'Só a equipe do HAVOK' },
       ingame: 'No jogo, todas as badges que você tem aparecem do lado do seu nome e na lista de jogadores. Digite /badges para ver a sua coleção.',
       wall: 'Fundadores da lista de espera', wall_sub: 'Os 15 primeiros da lista ganham uma badge para sempre e dias de VIP Survivor na inauguração.',
       tiers: [['vanguard', '#01–05', '30 dias de VIP Survivor'], ['pioneer', '#06–10', '15 dias de VIP Survivor'], ['early', '#11–15', '7 dias de VIP Survivor']],
-      open: 'Vaga aberta', join: 'Entrar na lista de espera', wall_err: 'Não deu para carregar a lista agora.' },
+      open: 'Vaga aberta', join: 'Entrar no Discord', wall_err: 'Não deu para carregar a lista agora.' },
   };
   let bRar = '';
   function pageBadges() {
@@ -576,7 +577,7 @@
           <p>${esc(lang === 'pt' ? pt : en)}</p><small class="bd-how how-${how}">${B.how[how]}</small></article>`).join('')}</div>
       <p class="bd-ingame">${svg('info')} ${B.ingame}</p>
       <section class="bd-wall-sec"><p class="l-kicker">${B.wall}</p><p class="page-sub">${B.wall_sub}</p><div class="bd-wall" id="bdWall">${spinner()}</div>
-        <a class="wl-btn inline" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${B.join}</span></a></section>`;
+        <a class="btn btn-discord" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${B.join}</span></a></section>`;
   }
 
   // ---------------------------------------------------------------- loja VIP
@@ -647,78 +648,63 @@
       <div class="sp-cta"><a class="cta" href="${esc(d)}" target="_blank" rel="noopener">${svg('discord')} ${t('store_cta')}</a><p class="fine">${t('store_fine')}</p></div>`;
   }
 
-  // ---------------------------------------------------------------- home (pré-lançamento)
-  // A página inicial gira em torno da inauguração: contador real da lista de espera (worker/waitlist.js,
-  // que conta o cargo "Waiting List" no Discord), como o jogo funciona, como participar e dúvidas.
-  // Loja e VIP ficam fora deste fluxo de propósito.
+  // ---------------------------------------------------------------- home
+  // Quem chega do vídeo vê em 5 s: JOGAR AGORA, DISCORD e que o servidor está vivo (status + gráfico de 24 h).
+  // Embaixo: wipe, prévia do mapa, "nunca jogou", feed do Discord, melhores sobreviventes e os 5 vídeos do ciclo.
   const LT = {
     en: {
-      eyebrow: 'MTA: San Andreas · Rust survival · Online now',
-      h1a: 'SURVIVE', h1b: 'THE FIRST DAY.',
-      sub: 'The server is live. Gather, build your base, raid the others and survive until the wipe.',
-      sv: 'Server', sv_on: 'Online', sv_locked: 'Opening soon', sv_off: 'Offline', sv_players: 'players online', sv_err: 'Player count unavailable right now.', sv_copy: 'Copy IP', sv_copied: 'Copied!', sv_join: 'Join the server', sv_note: 'Free · PC · MTA:SA',
-      wl: 'Waiting list', wl_of: 'of {n} survivors', wl_join: 'Join the waiting list', wl_note: 'Free · Through Discord · PC',
-      wl_left: '{n} spots to go until the launch is scheduled.', wl_left1: '1 spot to go until the launch is scheduled.',
-      wl_full: 'Goal reached! The launch date is coming on Discord.', wl_err: 'Counter unavailable right now.', wl_load: 'Checking the list...',
-      wiki: 'Explore the wiki', scroll: 'How it works',
-      how: 'How it works', how_h: 'You start with nothing. Everything else is earned.',
+      hero_sub: 'Rust survival inside MTA: San Andreas. Farm, build your base, join a group and raid the others.',
+      play: 'Play now', join_discord: 'Join the Discord', first: 'Never played MTA?', no_open: 'Nothing opened? You need MTA installed first.', no_open_link: 'See how',
+      st_on: 'Server online', st_off: 'Server offline', st_locked: 'Opening soon', st_load: 'Checking the server…', st_err: 'No answer from the server right now',
+      playing: 'playing', ip: 'IP', copy: 'Copy IP', copied: 'Copied',
+      last24: 'Last 24 h', peak: 'peak {n}', avg: 'avg {n}', hist_empty: 'The chart fills in as the first hours are recorded.', hist_err: 'History unavailable right now.', at_time: '{t} · {n} playing',
+      season: 'Season {n}',
+      wipe_h: 'Next wipe', u_d: 'days', u_h: 'h', u_m: 'min', wipe_note: '{d} · last 24 h = insane PvP', wipe_pvp: 'Insane PvP until the wipe', wipe_pending: 'Wipe in progress', wipe_failed: 'Wipe delayed', wipe_none: 'The next wipe date comes out on Discord.', wipe_more: 'See the wipe',
+      map_h: 'Server map', map_open: 'Open map', map_sub: 'Safe zones, vendors, military bases and the live airdrop.',
+      first_h: 'Never played MTA?', steps: ['Have GTA San Andreas for PC', 'Get MTA:SA (free)', 'Click Play now'], first_more: 'Step by step',
+      feed_h: 'News from Discord', feed_sync: 'synced from Discord', tabs: { anuncios: 'Announcements', atualizacoes: 'Updates', midia: 'Media' },
+      feed_empty: 'Nothing on this tab yet. News shows up on Discord first.', feed_err: 'The feed did not answer right now. News is still on Discord.', feed_go: 'Open Discord',
+      see_discord: 'See on Discord', read_more: 'Read more', read_less: 'Show less', edited: 'edited',
+      top_h: 'Top survivors', scope: { wipe: 'Wipe', all: 'All time' }, by: { kills: 'Kills', hours: 'Time', kd: 'K/D' }, top_more: 'Full ranking and groups',
+      top_empty_wipe: 'Nobody has scored this wipe yet. The first kills show up here.', top_empty_all: 'The all-time ranking starts counting this wipe.', top_empty_kd: 'K/D shows up from 10 kills.', top_err: 'Ranking is down right now. Try again in a moment.',
+      u_kills: 'kills', u_kd: 'K/D',
+      loop_h: 'You start with nothing. Everything else is earned.',
       loop: [
-        ['spawn', 'Wake up', 'You spawn with almost nothing. Every survivor starts the same way.', 'getting-started'],
-        ['gather-tools', 'Gather', 'Hit trees, rocks and ore nodes. Better tools, faster farming.', 'resource-gathering'],
-        ['first-house', 'Build', 'Foundation, walls, door and a Wardrobe to keep your base standing.', 'base-building'],
+        ['spawn', 'Wake up', 'You spawn with almost nothing. Everyone starts the same way.', 'getting-started'],
+        ['gather-tools', 'Gather', 'Trees, rocks and ore. Better tools, faster farming.', 'resource-gathering'],
+        ['first-house', 'Build', 'Foundation, walls, a door and a Wardrobe to keep it standing.', 'base-building'],
         ['vehicles', 'Explore', 'Fix up cars, loot military zones and fight for airdrops.', 'world-and-events'],
-        ['pvp', 'Fight', 'Take on other players and shoot down the patrol helicopter for its loot.', 'combat-raiding-and-recovery'],
+        ['pvp', 'Fight', 'Take on other players and shoot down the patrol helicopter.', 'combat-raiding-and-recovery'],
       ],
-      join: 'How to play', join_h: 'Three steps. A few minutes.',
-      steps: [
-        ['Have GTA San Andreas', 'The PC version, installed.'],
-        ['Install Multi Theft Auto', 'MTA:SA is free: multitheftauto.com.'],
-        ['Join the server', 'Click the button below, or open MTA → Quick Connect and paste the IP.'],
-      ],
-      faq: 'Questions', faqs: [
-        ['Do I have to pay to play?', 'No. The server is free. You only need GTA San Andreas for PC and Multi Theft Auto (MTA:SA), which is also free.'],
-        ['Is the server open?', 'Yes, since October 24, 2026. The IP and the players online are at the top of this page.'],
-        ['Is it like Rust?', 'The loop is: gather, craft, build a base, protect it and raid others. Everything happens on the San Andreas map, with its own mechanics.'],
-        ['Can I play with friends?', 'Yes. Groups have up to 8 members, with their own tag, emblem and color, plus a group ranking.'],
-        ['Does it run on a weak PC?', 'MTA runs on modest hardware. The server interface was built to stay light.'],
-      ],
-      rk_kicker: 'This wipe', rk_title: 'Who rules the island', rk_groups: 'Groups', rk_players: 'Players', rk_kills: 'Kills', rk_deaths: 'Deaths', rk_members: 'Members', rk_kd: 'K/D', rk_updated: 'Updated {t} · resets every wipe', rk_none: 'Nobody has scored yet this wipe. The first kills show up here.', wp_kicker: 'Current wipe', wp_title: 'The race for the island', wp_sub: 'At this time the server resets everything: bases, items and the ranking. Badges and paid VIP stay.', cd_more: 'See the wipe',
-      cd_wipe: 'Next wipe in', cd_pvp: 'FINAL 24 HOURS · INSANE PvP: weapons and loot are easier to find until the wipe', cd_every: 'full wipe every {n} days', cd_at: 'Next wipe: {d}', cd_pending: 'Wipe in progress', cd_failed: 'Wipe delayed', cd_stale: 'No connection to the server right now; trying again…',
-      news: 'Latest changes', all_news: 'Show older changes', social: 'Follow HAVOK', social_sub: 'Clips, updates and wipe news.',
+      cd_wipe: 'Next wipe in', cd_pvp: 'FINAL 24 HOURS · INSANE PvP: weapons and loot are easier to find until the wipe', cd_every: 'full wipe every {n} days', cd_at: 'Next wipe: {d}', cd_pending: 'Wipe in progress', cd_failed: 'Wipe delayed', cd_stale: 'No connection to the server right now; trying again…', cd_more: 'See the wipe',
+      wp_kicker: 'Current wipe', wp_title: 'The race for the island', wp_sub: 'At this time the server resets everything: bases, items and the ranking. Badges and paid VIP stay.',
     },
     pt: {
-      eyebrow: 'MTA: San Andreas · Rust survival · No ar',
-      h1a: 'SOBREVIVA', h1b: 'AO PRIMEIRO DIA.',
-      sub: 'O servidor está no ar. Colete, construa sua base, raide os outros e sobreviva até o wipe.',
-      sv: 'Servidor', sv_on: 'Online', sv_locked: 'Abrindo em breve', sv_off: 'Offline', sv_players: 'jogadores online', sv_err: 'Contagem de jogadores indisponível no momento.', sv_copy: 'Copiar IP', sv_copied: 'Copiado!', sv_join: 'Entrar no servidor', sv_note: 'Grátis · PC · MTA:SA',
-      wl: 'Lista de espera', wl_of: 'de {n} sobreviventes', wl_join: 'Entrar na lista de espera', wl_note: 'Grátis · Pelo Discord · PC',
-      wl_left: 'Faltam {n} vagas para marcar a inauguração.', wl_left1: 'Falta 1 vaga para marcar a inauguração.',
-      wl_full: 'Meta batida! A data da inauguração sai no Discord.', wl_err: 'Contador indisponível no momento.', wl_load: 'Conferindo a lista...',
-      wiki: 'Conhecer a wiki', scroll: 'Como funciona',
-      how: 'Como funciona', how_h: 'Você começa sem nada. Todo o resto é conquistado.',
+      hero_sub: 'Rust survival dentro do MTA: San Andreas. Farme, construa sua base, entre num grupo e raide os outros.',
+      play: 'Jogar agora', join_discord: 'Entrar no Discord', first: 'Nunca jogou MTA?', no_open: 'Não abriu? Primeiro instale o MTA.', no_open_link: 'Ver como',
+      st_on: 'Servidor online', st_off: 'Servidor offline', st_locked: 'Abrindo em breve', st_load: 'Conferindo o servidor…', st_err: 'Sem resposta do servidor agora',
+      playing: 'jogando', ip: 'IP', copy: 'Copiar IP', copied: 'Copiado',
+      last24: 'Últimas 24 h', peak: 'pico {n}', avg: 'média {n}', hist_empty: 'O gráfico enche conforme as primeiras horas são registradas.', hist_err: 'Histórico indisponível agora.', at_time: '{t} · {n} jogando',
+      season: 'Season {n}',
+      wipe_h: 'Próximo wipe', u_d: 'dias', u_h: 'h', u_m: 'min', wipe_note: '{d} · últimas 24 h = PvP insano', wipe_pvp: 'PvP insano até o wipe', wipe_pending: 'Wipe em andamento', wipe_failed: 'Wipe adiado', wipe_none: 'A data do próximo wipe sai no Discord.', wipe_more: 'Ver o wipe',
+      map_h: 'Mapa do servidor', map_open: 'Abrir mapa', map_sub: 'Safe zones, vendedores, bases militares e o airdrop ao vivo.',
+      first_h: 'Nunca jogou MTA?', steps: ['Tenha o GTA San Andreas de PC', 'Baixe o MTA:SA (grátis)', 'Clique em Jogar agora'], first_more: 'Passo a passo',
+      feed_h: 'Novidades do Discord', feed_sync: 'sincronizado do Discord', tabs: { anuncios: 'Anúncios', atualizacoes: 'Atualizações', midia: 'Mídia' },
+      feed_empty: 'Nada nesta aba ainda. Os avisos saem primeiro no Discord.', feed_err: 'O feed não respondeu agora. Os avisos continuam no Discord.', feed_go: 'Abrir o Discord',
+      see_discord: 'Ver no Discord', read_more: 'Ler mais', read_less: 'Mostrar menos', edited: 'editado',
+      top_h: 'Melhores sobreviventes', scope: { wipe: 'Wipe', all: 'De sempre' }, by: { kills: 'Abates', hours: 'Tempo', kd: 'K/D' }, top_more: 'Ranking completo e grupos',
+      top_empty_wipe: 'Ninguém pontuou neste wipe ainda. Os primeiros abates aparecem aqui.', top_empty_all: 'O ranking de sempre começa a contar a partir deste wipe.', top_empty_kd: 'O K/D entra a partir de 10 abates.', top_err: 'Ranking fora do ar agora. Tente de novo em instantes.',
+      u_kills: 'abates', u_kd: 'K/D',
+      loop_h: 'Você começa sem nada. Todo o resto é conquistado.',
       loop: [
-        ['spawn', 'Acorde', 'Você nasce quase sem nada. Todo sobrevivente começa igual.', 'getting-started'],
-        ['gather-tools', 'Colete', 'Bata em árvores, pedras e minérios. Ferramenta melhor, coleta mais rápida.', 'resource-gathering'],
-        ['first-house', 'Construa', 'Fundação, paredes, porta e um Armário para manter a base de pé.', 'base-building'],
-        ['vehicles', 'Explore', 'Monte carros, saqueie zonas militares e dispute airdrops.', 'world-and-events'],
-        ['pvp', 'Lute', 'Enfrente outros jogadores e derrube o helicóptero de patrulha para pegar o loot.', 'combat-raiding-and-recovery'],
+        ['spawn', 'Acordar', 'Você nasce quase sem nada. Todo mundo começa igual.', 'getting-started'],
+        ['gather-tools', 'Coletar', 'Árvores, pedras e minérios. Ferramenta melhor, coleta mais rápida.', 'resource-gathering'],
+        ['first-house', 'Construir', 'Fundação, paredes, porta e um Armário para manter de pé.', 'base-building'],
+        ['vehicles', 'Explorar', 'Monte carros, saqueie zonas militares e dispute airdrops.', 'world-and-events'],
+        ['pvp', 'Lutar', 'Enfrente outros jogadores e derrube o helicóptero de patrulha.', 'combat-raiding-and-recovery'],
       ],
-      join: 'Como jogar', join_h: 'Três passos. Poucos minutos.',
-      steps: [
-        ['Tenha o GTA San Andreas', 'A versão de PC, instalada.'],
-        ['Instale o Multi Theft Auto', 'O MTA:SA é grátis: multitheftauto.com.'],
-        ['Entre no servidor', 'Clique no botão abaixo, ou abra o MTA → Quick Connect e cole o IP.'],
-      ],
-      faq: 'Perguntas frequentes', faqs: [
-        ['Preciso pagar para jogar?', 'Não. O servidor é gratuito. Você só precisa do GTA San Andreas para PC e do Multi Theft Auto (MTA:SA), que também é grátis.'],
-        ['O servidor já abriu?', 'Sim, desde 24/10/2026. O IP e os jogadores online ficam no topo desta página.'],
-        ['É parecido com Rust?', 'O ciclo é: coletar, craftar, construir a base, protegê-la e raidar os outros. Tudo no mapa de San Andreas, com mecânicas próprias.'],
-        ['Dá para jogar com amigos?', 'Sim. Grupos têm até 8 membros, com tag, emblema e cor próprios, e um ranking de grupos.'],
-        ['Roda em PC fraco?', 'O MTA roda em máquinas modestas. A interface do servidor foi feita para ser leve.'],
-      ],
-      rk_kicker: 'Este wipe', rk_title: 'Quem manda na ilha', rk_groups: 'Grupos', rk_players: 'Jogadores', rk_kills: 'Kills', rk_deaths: 'Mortes', rk_members: 'Membros', rk_kd: 'K/D', rk_updated: 'Atualizado {t} · zera a cada wipe', rk_none: 'Ninguém pontuou ainda neste wipe. As primeiras kills aparecem aqui.', wp_kicker: 'Wipe atual', wp_title: 'A disputa pela ilha', wp_sub: 'Nesse horário o servidor zera tudo: bases, itens e o ranking. Badges e VIP pago ficam.', cd_more: 'Ver o wipe',
-      cd_wipe: 'Próximo wipe em', cd_pvp: 'ÚLTIMAS 24 HORAS · PvP INSANO: armas e loot mais fáceis até o wipe', cd_every: 'wipe completo a cada {n} dias', cd_at: 'Próximo wipe: {d}', cd_pending: 'Wipe em andamento', cd_failed: 'Wipe adiado', cd_stale: 'Sem conexão com o servidor agora; tentando de novo…',
-      news: 'Últimas mudanças', all_news: 'Ver mudanças antigas', social: 'Siga o HAVOK', social_sub: 'Clipes, atualizações e novidades de cada wipe.',
+      cd_wipe: 'Próximo wipe em', cd_pvp: 'ÚLTIMAS 24 HORAS · PvP INSANO: armas e loot mais fáceis até o wipe', cd_every: 'wipe completo a cada {n} dias', cd_at: 'Próximo wipe: {d}', cd_pending: 'Wipe em andamento', cd_failed: 'Wipe adiado', cd_stale: 'Sem conexão com o servidor agora; tentando de novo…', cd_more: 'Ver o wipe',
+      wp_kicker: 'Wipe atual', wp_title: 'A disputa pela ilha', wp_sub: 'Nesse horário o servidor zera tudo: bases, itens e o ranking. Badges e VIP pago ficam.',
     },
   };
   const lt = (k, vars) => {
@@ -726,113 +712,468 @@
     if (vars && typeof s === 'string') for (const v in vars) s = s.replace('{' + v + '}', vars[v]);
     return s;
   };
-  const fmtDate = (d) => { const [y, m, dd] = d.split('-'); return lang === 'pt' ? `${dd}/${m}/${y}` : `${m}/${dd}/${y}`; };
-  let newsAll = false;
+  const locale = () => (lang === 'pt' ? 'pt-BR' : 'en-US');
 
-  // servidor no ar: IP + jogadores online (o Worker lê a lista pública do MTA, /api/server; atualiza a cada 30 s)
-  let svTimer = null, svLast = null;
-  function serverCard() {
-    const H = window.HAVOK || {}, api = (H.serverStatus || {}).api, addr = H.server || '';
-    if (api) setTimeout(() => { if (svLast) paintServer(svLast); loadServer(); clearInterval(svTimer); svTimer = setInterval(() => { if (!document.hidden) loadServer(); }, 15000); });
+  // fetch com tempo-limite; erro/timeout = null (cada bloco mostra o próprio estado de erro)
+  async function getJson(url, opts = {}) {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), opts.timeout || 10000);
+    try {
+      const r = await fetch(url, { signal: ctrl.signal, cache: opts.cache || 'no-cache', credentials: opts.credentials });
+      return r.ok ? await r.json() : null;
+    } catch (e) {
+      return null;
+    } finally {
+      clearTimeout(to);
+    }
+  }
+  // scripts sob demanda (o mapa só baixa quando a prévia aparece na tela)
+  const scripts = {};
+  const loadScript = (src) => scripts[src] || (scripts[src] = new Promise((ok, fail) => {
+    const s = document.createElement('script');
+    s.src = src; s.async = true; s.onload = ok;
+    s.onerror = () => { delete scripts[src]; fail(new Error(src)); };
+    document.head.appendChild(s);
+  }));
+  // só quando o elemento aparece na tela (sem IntersectionObserver: na hora)
+  function whenVisible(el, fn, margin = '200px') {
+    if (!el) return;
+    if (!('IntersectionObserver' in window)) { fn(); return; }
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { rootMargin: margin });
+    io.observe(el);
+    onLeave(() => io.disconnect());
+  }
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // celular/tablet sem mouse: não tem MTA, o JOGAR AGORA leva para o passo a passo
+  const noMta = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-pointer: fine)').matches);
+  // contagem animada do número (sobe de onde estava até o novo valor)
+  function countTo(el, to, ms = 700) {
+    if (!el) return;
+    const from = Number(el.dataset.n || 0);
+    el.dataset.n = to;
+    if (reduced() || from === to) { el.textContent = to; return; }
+    const t0 = performance.now();
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(from + (to - from) * e);
+      if (k < 1 && el.isConnected) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // //------------------- status do servidor (online agora + IP + gráfico de 24 h) -------------------\\
+  const API = () => pfApi() || 'https://api.havokrust.xyz';
+  function statusCard() {
+    const H = window.HAVOK || {}, addr = H.server || '';
     setTimeout(() => {
-      const b = $('#svCopy');
-      if (b) b.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(addr) : Promise.reject()).then(() => { b.textContent = lt('sv_copied'); }, () => {});
+      const copy = $('#stCopy');
+      if (copy) copy.onclick = () => {
+        const done = () => { copy.classList.add('ok'); copy.querySelector('span').textContent = lt('copied'); setTimeout(() => { if (copy.isConnected) { copy.classList.remove('ok'); copy.querySelector('span').textContent = lt('copy'); } }, 1800); };
+        if (navigator.clipboard) navigator.clipboard.writeText(addr).then(done, () => {});
+      };
+      loadStatus();
+      loadHistory();
+      const t1 = setInterval(() => { if (!document.hidden) loadStatus(); }, 30000);
+      const t2 = setInterval(() => { if (!document.hidden) loadHistory(); }, 5 * 60000);
+      onLeave(() => { clearInterval(t1); clearInterval(t2); });
     });
-    return `<div class="wl sv" id="sv" data-state="${api ? 'loading' : 'error'}">
-        <div class="wl-top"><span class="wl-label"><i class="wl-live"></i><span id="svState">${lt('sv')}</span></span><span class="wl-of">MTA:SA</span></div>
-        <div class="wl-count" aria-live="polite"><b id="svNum">--</b><span id="svMax"></span></div>
-        <p class="wl-msg" id="svMsg">${lt('sv_players')}</p>
-        ${addr ? `<div class="sv-addr"><code>${esc(addr)}</code><button type="button" id="svCopy">${lt('sv_copy')}</button></div>` : ''}
-        <a class="wl-btn" href="play/">${svg('zap')}<span>${lt('sv_join')}</span></a>
-        <small class="wl-note">${lt('sv_note')}</small>
-      </div>`;
+    return `<aside class="card st" id="st" data-state="loading" aria-live="polite">
+        <div class="st-top"><span class="st-state"><i class="st-dot"></i><span id="stState">${lt('st_load')}</span></span><span class="st-season" id="stSeason"></span></div>
+        <div class="st-mid">
+          <div class="st-count"><b id="stNum">--</b><span id="stMax"></span><small>${lt('playing')}</small></div>
+          ${addr ? `<div class="st-ip"><span>${lt('ip')}</span><button type="button" id="stCopy" class="st-copy" title="${lt('copy')}"><code>${esc(addr)}</code>${svg('copy')}<span class="sr">${lt('copy')}</span></button></div>` : ''}
+        </div>
+        <div class="st-chart" id="stChart"><div class="st-chart-empty">${spinner()}</div></div>
+        <div class="st-foot"><span>${lt('last24')}</span><span id="stStats"></span></div>
+      </aside>`;
   }
-  function paintServer(d) {
-    const box = $('#sv');
-    if (!box) return;
-    if (!d) {
-      if (box.dataset.state === 'loading') box.dataset.state = 'error';
-      $('#svMsg').textContent = lt('sv_err');
-      return;
-    }
-    box.dataset.state = !d.online ? 'off' : d.locked ? 'locked' : 'ok';
-    $('#svState').textContent = !d.online ? lt('sv_off') : d.locked ? lt('sv_locked') : lt('sv_on');
-    $('#svNum').textContent = d.online ? String(d.players).padStart(2, '0') : '--';
-    $('#svMax').textContent = d.online && d.max ? '/' + d.max : '';
-    $('#svMsg').textContent = lt('sv_players');
-  }
-  async function loadServer() {
+  async function loadStatus() {
     const api = ((window.HAVOK || {}).serverStatus || {}).api;
-    let d = null;
-    try {
-      const ctrl = new AbortController();
-      const to = setTimeout(() => ctrl.abort(), 10000);
-      const r = await fetch(api, { signal: ctrl.signal, cache: 'no-cache' });
-      clearTimeout(to);
-      const j = r.ok ? await r.json() : null;
-      if (j && typeof j.online === 'boolean' && Number.isInteger(j.players)) d = j;
-    } catch (e) { d = null; }
-    if (d) svLast = d;
-    paintServer(d);
+    const d = api ? await getJson(api) : null;
+    const box = $('#st');
+    if (!box) return;
+    const ok = d && typeof d.online === 'boolean';
+    box.dataset.state = !ok ? 'error' : !d.online ? 'off' : d.locked ? 'locked' : 'ok';
+    $('#stState').textContent = !ok ? lt('st_err') : !d.online ? lt('st_off') : d.locked ? lt('st_locked') : lt('st_on');
+    if (ok && d.online) { countTo($('#stNum'), d.players | 0); $('#stMax').textContent = d.max ? ` / ${d.max}` : ''; } else { $('#stNum').textContent = '--'; $('#stNum').dataset.n = 0; $('#stMax').textContent = ''; }
+  }
+  async function loadHistory() {
+    const d = await getJson(`${API()}/api/status/history?hours=24`);
+    const box = $('#stChart');
+    if (!box) return;
+    const samples = d && Array.isArray(d.samples) ? d.samples.filter((s) => Number.isFinite(s.t) && Number.isFinite(s.online)) : null;
+    if (!samples) { box.innerHTML = `<p class="st-chart-empty">${lt('hist_err')}</p>`; $('#stStats').textContent = ''; return; }
+    $('#stStats').textContent = samples.length ? `${lt('peak', { n: d.peak })} · ${lt('avg', { n: Math.round(d.avg) })}` : '';
+    if (samples.length < 2) { box.innerHTML = `<svg class="st-svg" viewBox="0 0 300 70" preserveAspectRatio="none" aria-hidden="true"><path class="st-base" d="M0 69H300"/></svg><p class="st-chart-empty">${lt('hist_empty')}</p>`; return; }
+    drawChart(box, samples, d.peak);
+  }
+  // gráfico próprio (SVG): eixo x = 24 h até agora; buraco > 15 min entre amostras = servidor fora (linha quebra)
+  function drawChart(box, samples, peak) {
+    const W = 300, H = 70, now = Date.now() / 1000, t0 = now - 24 * 3600;
+    const top = Math.max(4, peak || 0) * 1.18;
+    const x = (t) => Math.max(0, Math.min(W, ((t - t0) / (now - t0)) * W));
+    const y = (v) => H - 2 - (v / top) * (H - 6);
+    const segs = [];
+    let cur = [];
+    samples.forEach((s, i) => {
+      if (i && s.t - samples[i - 1].t > 900) { if (cur.length) segs.push(cur); cur = []; }
+      cur.push(s);
+    });
+    if (cur.length) segs.push(cur);
+    const line = segs.map((sg) => sg.map((s, i) => `${i ? 'L' : 'M'}${x(s.t).toFixed(1)} ${y(s.online).toFixed(1)}`).join('')).join('');
+    const area = segs.filter((sg) => sg.length > 1).map((sg) => `M${x(sg[0].t).toFixed(1)} ${H}` + sg.map((s) => `L${x(s.t).toFixed(1)} ${y(s.online).toFixed(1)}`).join('') + `L${x(sg[sg.length - 1].t).toFixed(1)} ${H}Z`).join('');
+    box.innerHTML = `<svg class="st-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="stFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".32"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+        <path class="st-base" d="M0 ${H - 1}H${W}"/><path class="st-area" d="${area}" fill="url(#stFill)"/><path class="st-line" d="${line}"/></svg>
+      <i class="st-pt" hidden></i><span class="st-tip" hidden></span>`;
+    const pt = box.querySelector('.st-pt'), tip = box.querySelector('.st-tip');
+    const hm = (t) => new Date(t * 1000).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
+    const show = (e) => {
+      const r = box.getBoundingClientRect();
+      const tx = t0 + ((e.clientX - r.left) / r.width) * (now - t0);
+      let best = samples[0];
+      for (const s of samples) if (Math.abs(s.t - tx) < Math.abs(best.t - tx)) best = s;
+      const px = (x(best.t) / W) * 100, py = (y(best.online) / H) * 100;
+      pt.hidden = tip.hidden = false;
+      pt.style.left = px + '%'; pt.style.top = py + '%';
+      tip.textContent = lt('at_time', { t: hm(best.t), n: best.online });
+      tip.style.left = Math.max(18, Math.min(82, px)) + '%';
+    };
+    box.onpointermove = show;
+    box.onpointerdown = show;
+    box.onpointerleave = () => { pt.hidden = tip.hidden = true; };
   }
 
-  // lista de espera: barra com uma marca por vaga (até 60; acima disso 50 marcas proporcionais)
-  let wlTimer = null, wlLast = null;
-  const WL_EVERY = 30000;
-  const wlGoal = () => (wlLast && wlLast.goal) || ((window.HAVOK || {}).waitlist || {}).goal || 30;
-  function waitlistCard() {
-    const H = window.HAVOK || {}, cfg = H.waitlist || {};
-    const goal = wlGoal();
-    // até 60 vagas: uma marca por vaga; acima disso, 50 marcas proporcionais (igual ao painel do Discord)
-    const nCells = goal <= 60 ? goal : 50;
-    const cells = Array.from({ length: nCells }, () => '<i></i>').join('');
-    if (cfg.api) setTimeout(() => { if (wlLast) paintWaitlist(wlLast); loadWaitlist(); wlTimer = setInterval(() => { if (!document.hidden) loadWaitlist(); }, WL_EVERY); });
-    return `<div class="wl" id="wl" data-state="${cfg.api ? 'loading' : 'error'}">
-        <div class="wl-top"><span class="wl-label"><i class="wl-live"></i>${lt('wl')}</span><span class="wl-of">${lt('wl_of', { n: goal })}</span></div>
-        <div class="wl-count" aria-live="polite"><b id="wlNum">--</b><span>/${goal}</span></div>
-        <div class="wl-cells" style="--cols:${Math.ceil(nCells / 2)};--cols-m:${nCells % 10 ? Math.ceil(nCells / 3) : 10}" id="wlCells" role="progressbar" aria-label="${lt('wl')}" aria-valuemin="0" aria-valuemax="${goal}">${cells}</div>
-        <p class="wl-msg" id="wlMsg">${cfg.api ? lt('wl_load') : lt('wl_err')}</p>
-        <a class="wl-btn" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')}<span>${lt('wl_join')}</span></a>
-        <small class="wl-note">${lt('wl_note')}</small>
+  // //------------------- wipe (cartão da faixa) -------------------\\
+  function wipeCard() {
+    if (!((window.HAVOK || {}).wipe || {}).api) return '';
+    setTimeout(() => {
+      loadWipe(false).then(paintWipeCard);
+      const tm = setInterval(() => { paintWipeCard(); }, 1000);
+      const re = setInterval(() => { if (!document.hidden) loadWipe(false).then(paintWipeCard); }, 60000);
+      onLeave(() => { clearInterval(tm); clearInterval(re); });
+    });
+    return `<a class="card strip-card wc" id="wc" href="/wipe">
+        <span class="card-h">${lt('wipe_h')}</span>
+        <span class="wc-left" id="wcLeft"><b>--</b><i>${lt('u_d')}</i><b>--</b><i>${lt('u_h')}</i><b>--</b><i>${lt('u_m')}</i></span>
+        <span class="bar"><span id="wcBar"></span></span>
+        <span class="card-note" id="wcNote">&nbsp;</span>
+        <span class="card-link">${lt('wipe_more')} ${svg('chevron')}</span>
+      </a>`;
+  }
+  function paintWipeCard() {
+    const box = $('#wc');
+    if (!box) return;
+    const d = wipeData;
+    const season = $('#stSeason');
+    if (season && d && d.cycleId) season.textContent = lt('season', { n: d.cycleId });
+    if (!d || !d.scheduledWipeAt || d.status === 'NONE') { $('#wcLeft').innerHTML = `<span class="wc-msg">${lt('wipe_none')}</span>`; $('#wcNote').textContent = ''; return; }
+    const now = Date.now() + wipeOffset, at = Date.parse(d.scheduledWipeAt), start = Date.parse(d.startedAt);
+    const left = Math.max(0, at - now);
+    const pending = d.status === 'WIPE_PENDING' || d.status === 'FAILED' || left === 0;
+    const pvp = !pending && left <= PVP_MS;
+    box.classList.toggle('pvp', pvp);
+    box.classList.toggle('pending', pending);
+    let s = Math.floor(left / 1000);
+    const dd = Math.floor(s / 86400); s %= 86400;
+    const hh = Math.floor(s / 3600); s %= 3600;
+    $('#wcLeft').innerHTML = pending ? `<span class="wc-msg">${lt(d.status === 'FAILED' ? 'wipe_failed' : 'wipe_pending')}</span>`
+      : `<b>${dd}</b><i>${lt('u_d')}</i><b>${p2(hh)}</b><i>${lt('u_h')}</i><b>${p2(Math.floor(s / 60))}</b><i>${lt('u_m')}</i>`;
+    const pct = pending ? 1 : Math.min(1, Math.max(0, (now - start) / (at - start)));
+    $('#wcBar').style.transform = `scaleX(${pct.toFixed(4)})`;
+    const when = new Date(at).toLocaleString(locale(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    $('#wcNote').textContent = pvp ? lt('wipe_pvp') : lt('wipe_note', { d: when });
+  }
+
+  // //------------------- prévia do mapa (o módulo só baixa quando o cartão aparece) -------------------\\
+  function mapCard() {
+    setTimeout(() => {
+      const view = $('#mcView');
+      whenVisible(view, async () => {
+        try {
+          await loadScript('/mapa/mapa.js');
+          if (!view.isConnected || !window.HavokMap) return;
+          const holder = document.createElement('div');
+          holder.className = 'mc-live';
+          view.appendChild(holder);
+          const m = await window.HavokMap.mount(holder, { lang, airdropUrl: `${API()}/api/airdrop`, compact: true, href: '/mapa' });
+          if (!holder.isConnected) { m.destroy(); return; }
+          view.classList.add('live');
+          onLeave(() => m.destroy());
+        } catch (e) { /* fica a imagem de prévia, que já leva para o mapa */ }
+      });
+    });
+    return `<div class="card strip-card mc">
+        <div class="card-row"><span class="card-h">${lt('map_h')}</span><a class="card-link" href="/mapa">${lt('map_open')} ${svg('chevron')}</a></div>
+        <div class="mc-view" id="mcView"><a class="mc-prev" href="/mapa" aria-label="${lt('map_open')}"><img src="/mapa/preview.webp" alt="" loading="lazy" width="800" height="800"></a></div>
+        <span class="card-note">${lt('map_sub')}</span>
       </div>`;
   }
-  function paintWaitlist(data) {
-    const box = $('#wl');
-    if (!box) return;
-    const num = $('#wlNum'), msg = $('#wlMsg'), cells = $('#wlCells');
-    if (!data) {
-      // sem leitura real: nada de número. Se já tinha um na tela, mantém e só avisa.
-      if (box.dataset.state !== 'ok') box.dataset.state = 'error';
-      msg.textContent = lt('wl_err');
-      return;
-    }
-    const goal = data.goal, n = data.count;
-    box.dataset.state = n >= goal ? 'full' : 'ok';
-    num.textContent = String(n).padStart(2, '0');
-    cells.setAttribute('aria-valuenow', n);
-    const total = cells.children.length, lit = total === goal ? n : Math.round((Math.min(n, goal) / goal) * total);
-    [...cells.children].forEach((c, i) => { c.classList.toggle('on', i < lit); c.style.transitionDelay = (i * 25) + 'ms'; });
-    const left = goal - n;
-    msg.textContent = left <= 0 ? lt('wl_full') : left === 1 ? lt('wl_left1') : lt('wl_left', { n: left });
+
+  function firstCard() {
+    return `<a class="card strip-card fc" href="/play/">
+        <span class="card-h">${lt('first_h')}</span>
+        <ol class="fc-steps">${lt('steps').map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+        <span class="card-link">${lt('first_more')} ${svg('chevron')}</span>
+      </a>`;
   }
-  async function loadWaitlist() {
-    const cfg = (window.HAVOK || {}).waitlist || {};
-    let data = null;
-    try {
-      const ctrl = new AbortController();
-      const to = setTimeout(() => ctrl.abort(), 10000);
-      const r = await fetch(cfg.api, { signal: ctrl.signal, cache: 'no-cache' });
-      clearTimeout(to);
-      const j = r.ok ? await r.json() : null;
-      if (j && Number.isInteger(j.count) && j.count >= 0 && Number.isInteger(j.goal) && j.goal > 0) data = j;
-    } catch (e) { data = null; }
-    if (data) {
-      // a meta mudou no Worker: redesenha a barra com o número certo de marcas
-      const regoal = wlLast ? wlLast.goal !== data.goal : data.goal !== wlGoal();
-      wlLast = data;
-      if (regoal && $('#wl')) { route(); return; }
+
+  // //------------------- feed do Discord -------------------\\
+  const FEED_API = () => String(((window.HAVOK || {}).feed || {}).api || 'https://havok-waitlist.havokrust.workers.dev/api/feed');
+  const safeUrl = (u) => (/^https?:\/\//i.test(u || '') ? u : '');
+  // markdown do Discord -> HTML (o texto é escapado antes; só o que está aqui vira tag)
+  function discordMd(src) {
+    const keep = [];
+    const stash = (html) => `\u0000${keep.push(html) - 1}\u0000`;
+    let s = esc(String(src || ''));
+    s = s.replace(/```(?:[a-z0-9+-]*\n)?([\s\S]*?)```/gi, (m, code) => stash(`<pre><code>${code.replace(/^\n|\n$/g, '')}</code></pre>`));
+    s = s.replace(/`([^`\n]+)`/g, (m, code) => stash(`<code>${code}</code>`));
+    const inl = (t) => t
+      .replace(/&lt;(a?):([\w~]{1,40}):(\d{5,25})&gt;/g, (m, a, n, id) => stash(`<img class="emo" src="https://cdn.discordapp.com/emojis/${id}.${a ? 'gif' : 'webp'}?size=48" alt=":${n}:" title=":${n}:" loading="lazy">`))
+      .replace(/&lt;#\d{5,25}&gt;/g, '#canal')
+      .replace(/&lt;t:(\d{1,12})(?::[tTdDfFR])?&gt;/g, (m, ts) => new Date(Number(ts) * 1000).toLocaleString(locale(), { dateStyle: 'medium', timeStyle: 'short' }))
+      .replace(/\[([^\]\n]{1,200})\]\((https?:\/\/[^)\s]+)\)/g, (m, txt, u) => stash(`<a href="${u}" target="_blank" rel="noopener nofollow">${txt}</a>`))
+      .replace(/&lt;(https?:\/\/[^\s&]+)&gt;/g, (m, u) => stash(`<a href="${u}" target="_blank" rel="noopener nofollow">${u}</a>`))
+      .replace(/(^|[\s(])(https?:\/\/[^\s<]+[^\s<.,;:!?)'"])/g, (m, pre, u) => pre + stash(`<a href="${u}" target="_blank" rel="noopener nofollow">${u.replace(/^https?:\/\//, '').slice(0, 48)}${u.length > 56 ? '…' : ''}</a>`))
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/__(.+?)__/g, '<u>$1</u>')
+      .replace(/(^|[^\w*])\*(?!\s)(.+?)\*(?!\w)/g, '$1<em>$2</em>')
+      .replace(/(^|[^\w])_(?!\s)(.+?)_(?!\w)/g, '$1<em>$2</em>')
+      .replace(/~~(.+?)~~/g, '<s>$1</s>')
+      .replace(/\|\|(.+?)\|\|/g, '<span class="spoiler" tabindex="0">$1</span>');
+    const out = [];
+    let list = null;
+    const flush = () => { if (list) { out.push(`<ul>${list.join('')}</ul>`); list = null; } };
+    for (const raw of s.split('\n')) {
+      const l = raw.trimEnd();
+      let m;
+      if ((m = l.match(/^(#{1,3}) (.+)$/))) { flush(); out.push(`<p class="md-h${m[1].length}">${inl(m[2])}</p>`); continue; }
+      if ((m = l.match(/^-# (.+)$/))) { flush(); out.push(`<p class="md-sub">${inl(m[1])}</p>`); continue; }
+      if ((m = l.match(/^\s*[-*•] (.+)$/))) { (list = list || []).push(`<li>${inl(m[1])}</li>`); continue; }
+      if ((m = l.match(/^&gt;&gt;&gt; ?(.*)$/)) || (m = l.match(/^&gt; ?(.*)$/))) { flush(); out.push(`<blockquote>${inl(m[1])}</blockquote>`); continue; }
+      flush();
+      if (!l.trim()) { out.push('<p class="md-gap"></p>'); continue; }
+      out.push(`<p>${inl(l)}</p>`);
     }
-    paintWaitlist(data);
+    flush();
+    return out.join('').replace(/(<p class="md-gap"><\/p>)+/g, '<p class="md-gap"></p>').replace(/^<p class="md-gap"><\/p>|<p class="md-gap"><\/p>$/g, '')
+      .replace(/\u0000(\d+)\u0000/g, (m, i) => keep[i]).replace(/\u0000(\d+)\u0000/g, (m, i) => keep[i]);
+  }
+  const relTime = (iso) => {
+    const t = Date.parse(iso);
+    if (!Number.isFinite(t)) return '';
+    const s = (t - Date.now()) / 1000, rtf = new Intl.RelativeTimeFormat(locale(), { numeric: 'auto' });
+    const a = Math.abs(s);
+    if (a < 3600) return rtf.format(Math.round(s / 60), 'minute');
+    if (a < 86400) return rtf.format(Math.round(s / 3600), 'hour');
+    if (a < 7 * 86400) return rtf.format(Math.round(s / 86400), 'day');
+    return new Date(t).toLocaleDateString(locale(), { day: '2-digit', month: 'short' });
+  };
+  function postCard(p) {
+    const imgs = (p.attachments || []).filter((a) => a.type === 'image' && safeUrl(a.url));
+    const vids = (p.attachments || []).filter((a) => a.type === 'video' && safeUrl(a.url));
+    const embeds = (p.embeds || []).slice(0, 2);
+    const mediaHtml = imgs.length ? `<div class="post-media${imgs.length > 1 ? ' multi' : ''}">${imgs.slice(0, 4).map((a) => `<img src="${esc(a.url)}" alt="${esc(a.name || '')}" loading="lazy" decoding="async"${a.width && a.height ? ` width="${a.width | 0}" height="${a.height | 0}"` : ''}>`).join('')}</div>`
+      : vids.length ? `<div class="post-media"><video src="${esc(vids[0].url)}" controls playsinline preload="none"></video></div>` : '';
+    const embHtml = embeds.map((e) => `<div class="post-embed" style="--ec:${/^#[0-9a-f]{6}$/i.test(e.color || '') ? e.color : 'var(--line2)'}">
+        ${e.title ? (safeUrl(e.url) ? `<a class="pe-t" href="${esc(e.url)}" target="_blank" rel="noopener nofollow">${esc(e.title)}</a>` : `<b class="pe-t">${esc(e.title)}</b>`) : ''}
+        ${e.description ? `<div class="pe-d">${discordMd(e.description)}</div>` : ''}
+        ${!imgs.length && safeUrl(e.image) ? `<img src="${esc(e.image)}" alt="" loading="lazy">` : ''}</div>`).join('');
+    const reac = (p.reactions || []).slice(0, 6).map((r) => `<span class="reac">${safeUrl(r.url) ? `<img src="${esc(r.url)}" alt="${esc(r.emoji)}" loading="lazy">` : esc(r.emoji)}<b>${num(r.count)}</b></span>`).join('');
+    const a = p.author || {};
+    return `<article class="card post">
+        <header class="post-who">${a.avatar && safeUrl(a.avatar) ? `<img class="post-av" src="${esc(a.avatar)}" alt="" loading="lazy">` : '<span class="post-av"></span>'}
+          <b>${esc(a.name || 'HAVOK')}</b><time datetime="${esc(p.createdAt || '')}">${esc(relTime(p.createdAt))}</time>${p.editedAt ? `<small>(${lt('edited')})</small>` : ''}</header>
+        ${p.content ? `<div class="post-body md">${discordMd(p.content)}</div>` : ''}
+        ${embHtml}${mediaHtml}
+        <footer class="post-foot">${reac}${safeUrl(p.url) ? `<a class="post-link" href="${esc(p.url)}" target="_blank" rel="noopener">${lt('see_discord')} ${svg('external')}</a>` : ''}</footer>
+      </article>`;
+  }
+  let feedTab = 'anuncios';
+  const feedCache = {};
+  function feedSection() {
+    setTimeout(() => {
+      document.querySelectorAll('#feedTabs button').forEach((b) => b.onclick = () => {
+        if (b.dataset.tab === feedTab) return;
+        feedTab = b.dataset.tab;
+        document.querySelectorAll('#feedTabs button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
+        loadFeed();
+      });
+      loadFeed();
+    });
+    const tabs = Object.entries(lt('tabs')).map(([k, n]) => `<button type="button" role="tab" data-tab="${k}" class="${k === feedTab ? 'on' : ''}" aria-selected="${k === feedTab}">${esc(n)}</button>`).join('');
+    return `<section class="feed" aria-labelledby="feedH">
+        <div class="sec-head"><h2 class="sec-h" id="feedH">${lt('feed_h')}</h2><span class="sec-note">${svg('discord')} ${lt('feed_sync')}</span></div>
+        <div class="tabs" role="tablist" id="feedTabs">${tabs}</div>
+        <div class="feed-list" id="feedList" role="tabpanel">${spinner()}</div>
+      </section>`;
+  }
+  async function loadFeed() {
+    const tab = feedTab, box = $('#feedList');
+    if (!box) return;
+    if (!feedCache[tab]) box.classList.add('busy');
+    const d = feedCache[tab] || await getJson(`${FEED_API()}?tab=${tab}&limit=5`);
+    if (!$('#feedList') || tab !== feedTab) return;
+    if (d && Array.isArray(d.posts)) feedCache[tab] = d;
+    box.classList.remove('busy');
+    const H = window.HAVOK || {};
+    const go = `<a class="btn btn-discord sm" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')} ${lt('feed_go')}</a>`;
+    if (!d || !Array.isArray(d.posts)) { box.innerHTML = `<div class="empty card">${svg('discord')}<p>${lt('feed_err')}</p>${go}</div>`; return; }
+    if (!d.posts.length) { box.innerHTML = `<div class="empty card">${svg('megaphone')}<p>${lt('feed_empty')}</p>${go}</div>`; return; }
+    box.innerHTML = d.posts.slice(0, 5).map(postCard).join('');
+    fadeIn(box);
+    // texto longo: corta e mostra "Ler mais"
+    box.querySelectorAll('.post-body').forEach((b) => {
+      if (b.scrollHeight <= b.clientHeight + 4) { b.classList.add('full'); return; }
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'post-more'; btn.textContent = lt('read_more');
+      btn.onclick = () => { const open = b.classList.toggle('open'); btn.textContent = lt(open ? 'read_less' : 'read_more'); };
+      b.after(btn);
+    });
+    box.querySelectorAll('.spoiler').forEach((sp) => { sp.onclick = sp.onkeydown = (e) => { if (!e.key || e.key === 'Enter' || e.key === ' ') sp.classList.add('shown'); }; });
+  }
+  const fadeIn = (el) => { if (reduced()) return; el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade'); };
+
+  // //------------------- melhores sobreviventes (top 5) -------------------\\
+  let topScope = 'wipe', topBy = 'kills';
+  const topCache = {};
+  function topSection() {
+    setTimeout(() => {
+      document.querySelectorAll('#topScope button, #topBy button').forEach((b) => b.onclick = () => {
+        if (b.dataset.scope) topScope = b.dataset.scope; else topBy = b.dataset.by;
+        document.querySelectorAll('#topScope button').forEach((x) => { x.classList.toggle('on', x.dataset.scope === topScope); x.setAttribute('aria-pressed', x.dataset.scope === topScope); });
+        document.querySelectorAll('#topBy button').forEach((x) => { x.classList.toggle('on', x.dataset.by === topBy); x.setAttribute('aria-pressed', x.dataset.by === topBy); });
+        loadTop();
+      });
+      loadTop();
+    });
+    const seg = (id, key, cur, items, cls = '') => `<div class="seg${cls}" id="${id}" role="group">${Object.entries(items).map(([k, n]) => `<button type="button" data-${key}="${k}" class="${k === cur ? 'on' : ''}" aria-pressed="${k === cur}">${esc(n)}</button>`).join('')}</div>`;
+    return `<section class="card top" aria-labelledby="topH">
+        <div class="top-head"><h2 class="sec-h" id="topH">${lt('top_h')}</h2>${seg('topScope', 'scope', topScope, lt('scope'))}</div>
+        ${seg('topBy', 'by', topBy, lt('by'), ' seg-line')}
+        <ol class="top-list" id="topList">${spinner()}</ol>
+        <a class="top-more" href="/ranking${topScope === 'all' ? '?scope=all' : ''}">${lt('top_more')} ${svg('chevron')}</a>
+      </section>`;
+  }
+  async function loadTop() {
+    const key = `${topScope}:${topBy}`, box = $('#topList');
+    if (!box) return;
+    if (!topCache[key]) box.classList.add('busy');
+    const d = topCache[key] || await getJson(`${API()}/api/ranking/players?scope=${topScope}&by=${topBy}`);
+    if (!$('#topList') || key !== `${topScope}:${topBy}`) return;
+    box.classList.remove('busy');
+    if (d && Array.isArray(d.players)) topCache[key] = d;
+    if (!d || !Array.isArray(d.players)) { box.innerHTML = `<li class="top-empty">${lt('top_err')}</li>`; return; }
+    const list = d.players.slice(0, 5);
+    if (!list.length) { box.innerHTML = `<li class="top-empty">${lt(topBy === 'kd' ? 'top_empty_kd' : topScope === 'all' ? 'top_empty_all' : 'top_empty_wipe')}</li>`; return; }
+    const val = (p) => {
+      if (topBy === 'hours') { const m = p.playMinutes | 0; return m < 60 ? `<b>${m}</b><small>min</small>` : `<b>${num(Math.floor(m / 60))}</b><small>h</small>`; }
+      if (topBy === 'kd') return `<b>${Number(p.kd ?? (p.kills / Math.max(1, p.deaths))).toFixed(2)}</b>`;
+      return `<b>${num(p.kills)}</b>`;
+    };
+    box.innerHTML = list.map((p, i) => `<li><a class="top-row${i === 0 ? ' first' : ''}" href="/jogador/${encodeURIComponent(p.pid)}">
+        <span class="top-pos">${p.rank || i + 1}</span>${avatar(p.avatarUrl, 'top-av')}
+        <span class="top-nick">${esc(p.nick)}${p.group && p.group.tag ? ` ${tagPill(p.group)}` : ''}</span>
+        <span class="top-val">${val(p)}</span></a></li>`).join('');
+    fadeIn(box);
+    const more = $('.top-more');
+    if (more) more.href = `/ranking${topScope === 'all' ? '?scope=all' : ''}`;
+  }
+
+  // //------------------- os 5 blocos com vídeo -------------------\\
+  function loopSection() {
+    setTimeout(() => {
+      const vids = [...document.querySelectorAll('.loop-card video')];
+      if (!('IntersectionObserver' in window) || reduced()) return;
+      // cada vídeo só baixa e toca quando aparece (economiza a internet do celular)
+      const io = new IntersectionObserver((es) => es.forEach((e) => {
+        const v = e.target;
+        if (e.isIntersecting) { if (!v.dataset.on) { v.dataset.on = 1; v.querySelectorAll('source').forEach((s) => { s.src = s.dataset.src; }); v.load(); } v.play().catch(() => {}); } else v.pause();
+      }), { threshold: 0.35 });
+      vids.forEach((v) => io.observe(v));
+      onLeave(() => io.disconnect());
+    });
+    return `<section class="loops" aria-labelledby="loopH">
+        <h2 class="sec-h" id="loopH">${lt('loop_h')}</h2>
+        <div class="loop-grid">${lt('loop').map(([id, title, desc, guide]) => `<a class="card loop-card" href="/wiki/guia/${guide}">
+            <span class="loop-media"><video muted loop playsinline preload="none" aria-hidden="true"><source data-src="/media/${id}.webm" type="video/webm"><source data-src="/media/${id}.mp4" type="video/mp4"></video></span>
+            <span class="loop-txt"><b>${esc(title)}</b><small>${esc(desc)}</small></span></a>`).join('')}</div>
+      </section>`;
+  }
+
+  function pageLanding() {
+    const H = window.HAVOK || {}, addr = H.server || '';
+    const playHref = addr && !noMta() ? `mtasa://${addr}` : '/play/';
+    setTimeout(() => {
+      // vídeo do hero: entra depois do primeiro desenho; sem ele (economia de dados / menos movimento) fica a imagem
+      const v = $('#heroVid');
+      const save = navigator.connection && navigator.connection.saveData;
+      if (v && !save && !reduced()) {
+        v.innerHTML = '<source src="/media/hero.webm" type="video/webm"><source src="/media/hero.mp4" type="video/mp4">';
+        v.load();
+        v.play().catch(() => {});
+      }
+      // mtasa:// sem MTA instalado não faz nada: se a página não perder o foco, mostra o atalho para o passo a passo
+      const play = $('#playBtn');
+      if (play && play.getAttribute('href').startsWith('mtasa:')) play.addEventListener('click', () => {
+        let left = false;
+        const off = () => { left = true; };
+        window.addEventListener('blur', off, { once: true });
+        setTimeout(() => { window.removeEventListener('blur', off); const n = $('#noOpen'); if (!left && n) n.hidden = false; }, 1600);
+      });
+    });
+    return `<div class="home">
+      <section class="hero">
+        <video class="hero-bg" id="heroVid" muted loop playsinline preload="metadata" poster="/media/hero.webp" aria-hidden="true"></video>
+        <div class="hero-in wrap">
+          <div class="hero-copy">
+            <img class="hero-logo" src="/logo-text.png" alt="HAVOK" width="1522" height="507" fetchpriority="high">
+            <h1 class="hero-title">Survive. Build. <em>Raid.</em></h1>
+            <p class="hero-sub">${lt('hero_sub')}</p>
+            <div class="hero-cta">
+              <a class="btn btn-play" id="playBtn" href="${esc(playHref)}">${svg('play')} ${lt('play')}</a>
+              <a class="btn btn-discord" href="${esc(H.discord || '#')}" target="_blank" rel="noopener">${svg('discord')} ${lt('join_discord')}</a>
+              <a class="hero-first" href="/play/">${lt('first')}</a>
+            </div>
+            <p class="hero-noopen" id="noOpen" hidden>${lt('no_open')} <a href="/play/">${lt('no_open_link')} ${svg('chevron')}</a></p>
+          </div>
+          ${statusCard()}
+        </div>
+      </section>
+      <div class="wrap home-body">
+        <div class="strip">${wipeCard()}${mapCard()}${firstCard()}</div>
+        <div class="home-main">${feedSection()}${topSection()}</div>
+        ${loopSection()}
+      </div>
+    </div>`;
+  }
+
+  // //------------------- mapa (página): o módulo em tela cheia; a B3 refaz o entorno -------------------\\
+  function pageMap() {
+    setTimeout(async () => {
+      const el = $('#mapFull');
+      try {
+        await loadScript('/mapa/mapa.js');
+        if (!el || !el.isConnected) return;
+        const m = await window.HavokMap.mount(el, { lang, airdropUrl: `${API()}/api/airdrop` });
+        if (!el.isConnected) { m.destroy(); return; }
+        onLeave(() => m.destroy());
+      } catch (e) {
+        if (el && el.isConnected) el.innerHTML = `<div class="empty card">${svg('map')}<p>${lang === 'pt' ? 'Não deu para carregar o mapa. Confira a conexão e recarregue a página.' : 'Could not load the map. Check your connection and reload the page.'}</p></div>`;
+      }
+    });
+    return `<div class="map-page"><div class="map-full" id="mapFull"></div></div>`;
+  }
+
+  function pageNotFound() {
+    const pt = lang === 'pt';
+    return `<div class="nf card">
+        <span class="nf-code">404</span>
+        <h1 class="page-title">${pt ? 'Página não encontrada' : 'Page not found'}</h1>
+        <p class="page-sub">${pt ? 'O link pode ter mudado. Tente a wiki ou volte para o início.' : 'The link may have changed. Try the wiki or go back home.'}</p>
+        <div class="nf-go"><a class="btn btn-play sm" href="/">${pt ? 'Ir para o início' : 'Go home'}</a><a class="btn btn-ghost sm" href="/wiki">Wiki</a></div>
+      </div>`;
   }
 
   // contagem do wipe: calendário OFICIAL do Worker (/api/wipe/status, o mesmo que o Discord e o servidor usam).
@@ -900,52 +1241,7 @@
       }, 1000);
     });
     return `<div class="cd${more ? '' : ' cd-big'}" id="cdBox" ${more ? '' : 'data-big="1"'} hidden><span class="cd-label">${lt('cd_wipe')}</span><span class="cd-left" id="cdLeft"></span>
-      <span class="cd-bar"><span id="cdBar"></span><em class="cd-pct" id="cdPct"></em></span><small id="cdNote"></small>${more ? `<a class="cd-more" href="#/wipe">${lt('cd_more')} ${svg('chevron')}</a>` : ''}</div>`;
-  }
-
-  // ranking do wipe atual (página #/wipe): grupos em destaque à esquerda, jogadores à direita
-  function rankingSection() {
-    const api = ((window.HAVOK || {}).ranking || {}).api;
-    if (!api) return '';
-    setTimeout(() => {
-      fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => {
-        if (!$('#rankSec')) return;
-        const groups = (d && d.groups) || [], players = (d && d.players) || [];
-        const n = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
-        const kd = (k, de) => (de ? (k / de).toFixed(2) : n(k));
-        const empty = `<li class="rk-empty">${lt('rk_none')}</li>`;
-        $('#rkGroups').innerHTML = groups.map((g) => `<li data-name="${esc(g.name)}"><span class="rk-pos">${String(g.rank).padStart(2, '0')}</span>
-          <span class="rk-name"><i class="rk-dot" style="background:${/^#[0-9a-fA-F]{6}$/.test(g.color || '') ? g.color : 'var(--accent)'}"></i>${esc(g.name)}${g.tag ? ` <small>[${esc(g.tag)}]</small>` : ''}</span>
-          <span class="rk-num">${n(g.members)}</span><span class="rk-num hot">${n(g.kills)}</span><span class="rk-num">${n(g.deaths)}</span></li>`).join('') || empty;
-        $('#rkPlayers').innerHTML = players.map((p) => `<li><span class="rk-pos">${String(p.rank).padStart(2, '0')}</span>
-          <span class="rk-name">${esc(p.nick)}</span><span class="rk-num hot">${n(p.kills)}</span><span class="rk-num">${n(p.deaths)}</span><span class="rk-num">${kd(p.kills, p.deaths)}</span></li>`).join('') || empty;
-        // grupo clicável: abre a página do grupo com os membros (API do perfil)
-        if (pfApi()) fetch(`${pfApi()}/api/groups`).then((r) => (r.ok ? r.json() : null)).then((x) => {
-          const by = Object.fromEntries(((x && x.groups) || []).map((g) => [g.name, g.slug]));
-          document.querySelectorAll('#rkGroups li[data-name]').forEach((li) => {
-            const sl = by[li.dataset.name];
-            if (!sl) return;
-            li.classList.add('rk-link');
-            li.tabIndex = 0;
-            li.onclick = () => { location.hash = `#/grupo/${sl}`; };
-            li.onkeydown = (e) => { if (e.key === 'Enter') li.onclick(); };
-          });
-        }).catch(() => {});
-        if (d && d.updatedAt) $('#rkUpdated').textContent = lt('rk_updated', { t: new Date(d.updatedAt).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { dateStyle: 'short', timeStyle: 'short' }) });
-      }).catch(() => {
-        if ($('#rkGroups')) $('#rkGroups').innerHTML = $('#rkPlayers').innerHTML = `<li class="rk-empty">${lt('cd_stale')}</li>`;
-      });
-    });
-    const head = (cols) => `<li class="rk-head"><span class="rk-pos">#</span>${cols.map((c, i) => `<span class="${i ? 'rk-num' : 'rk-name'}">${c}</span>`).join('')}</li>`;
-    const loading = `<li class="rk-empty">${lang === 'pt' ? 'Carregando…' : 'Loading…'}</li>`;
-    return `<section class="rk" id="rankSec">
-        <div class="rk-grid">
-          <div class="rk-col rk-main"><h3>${lt('rk_groups')}</h3><ol class="rk-list">${head(['', lt('rk_members'), lt('rk_kills'), lt('rk_deaths')])}</ol><ol class="rk-list" id="rkGroups">${loading}</ol></div>
-          <div class="rk-col"><h3>${lt('rk_players')}</h3><ol class="rk-list">${head(['', lt('rk_kills'), lt('rk_deaths'), lt('rk_kd')])}</ol><ol class="rk-list" id="rkPlayers">${loading}</ol></div>
-        </div>
-        <p class="rk-updated" id="rkUpdated"></p>
-        ${pfApi() ? `<p class="rk-more"><a class="chip" href="#/ranking">${t('rk_full')} ›</a></p>` : ''}
-      </section>`;
+      <span class="cd-bar"><span id="cdBar"></span><em class="cd-pct" id="cdPct"></em></span><small id="cdNote"></small>${more ? `<a class="cd-more" href="/wipe">${lt('cd_more')} ${svg('chevron')}</a>` : ''}</div>`;
   }
 
   function pageWipe() {
@@ -959,114 +1255,8 @@
       </div>`;
   }
 
-  function pageLanding() {
-    const H = window.HAVOK || {};
-    const so = Object.assign({ discord: H.discord }, H.socials || {});
-    const goal = wlGoal();
-    const news = (window.HAVOK_NEWS || []);
-    const shown = newsAll ? news : news.slice(0, 2);
-    const loop = (id) => `<video muted loop playsinline preload="none" aria-hidden="true"><source src="media/${id}.webm" type="video/webm"><source src="media/${id}.mp4" type="video/mp4"></video>`;
-    setTimeout(() => {
-      // os vídeos só tocam quando aparecem na tela (economiza banda e CPU)
-      const vids = document.querySelectorAll('.l-step video');
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause())), { threshold: 0.3 });
-        vids.forEach((v) => io.observe(v));
-      }
-      const more = $('#newsMore');
-      if (more) more.onclick = () => { newsAll = true; route(); };
-      // âncora sem mexer no hash (o hash é a rota)
-      const go = $('#toHow');
-      if (go) go.onclick = () => $('#how').scrollIntoView({ behavior: 'smooth' });
-    });
-    return `<section class="l-hero">
-        <video class="l-hero-bg" autoplay muted loop playsinline preload="auto" poster="media/hero.webp" aria-hidden="true"><source src="media/hero.webm" type="video/webm"><source src="media/hero.mp4" type="video/mp4"></video>
-        <div class="l-hero-in">
-          <div class="l-copy">
-            <img class="l-logo" src="logo-text.png" alt="HAVOK" width="560" height="140">
-            <p class="l-eyebrow">${lt('eyebrow')}</p>
-            <h1 class="l-h1"><span>${lt('h1a')}</span> <span class="hot">${lt('h1b')}</span></h1>
-            <p class="l-sub">${lt('sub', { n: goal })}</p>
-            ${countdownBox(true)}
-            <div class="l-links"><a href="#/wiki">${svg('book')} ${lt('wiki')}</a><button type="button" id="toHow">${svg('chevron')} ${lt('scroll')}</button></div>
-          </div>
-          ${serverCard()}
-        </div>
-      </section>
-      <div class="l-body">
-        <section class="l-sec" id="how">
-          <p class="l-kicker">01 · ${lt('how')}</p>
-          <h2 class="l-h2">${lt('how_h')}</h2>
-          <div class="l-loop">${lt('loop').map(([id, title, desc, guide], i) => `<a class="l-step" href="#/guides/${guide}">
-              <div class="l-step-media">${loop(id)}<span class="l-step-n">${String(i + 1).padStart(2, '0')}</span></div>
-              <b>${esc(title)}</b><small>${esc(desc)}</small></a>`).join('')}</div>
-        </section>
 
-        <section class="l-sec l-join">
-          <div>
-            <p class="l-kicker">02 · ${lt('join')}</p>
-            <h2 class="l-h2">${lt('join_h')}</h2>
-            <ol class="l-steps">${lt('steps').map(([title, desc]) => `<li><b>${esc(title)}</b><span>${esc(desc)}</span></li>`).join('')}</ol>
-            <a class="wl-btn inline" href="play/">${svg('zap')}<span>${lt('sv_join')}</span></a>
-          </div>
-        </section>
-
-        <section class="l-sec">
-          <p class="l-kicker">03 · ${lt('faq')}</p>
-          <div class="faq l-faq">${lt('faqs').map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a.replace('{n}', goal))}</p></details>`).join('')}</div>
-        </section>
-
-        ${news.length ? `<section class="l-sec">
-          <p class="l-kicker">${lt('news')}</p>
-          <div class="l-news">${shown.map((n) => `<article class="l-post">
-              <header><time datetime="${n.date}">${fmtDate(n.date)}</time><h3>${esc(n.title[lang] || n.title.en)}</h3></header>
-              <ul>${n.items.map((i) => `<li><span class="tag ${i.tag}">${esc(T[lang].tags[i.tag] || i.tag)}</span><span>${esc(i[lang] || i.en)}</span></li>`).join('')}</ul>
-            </article>`).join('')}
-            ${news.length > shown.length ? `<button class="l-more" id="newsMore">${lt('all_news')}</button>` : ''}</div>
-        </section>` : ''}
-
-        <div class="l-social">
-          <div><h2>${lt('social')}</h2><p>${lt('social_sub')}</p></div>
-          <div class="l-social-links">${[['discord', 'Discord'], ['youtube', 'YouTube'], ['tiktok', 'TikTok'], ['instagram', 'Instagram']].filter(([k]) => so[k]).map(([k, n]) => `<a class="l-soc ${k}" href="${esc(so[k])}" target="_blank" rel="noopener">${svg(k)}<span>${n}</span></a>`).join('')}</div>
-        </div>
-      </div>`;
-  }
-
-  // ---------------------------------------------------------------- plano de mídias + roteiro de teste
-  // Página de trabalho da equipe (fora do menu): lê o MIDIAS.md, então editar o arquivo atualiza a página.
-  // "- [ ] tarefa" vira uma caixinha; o que foi marcado fica salvo só neste navegador.
-  function pagePlan() {
-    setTimeout(async () => {
-      const box = $('#plan');
-      if (!box) return;
-      let src = '';
-      try {
-        const r = await fetch('MIDIAS.md', { cache: 'no-cache' });
-        src = r.ok ? await r.text() : '';
-      } catch (e) { src = ''; }
-      if (!src) { box.innerHTML = '<p class="muted">Não consegui carregar o MIDIAS.md.</p>'; return; }
-      const title = (src.match(/^# (.+)$/m) || [])[1] || 'Plano';
-      src = src.replace(/^# .+$/m, '').replace(/^---$/gm, '@@HR@@');
-      box.innerHTML = `<h1 class="page-title">${esc(title)}</h1>` + md(src).replace(/<p>@@HR@@<\/p>/g, '<hr class="plan-hr">');
-      let saved = {};
-      try { saved = JSON.parse(localStorage.getItem('havok:plan') || '{}'); } catch (e) { saved = {}; }
-      box.querySelectorAll('li').forEach((li) => {
-        const m = li.innerHTML.match(/^\[( |x)\] ?([\s\S]*)$/i);
-        if (!m) return;
-        const key = li.textContent.replace(/^\[( |x)\] ?/i, '').trim();
-        const done = key in saved ? saved[key] : m[1].toLowerCase() === 'x';
-        li.classList.add('check');
-        li.innerHTML = `<label><input type="checkbox" ${done ? 'checked' : ''}><span>${m[2]}</span></label>`;
-        li.querySelector('input').onchange = (e) => {
-          saved[key] = e.target.checked;
-          try { localStorage.setItem('havok:plan', JSON.stringify(saved)); } catch (err) { /* sem storage: só não lembra */ }
-        };
-      });
-    });
-    return `${crumbs([['Wiki', '#/wiki'], ['Plano']])}<div id="plan" class="prose plan"><p class="muted">Carregando...</p></div>`;
-  }
-
-  // ---------------------------------------------------------------- perfil (#/perfil): login com Discord + vínculo com o jogo
+  // ---------------------------------------------------------------- perfil (/perfil): login com Discord + vínculo com o jogo
   const PF = {
     en: { kicker: 'HAVOK · Profile', title: 'YOUR PROFILE', sub: 'Your stats, group and badges in one place, with your Discord picture on the ranking.',
       login: 'Sign in with Discord', connect: 'Connect Discord', my_profile: 'My profile', how: 'Then join the server: the link screen shows up by itself. Point your phone at the QR or click COPY LINK. No commands.',
@@ -1102,21 +1292,21 @@
     const b = BADGE_LIST.find((x) => x[0] === id);
     if (b) return { name: b[1], rar: b[2], img: badgeImg(id) };
     const y = /^newyear(\d{4})$/.exec(id);
-    if (y) return { name: `New Year ${y[1]}`, rar: 'legendary', img: `badges/${id}.png` };
+    if (y) return { name: `New Year ${y[1]}`, rar: 'legendary', img: `/badges/${id}.png` };
     const e = BADGE_EXTRA[id];
-    return e ? { name: e[0], rar: e[1], img: `badges/${id}.png` } : null;
+    return e ? { name: e[0], rar: e[1], img: `/badges/${id}.png` } : null;
   };
   // carregando: círculo girando + texto, até a API responder
   const spinner = () => `<div class="loading" role="status"><span class="spin" aria-hidden="true"></span>${lang === 'pt' ? 'Carregando…' : 'Loading…'}</div>`;
-  const ANON = 'img/avatar-anon.svg'; // jogador sem Discord vinculado: avatar cinza
+  const ANON = '/img/avatar-anon.svg'; // jogador sem Discord vinculado: avatar cinza
   const pfApi = () => (((window.HAVOK || {}).account || {}).api || '').replace(/\/+$/, '');
   const num = (v) => Number(v || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
   const avatar = (url, cls = 'pf-avatar') => `<img class="${cls}" src="${esc(url || ANON)}" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${ANON}'">`;
   const ROLE = { en: { Leader: 'Leader', Staff: 'Officer', Sub: 'Co-leader', Member: 'Member' }, pt: { Leader: 'Líder', Staff: 'Oficial', Sub: 'Sub-líder', Member: 'Membro' } };
   const gColor = (c) => (/^#[0-9a-fA-F]{6}$/.test(c || '') ? c : '#ff6a00');
   // emblema do grupo (silhueta branca do jogo) pintado com a cor do grupo
-  const emblem = (g, cls = 'gp-emblem') => `<span class="${cls}" style="--gc:${gColor(g.color)}">${/^\d{2}$/.test(g.emblem || '') ? `<i style="-webkit-mask-image:url(img/emblems/${g.emblem}.png);mask-image:url(img/emblems/${g.emblem}.png)"></i>` : `<b>${esc((g.tag || g.name || '?').slice(0, 3))}</b>`}</span>`;
-  const groupLink = (g) => (g ? `<a href="#/grupo/${esc(g.slug)}"><b>${esc(g.name)}</b>${g.tag ? ` ${tagPill(g)}` : ''}</a>` : '');
+  const emblem = (g, cls = 'gp-emblem') => `<span class="${cls}" style="--gc:${gColor(g.color)}">${/^\d{2}$/.test(g.emblem || '') ? `<i style="-webkit-mask-image:url(/img/emblems/${g.emblem}.png);mask-image:url(/img/emblems/${g.emblem}.png)"></i>` : `<b>${esc((g.tag || g.name || '?').slice(0, 3))}</b>`}</span>`;
+  const groupLink = (g) => (g ? `<a href="/grupo/${esc(g.slug)}"><b>${esc(g.name)}</b>${g.tag ? ` ${tagPill(g)}` : ''}</a>` : '');
   // etiqueta da tag na cor do grupo (cor escura fica mais clara no texto para dar para ler)
   const tagPill = (g) => (g && g.tag ? `<span class="gtag" style="--gc:${gColor(g.color)}">${esc(g.tag)}</span>` : '');
 
@@ -1132,7 +1322,7 @@
     const links = [so.youtube ? `<a class="pf-link yt" href="${esc(so.youtube)}" target="_blank" rel="noopener nofollow">${svg('youtube')}YouTube</a>` : '',
       so.tiktok ? `<a class="pf-link tt" href="${esc(so.tiktok)}" target="_blank" rel="noopener nofollow">${svg('tiktok')}TikTok</a>` : ''].join('');
     const g = p.group;
-    const groupCard = g ? `<a class="pf-group" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">${emblem(g)}
+    const groupCard = g ? `<a class="pf-group" href="/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">${emblem(g)}
         <div><b>${esc(g.name)} ${tagPill(g)}</b><small>#${g.rank} ${P.in_rank} · ${ROLE[lang][g.role] || g.role} · ${num(g.members)} ${g.members === 1 ? P.member : P.members}</small></div>
         <span class="pf-group-go">${P.see_group} ›</span></a>` : `<p class="pf-nogroup muted">${P.nogroup}</p>`;
     return `<div class="pf-card">
@@ -1183,7 +1373,7 @@
     menu = document.createElement('div');
     menu.id = 'acctMenu';
     menu.className = 'acct-menu';
-    menu.innerHTML = `<a href="#/perfil">${svg('user')}${P.my_profile}</a><button type="button" class="out">${svg('logout')}${P.logout}</button>`;
+    menu.innerHTML = `<a href="/perfil">${svg('user')}${P.my_profile}</a><button type="button" class="out">${svg('logout')}${P.logout}</button>`;
     $('#acctBtn').after(menu);
     menu.querySelector('a').onclick = () => toggleAcctMenu(false);
     menu.querySelector('.out').onclick = async () => {
@@ -1251,12 +1441,12 @@
           <p class="pf-note">${me.linked ? P.nodata : P.unlinked}</p></div>`;
       }
       const out = $('#pfOut');
-      if (out) out.onclick = async () => { try { await fetch(`${api}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ } location.hash = '#/perfil'; route(); refreshAccount(); };
+      if (out) out.onclick = async () => { try { await fetch(`${api}/api/logout`, { method: 'POST', credentials: 'include' }); } catch (e) { /* offline */ } go('/perfil', { replace: true, force: true }); refreshAccount(); };
     });
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker}</p><h1 class="page-title">${P.title}</h1><p class="page-sub">${P.sub}</p></section>${note}<div id="pfBox" class="pf">${spinner()}</div>`;
   }
 
-  // perfil público (#/jogador/<pid>): com ou sem Discord
+  // perfil público (/jogador/<pid>): com ou sem Discord
   function pageJogador(pid) {
     const P = PF[lang];
     setTimeout(async () => {
@@ -1270,7 +1460,7 @@
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker_player}</p></section><div id="pfBox" class="pf">${spinner()}</div>`;
   }
 
-  // ranking completo do wipe (#/ranking): grupos com emblema/cor/descrição e jogadores com foto ou avatar cinza
+  // ranking completo do wipe (/ranking): grupos com emblema/cor/descrição e jogadores com foto ou avatar cinza
   let rkBy = 'kills';
   function pageRanking() {
     const P = PF[lang];
@@ -1288,7 +1478,7 @@
       const ico = (n) => `<span class="rkp-ic">${svg(n)}</span>`;
       gBox.innerHTML = !gr ? `<p class="muted">${P.down}</p>` : gr.groups.map((g) => {
         const medal = MEDAL[g.rank - 1];
-        return `<a class="rkp-group${medal ? ` podium ${medal}` : ''}" href="#/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
+        return `<a class="rkp-group${medal ? ` podium ${medal}` : ''}" href="/grupo/${esc(g.slug)}" style="--gc:${gColor(g.color)}">
           <span class="rkp-pos">${medal ? svg('award') : ''}${String(g.rank).padStart(2, '0')}</span>${emblem(g)}
           <div class="rkp-gtxt"><b>${esc(g.name)} ${tagPill(g)}</b>${g.description ? `<p>${esc(g.description)}</p>` : ''}
             <span class="rkp-stats">${ico('users')}${num(g.members)} <em>${g.members === 1 ? P.member : P.members}</em>${ico('skull')}${num(g.kills)} <em>${P.kills_l}</em>${ico('star')}${num(g.xp)} <em>XP</em></span>
@@ -1304,7 +1494,7 @@
           : `${svg('skull')}<b>${num(p.kills)}</b><em>${P.kills_l}</em>`);
       pBox.innerHTML = !pl ? `<p class="muted">${P.down}</p>` : pl.players.map((p) => {
         const medal = MEDAL[p.rank - 1];
-        return `<a class="rkp-player${medal ? ` podium ${medal}` : ''}" href="#/jogador/${esc(p.pid)}">
+        return `<a class="rkp-player${medal ? ` podium ${medal}` : ''}" href="/jogador/${esc(p.pid)}">
           <span class="rkp-pos">${String(p.rank).padStart(2, '0')}</span>${avatar(p.avatarUrl, 'gp-avatar')}
           <div><b>${esc(p.nick)}${p.group && p.group.tag ? ` ${tagPill(p.group)}` : ''}${(p.badges || []).filter((id) => CREATOR_BADGES.includes(id)).map((id) => `<img class="rkp-badge" src="${badgeImg(id)}" alt="${esc(id)}" title="${esc((BADGE_LIST.find((x) => x[0] === id) || [])[1] || id)}">`).join('')}</b><span class="rkp-stats">${p.group && !p.group.tag ? `<i>${esc(p.group.name)}</i>` : ''}${ico('chevrons')}Lv ${num(p.level)}${ico('crosshair')}K/D ${p.deaths ? (p.kills / p.deaths).toFixed(2) : num(p.kills)}</span></div>
           <span class="rkp-val">${val(p)}</span></a>`;
@@ -1319,7 +1509,7 @@
       </div>`;
   }
 
-  // grupo (#/grupo/<slug>): todos os membros; quem não vinculou o Discord aparece com o nick e o avatar cinza
+  // grupo (/grupo/<slug>): todos os membros; quem não vinculou o Discord aparece com o nick e o avatar cinza
   function pageGrupo(slug) {
     const P = PF[lang];
     setTimeout(async () => {
@@ -1329,7 +1519,7 @@
       if (!box) return;
       if (!g) { box.innerHTML = `<p class="muted">${P.notfound_group}</p>`; return; }
       document.title = `${g.name} — HAVOK`;
-      const members = g.members.map((m) => `<a class="gp-member" href="#/jogador/${esc(m.pid)}">${avatar(m.avatarUrl, 'gp-avatar')}
+      const members = g.members.map((m) => `<a class="gp-member" href="/jogador/${esc(m.pid)}">${avatar(m.avatarUrl, 'gp-avatar')}
           <div><b>${esc(m.nick)}</b><small>${ROLE[lang][m.role] || m.role} · Lv ${num(m.level)}</small></div>
           <span class="gp-k"><b>${num(m.kills)}</b><small>${P.kills}</small></span></a>`).join('');
       box.innerHTML = `<div class="pf-card">
@@ -1341,7 +1531,6 @@
     return `<section class="bd-hero"><p class="l-kicker">${P.kicker_group}</p></section><div id="pfBox" class="pf">${spinner()}</div>`;
   }
 
-  // ---------------------------------------------------------------- router
   // ---------------------------------------------------------------- anti-cheat: gravação (link só no canal de staff)
   function pageAc(id) {
     const pt = lang === 'pt';
@@ -1382,64 +1571,138 @@
     return `<div class="pf-card ac-card"><h1 class="ac-title">${pt ? 'Gravação do anti-cheat' : 'Anti-cheat recording'}</h1><div id="acBox">${spinner()}</div></div>`;
   }
 
-  function route() {
-    clearInterval(wlTimer);
-    clearInterval(svTimer);
-    const full = (location.hash || '#/').slice(1) || '/';
-    // #/perfil?vinculado=1 -> rota sem a query
-    const [h, query] = full.split('?');
-    const parts = h.split('/').filter(Boolean);
+  // ---------------------------------------------------------------- roteador (History API; tabela em routes.js)
+  // Cada página registra o que precisa parar ao sair (timers, mapa) com onLeave(fn).
+  const leaveFns = [];
+  function onLeave(fn) { leaveFns.push(fn); }
+  const WIKI_PAGES = ['wiki', 'items', 'category', 'item', 'vehicles', 'guides', 'guide', 'faq'];
+  const PAGE_TITLE = {
+    en: { home: 'HAVOK — Rust Survival on MTA:SA', wiki: 'Wiki — HAVOK', items: 'Items — HAVOK Wiki', vehicles: 'Vehicles — HAVOK Wiki', guides: 'Guides — HAVOK Wiki', faq: 'FAQ — HAVOK',
+      map: 'Map — HAVOK', ranking: 'Ranking — HAVOK', wipe: 'Wipe — HAVOK', store: 'VIP Store — HAVOK', badges: 'Badges — HAVOK', perfil: 'Profile — HAVOK', group: 'Group — HAVOK', player: 'Player — HAVOK', ac: 'Anti-cheat — HAVOK', notfound: 'Page not found — HAVOK' },
+    pt: { home: 'HAVOK — Rust Survival no MTA:SA', wiki: 'Wiki — HAVOK', items: 'Itens — Wiki HAVOK', vehicles: 'Veículos — Wiki HAVOK', guides: 'Guias — Wiki HAVOK', faq: 'Perguntas frequentes — HAVOK',
+      map: 'Mapa — HAVOK', ranking: 'Ranking — HAVOK', wipe: 'Wipe — HAVOK', store: 'Loja VIP — HAVOK', badges: 'Badges — HAVOK', perfil: 'Perfil — HAVOK', group: 'Grupo — HAVOK', player: 'Jogador — HAVOK', ac: 'Anti-cheat — HAVOK', notfound: 'Página não encontrada — HAVOK' },
+  };
+  function pageTitle(r) {
+    const T0 = PAGE_TITLE[lang], wikiT = lang === 'pt' ? 'Wiki HAVOK' : 'HAVOK Wiki';
+    if (r.page === 'item' && byId[r.id]) return `${name(byId[r.id])} — ${wikiT}`;
+    if (r.page === 'category') { const c = CATS.find((x) => x.id === r.id); if (c) return `${c[lang]} — ${wikiT}`; }
+    if (r.page === 'guide') { const g = W.guides.find((x) => x.slug === r.id); if (g) return `${L(g).title} — ${lang === 'pt' ? 'Guia do HAVOK' : 'HAVOK Guide'}`; }
+    return T0[r.page] || T0.home;
+  }
+
+  let curKey = null;
+  function route(opts = {}) {
+    leaveFns.splice(0).forEach((f) => { try { f(); } catch (e) { /* segue */ } });
+    clearInterval(cdTimer); cdTimer = null;
+    const r = HavokRoutes.parse(location.pathname);
+    const query = location.search.slice(1);
+    const key = location.pathname + location.search;
+    const changed = key !== curKey;
+    curKey = key;
+    const wiki = WIKI_PAGES.includes(r.page);
     let html;
-    const landing = !parts.length;
-    document.body.classList.toggle('landing', landing);
-    document.body.classList.toggle('standalone', ['store', 'badges', 'wipe', 'perfil', 'jogador', 'grupo', 'ranking', 'ac'].includes(parts[0]));
-    if (landing) html = pageLanding();
-    else if (parts[0] === 'wiki') html = pageHome();
-    else if (parts[0] === 'items' && parts[1]) html = pageItem(parts[1]);
-    else if (parts[0] === 'items') html = pageList(null);
-    else if (parts[0] === 'category') html = pageList(parts[1]);
-    else if (parts[0] === 'guides' && parts[1]) html = pageGuide(parts[1]);
-    else if (parts[0] === 'guides') html = pageGuides();
-    else if (parts[0] === 'faq') html = pageFaq();
-    else if (parts[0] === 'media') html = pageMedia();
-    else if (parts[0] === 'plano' || parts[0] === 'plan') html = pagePlan();
-    else if (parts[0] === 'store') html = pageStore();
-    else if (parts[0] === 'badges') html = pageBadges();
-    else if (parts[0] === 'wipe') html = pageWipe();
-    else if (parts[0] === 'perfil' || parts[0] === 'profile') html = pagePerfil(query);
-    else if (parts[0] === 'ranking') html = pageRanking();
-    else if (parts[0] === 'jogador' && parts[1]) html = pageJogador(parts[1]);
-    else if (parts[0] === 'grupo' && parts[1]) html = pageGrupo(parts[1]);
-    else if (parts[0] === 'vehicles') html = pageVehicles();
-    else if (parts[0] === 'ac') html = pageAc(parts[1]);
-    else html = pageHome();
+    switch (r.page) {
+      case 'home': html = pageLanding(); break;
+      case 'wiki': html = pageHome(); break;
+      case 'items': html = pageList(null); break;
+      case 'category': html = CATS.some((c) => c.id === r.id) ? pageList(r.id) : pageNotFound(); break;
+      case 'item': html = pageItem(r.id); break;
+      case 'vehicles': html = pageVehicles(); break;
+      case 'guides': html = pageGuides(); break;
+      case 'guide': html = pageGuide(r.id); break;
+      case 'faq': html = pageFaq(); break;
+      case 'map': html = pageMap(); break;
+      case 'ranking': html = pageRanking(); break;
+      case 'wipe': html = pageWipe(); break;
+      case 'store': html = pageStore(); break;
+      case 'badges': html = pageBadges(); break;
+      case 'perfil': html = pagePerfil(query); break;
+      case 'group': html = pageGrupo(r.id); break;
+      case 'player': html = pageJogador(r.id); break;
+      case 'ac': html = pageAc(r.id); break;
+      default: html = pageNotFound();
+    }
+    const body = document.body;
+    body.dataset.page = r.page;
+    body.classList.toggle('landing', r.page === 'home');
+    body.classList.toggle('wiki-mode', wiki);
+    body.classList.toggle('standalone', !wiki && r.page !== 'home' && r.page !== 'map');
     $('#main').innerHTML = html;
-    renderSide(h.startsWith('/items/') ? '/category/' + (byId[parts[1]] || {}).cat : h);
-    $('#sidebar').classList.remove('open');
-    document.body.classList.remove('menu-open');
-    document.querySelectorAll('.topnav a').forEach((x) => x.classList.toggle('on', x.dataset.nav === (landing ? 'home' : ['grupo', 'jogador'].includes(parts[0]) ? 'ranking' : ['store', 'badges', 'wipe', 'perfil', 'ranking'].includes(parts[0]) ? parts[0] : 'wiki')));
-    if ($('#acctBtn')) $('#acctBtn').classList.toggle('cur', parts[0] === 'perfil');
-    const it = parts[0] === 'items' && byId[parts[1]];
-    document.title = landing ? 'HAVOK — Rust Survival' : parts[0] === 'wipe' ? 'Wipe — HAVOK' : parts[0] === 'perfil' ? (lang === 'pt' ? 'Perfil' : 'Profile') + ' — HAVOK' : (it ? name(it) + ' — ' : '') + 'HAVOK Wiki';
-    window.scrollTo(0, 0);
+    renderSide(r.page === 'item' && byId[r.id] ? '/wiki/categoria/' + byId[r.id].cat : location.pathname + location.search);
+    setMenu(false);
+    const groups = r.page === 'group' || (r.page === 'ranking' && /(^|&)tab=grupos/.test(query));
+    const navOn = wiki ? 'wiki' : groups ? 'groups' : r.page === 'player' ? 'ranking' : r.page;
+    document.querySelectorAll('.topnav a').forEach((x) => {
+      const on = x.dataset.nav === navOn;
+      x.classList.toggle('on', on);
+      if (on) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
+    });
+    if ($('#acctBtn')) $('#acctBtn').classList.toggle('cur', r.page === 'perfil');
+    document.title = pageTitle(r);
+    // página nova: topo (ou a posição salva ao voltar); a mesma página redesenhada (filtro, idioma): fica onde está
+    if (opts.scroll !== undefined) requestAnimationFrame(() => window.scrollTo(0, opts.scroll));
+    else if (changed) window.scrollTo(0, 0);
+  }
+
+  // abre um caminho do site sem recarregar
+  function go(href, opts = {}) {
+    const u = new URL(href, location.href);
+    const to = u.pathname + u.search + u.hash;
+    if (to === location.pathname + location.search + location.hash && !opts.force) { window.scrollTo(0, 0); setMenu(false); return; }
+    try { history.replaceState(Object.assign({}, history.state, { y: window.scrollY }), ''); } catch (e) { /* segue */ }
+    history[opts.replace ? 'replaceState' : 'pushState']({ y: 0 }, '', to);
+    route({ scroll: 0 });
+    // leitor de tela: o foco vai para o conteúdo novo
+    const m = $('#main');
+    if (m) m.focus({ preventScroll: true });
+  }
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.addEventListener('popstate', (e) => route({ scroll: (e.state && e.state.y) || 0 }));
+  // links internos: sem recarregar (Ctrl/⌘/botão do meio, target e download seguem o navegador)
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest('a[href]');
+    if (!a || (a.target && a.target !== '_self') || a.hasAttribute('download')) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#')) return;
+    const u = new URL(href, location.href);
+    if (u.origin !== location.origin || !HavokRoutes.isApp(u.pathname)) return;
+    e.preventDefault();
+    go(u.href);
+  });
+  // link antigo com # (Discord, favoritos): troca pelo caminho novo, sem entrada a mais no histórico
+  function fixLegacyHash() {
+    const to = HavokRoutes.fromHash(location.hash);
+    if (to === null) return false;
+    history.replaceState({ y: 0 }, '', to);
+    return true;
+  }
+  window.addEventListener('hashchange', () => { if (fixLegacyHash()) route({ scroll: 0 }); });
+
+  function setMenu(open) {
+    $('#sidebar').classList.toggle('open', open);
+    document.body.classList.toggle('menu-open', open);
+    $('#menuBtn').setAttribute('aria-expanded', open);
   }
 
   function applyLang() {
     document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
     document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
-    document.querySelectorAll('#lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
+    document.querySelectorAll('#lang button').forEach((b) => { b.classList.toggle('on', b.dataset.lang === lang); b.setAttribute('aria-pressed', b.dataset.lang === lang); });
     $('#search').placeholder = t('search');
     $('#searchBtn').setAttribute('aria-label', t('open_search'));
     document.querySelectorAll('[data-discord]').forEach((x) => { x.href = (window.HAVOK || {}).discord || '#'; });
   }
   document.querySelectorAll('#lang button').forEach((b) => b.addEventListener('click', () => {
+    if (lang === b.dataset.lang) return;
     lang = b.dataset.lang;
     try { localStorage.setItem('havok-lang', lang); } catch (e) { /* sem storage */ }
     applyLang();
     route();
     drawAccount();
   }));
-  $('#menuBtn').addEventListener('click', () => document.body.classList.toggle('menu-open', $('#sidebar').classList.toggle('open')));
+  $('#menuBtn').addEventListener('click', () => setMenu(!$('#sidebar').classList.contains('open')));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('menu-open')) setMenu(false); });
 
   // ---------------------------------------------------------------- global search
   const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1453,8 +1716,8 @@
     const hits = W.items.map((i) => [i, score(i)]).filter((x) => x[1] < 9).sort((a, b) => a[1] - b[1] || sortByName(a[0], b[0])).slice(0, 10).map((x) => x[0]);
     const guides = W.guides.filter((g) => norm(L(g).title).includes(q) || norm(L(g).description).includes(q)).slice(0, 3);
     sel = 0;
-    const rows = hits.map((i) => `<a href="#/items/${i.id}">${iconOf(i)}<span>${esc(name(i))}<small>${esc(typeName(i.type))}</small></span></a>`)
-      .concat(guides.map((g) => `<a href="#/guides/${g.slug}"><span class="ic">${svg(g.icon)}</span><span>${esc(L(g).title)}<small>${t('guides')}</small></span></a>`));
+    const rows = hits.map((i) => `<a href="/wiki/item/${i.id}">${iconOf(i)}<span>${esc(name(i))}<small>${esc(typeName(i.type))}</small></span></a>`)
+      .concat(guides.map((g) => `<a href="/wiki/guia/${g.slug}"><span class="ic">${svg(g.icon)}</span><span>${esc(L(g).title)}<small>${t('guides')}</small></span></a>`));
     sRes.innerHTML = rows.length ? rows.join('').replace('<a ', '<a class="sel" ') : `<div class="empty">${t('no_results')}</div>`;
     sRes.classList.add('open');
   }
@@ -1466,16 +1729,18 @@
       sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + links.length) % Math.max(links.length, 1);
       links.forEach((l, n) => l.classList.toggle('sel', n === sel));
     } else if (e.key === 'Enter' && links[sel]) {
-      location.hash = links[sel].getAttribute('href');
+      const href = links[sel].getAttribute('href');
       sIn.value = ''; sRes.classList.remove('open'); sIn.blur();
+      go(href);
     } else if (e.key === 'Escape') { sRes.classList.remove('open'); sIn.blur(); }
   });
   sRes.addEventListener('click', () => { sIn.value = ''; sRes.classList.remove('open'); });
   document.addEventListener('click', (e) => { if (!e.target.closest('.search')) sRes.classList.remove('open'); });
   // no celular a busca mora no menu lateral: abre o menu e já foca o campo
   function openSearch() {
-    if (window.matchMedia('(max-width: 860px)').matches) { $('#sidebar').classList.add('open'); document.body.classList.add('menu-open'); }
-    else if (document.body.classList.contains('landing')) { location.hash = '#/wiki'; setTimeout(() => sIn.focus(), 60); return; }
+    // fora da wiki (no computador) a barra lateral não aparece: abre a wiki e foca a busca
+    if (window.matchMedia('(max-width: 860px)').matches) setMenu(true);
+    else if (!document.body.classList.contains('wiki-mode')) { go('/wiki'); setTimeout(() => sIn.focus(), 60); return; }
     sIn.focus(); sIn.select();
   }
   document.addEventListener('keydown', (e) => {
@@ -1483,7 +1748,7 @@
   });
   $('#searchBtn').addEventListener('click', openSearch);
 
-  window.addEventListener('hashchange', route);
+  fixLegacyHash();
   refreshAccount();
   applyLang();
   route();
