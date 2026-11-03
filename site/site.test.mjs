@@ -218,7 +218,7 @@ test('/wiki/item inexistente e item sem ícone: textos da wiki', async () => {
 
 test('categoria, guia, itens, veículos e faq têm título próprio', async () => {
   assert.equal(metas(await (await get('/wiki/categoria/weapons')).text()).title, 'Armas — Wiki HAVOK');
-  assert.equal(metas(await (await get('/wiki/guia/getting-started')).text()).title, 'Primeiros Passos — Guia do HAVOK');
+  assert.equal(metas(await (await get('/wiki/guia/getting-started')).text()).title, 'Tela e Teclas — Guia do HAVOK');
   const itens = metas(await (await get('/wiki/itens')).text());
   assert.equal(itens.title, 'Todos os itens — Wiki HAVOK');
   assert.match(itens.description, /^\d+ itens/);
