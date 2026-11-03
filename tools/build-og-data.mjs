@@ -49,6 +49,9 @@ const cats = {};
 for (const c of categories()) {
   cats[c.id] = { n: c.pt || c.en || c.id, count: W.items.filter((it) => it.cat === c.id).length };
 }
+// galeria de cosméticos (/wiki/categoria/cosmeticos): não é categoria de item, tem texto próprio
+const nCos = (W.cosmetics || []).reduce((a, c) => a + (c.items || []).length, 0);
+if (nCos) cats.cosmeticos = { n: 'Cosméticos', count: nCos, d: `${nCos} roupas e acessórios para o personagem no HAVOK: camisas, calças, bonés, óculos e mochilas, com raridade e onde conseguir.` };
 const guides = {};
 for (const g of W.guides || []) {
   const l = g.pt || g.en || {};

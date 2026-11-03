@@ -1114,7 +1114,7 @@ a:hover > .card-link svg, .card-link:hover svg { transform: translateX(3px); }
 .loops { margin-top: 64px; }
 .loop-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
 .loop-card { display: block; overflow: hidden; padding: 0; }
-.loop-media { position: relative; display: block; aspect-ratio: 4 / 5; background: #0d0c0b url(/media/hero.webp) 78% 88% / auto 160% no-repeat; } /* sem o canto do serial */
+.loop-media { position: relative; display: block; aspect-ratio: 4 / 5; background: #0d0c0b url(/media/hero-limpo.webp) 78% 88% / auto 160% no-repeat; } /* sem o canto do serial */
 .loop-media::before { content: ""; position: absolute; inset: 0; background: rgba(11, 10, 9, .55); }
 /* gravações: serial e chat ficam no canto de cima à esquerda; o vídeo cresce a partir de baixo/direita e o canto sai */
 .loop-media { overflow: hidden; }
